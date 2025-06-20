@@ -1,0 +1,42 @@
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script>
+function renderGraph(containerSelector, elements) {
+  const cy = cytoscape({
+    container: document.querySelector(containerSelector),
+    elements,
+    layout:      { name:'cose', animate:true },
+    style: [
+      {
+        selector: 'node', style: {
+          'label': 'data(label)',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'background-color': '#60A5FA',
+          'color': '#fff',
+          /* ↓ make text smaller */
+          'font-size': '8px',
+          /* ↓ allow multi-line labels */
+          'text-wrap': 'wrap',
+          /* ↓ max width before wrapping */
+          'text-max-width': '80px',
+          /* ↓ auto-size the node to its label + padding */
+          'width': 'label',
+          'height': 'label',
+          'padding': '4px'
+        }
+      },
+      {
+        selector: 'edge', style: {
+          'width': 1,
+          'line-color': '#CBD5E1'
+        }
+      }
+    ]
+  });
+
+  cy.on('tap', 'node', evt => {
+    const url = evt.target.data('url');
+    if(url) window.location.href = url;
+  });
+}
+</script>
