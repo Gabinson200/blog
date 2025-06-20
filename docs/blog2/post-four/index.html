@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Fourth Post</title>
+    <link href="/assets/css/tailwind.css" rel="stylesheet" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+    <script defer src="/assets/js/graph-init.js"></script>
+  </head>
+  <body class="flex h-screen bg-white text-gray-900">
+    
+<aside x-data="{ open: {} }" class="w-64 bg-gray-50 border-r hidden md:block">
+  <nav aria-label="Site Navigation" class="h-full overflow-auto">
+
+    <ul>
+        <li>
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
+              <a
+                href="/blog/"
+                class="font-medium "
+              >
+                blog
+              </a>
+              <button
+                @click="open['/blog/'] = !open['/blog/']"
+                class="focus:outline-none"
+                :aria-expanded="open['/blog/']"
+              >
+                <span x-show="!open['/blog/']">▶</span>
+                <span x-show=" open['/blog/']">▼</span>
+              </button>
+            </div>
+            <div
+              x-show="open['/blog/']"
+              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
+              x-bind:class="{'max-h-screen': open['/blog/']}"
+            >
+              <ul>
+        <li>
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
+              <a
+                href="/blog/blog3/"
+                class="font-medium "
+              >
+                blog3
+              </a>
+              <button
+                @click="open['/blog/blog3/'] = !open['/blog/blog3/']"
+                class="focus:outline-none"
+                :aria-expanded="open['/blog/blog3/']"
+              >
+                <span x-show="!open['/blog/blog3/']">▶</span>
+                <span x-show=" open['/blog/blog3/']">▼</span>
+              </button>
+            </div>
+            <div
+              x-show="open['/blog/blog3/']"
+              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
+              x-bind:class="{'max-h-screen': open['/blog/blog3/']}"
+            >
+              <ul>
+        <li>
+            <a
+              href="/blog/blog3/post-three/"
+              class="block px-4 py-2 hover:bg-gray-200 "
+            >
+              post three
+            </a>
+        </li>
+      </ul>
+            </div>
+        </li>
+        <li>
+            <a
+              href="/blog/post-one/"
+              class="block px-4 py-2 hover:bg-gray-200 "
+            >
+              post one
+            </a>
+        </li>
+        <li>
+            <a
+              href="/blog/post-two/"
+              class="block px-4 py-2 hover:bg-gray-200 "
+            >
+              post two
+            </a>
+        </li>
+      </ul>
+            </div>
+        </li>
+        <li>
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
+              <a
+                href="/blog2/"
+                class="font-medium "
+              >
+                blog2
+              </a>
+              <button
+                @click="open['/blog2/'] = !open['/blog2/']"
+                class="focus:outline-none"
+                :aria-expanded="open['/blog2/']"
+              >
+                <span x-show="!open['/blog2/']">▶</span>
+                <span x-show=" open['/blog2/']">▼</span>
+              </button>
+            </div>
+            <div
+              x-show="open['/blog2/']"
+              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
+              x-bind:class="{'max-h-screen': open['/blog2/']}"
+            >
+              <ul>
+        <li>
+            <a
+              href="/blog2/post-four/"
+              class="block px-4 py-2 hover:bg-gray-200 bg-gray-200 font-semibold"
+            >
+              post four
+            </a>
+        </li>
+      </ul>
+            </div>
+        </li>
+        <li>
+            <a
+              href="/"
+              class="block px-4 py-2 hover:bg-gray-200 "
+            >
+              Home
+            </a>
+        </li>
+      </ul>
+  </nav>
+</aside>
+
+    <main class="flex-1 overflow-y-auto p-6">
+        <article class="prose lg:prose-lg mx-auto">
+            <h1 id="my-fourth-post" tabindex="-1">My Fourth Post</h1>
+<h2 id="details" tabindex="-1">Details</h2>
+<p>blah blah blah</p>
+<p>This post refers back to <a href="/blog/post-three/">the third post</a>.</p>
+
+        </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Knowledge Graph</title>
+    <link href="/assets/css/tailwind.css" rel="stylesheet" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </head>
+  <body class="flex h-screen bg-white text-gray-900">
+    <aside
+  x-data="{ open: {} }"
+  class="hidden md:block w-64 bg-gray-50 border-r overflow-auto"
+>
+  <nav aria-label="Site Navigation">
+    <ul>
+      
+        <li>
+          
+            <a
+              href="/"
+              class="block px-4 py-2 hover:bg-gray-200 "
+            >
+              Home
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <button
+              @click="open['/blog/'] = !open['/blog/']"
+              class="w-full text-left px-4 py-2 hover:bg-gray-200 focus:outline-none"
+              :aria-expanded="open['/blog/']"
+            >
+              Blog
+            </button>
+            <ul
+              x-show="open['/blog/']"
+              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
+              x-bind:class="{'max-h-screen': open['/blog/']}"
+            >
+              
+                <li class="px-4 py-1">
+                  <a
+                    href="/blog/post-one/"
+                    class="block hover:underline "
+                  >
+                    First Post
+                  </a>
+                </li>
+              
+                <li class="px-4 py-1">
+                  <a
+                    href="/blog/post-two/"
+                    class="block hover:underline "
+                  >
+                    Second Post
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+    </ul>
+  </nav>
+</aside>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <h1 id="knowledge-graph" tabindex="-1">Knowledge Graph</h1>
+<div id="graph-container" class="h-96 border"></div>
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script>
+  function renderGraph(container, data) {
+    const cy = cytoscape({
+      container: document.querySelector(container),
+      elements: data,
+      layout: { name: "cose" },
+      style: [
+        { selector: "node", style: { "label": "data(label)", "text-valign": "center", "background-color": "#60A5FA", "color": "#fff" } },
+        { selector: "edge", style: { "width": 1, "line-color": "#CBD5E1" } }
+      ]
+    });
+    cy.on("tap", "node", (evt) => {
+      const url = evt.target.data("url");
+      if(url) window.location.href = url;
+    });
+  }
+</script>
+<script>
+  const elements = [{&quot;data&quot;:{&quot;id&quot;:&quot;&quot;,&quot;label&quot;:&quot;Home&quot;,&quot;url&quot;:&quot;/&quot;}},{&quot;data&quot;:{&quot;id&quot;:&quot;post-one&quot;,&quot;label&quot;:&quot;My First Post&quot;,&quot;url&quot;:&quot;/blog/post-one/&quot;}},{&quot;data&quot;:{&quot;source&quot;:&quot;post-one&quot;,&quot;target&quot;:&quot;post-one&quot;}},{&quot;data&quot;:{&quot;id&quot;:&quot;post-two#details&quot;,&quot;label&quot;:&quot;Details&quot;,&quot;url&quot;:&quot;/post-two/#details&quot;}},{&quot;data&quot;:{&quot;source&quot;:&quot;post-one&quot;,&quot;target&quot;:&quot;post-two#details&quot;}},{&quot;data&quot;:{&quot;id&quot;:&quot;post-two&quot;,&quot;label&quot;:&quot;My Second Post&quot;,&quot;url&quot;:&quot;/blog/post-two/&quot;}},{&quot;data&quot;:{&quot;source&quot;:&quot;post-two&quot;,&quot;target&quot;:&quot;post-one&quot;}},{&quot;data&quot;:{&quot;id&quot;:&quot;graph&quot;,&quot;label&quot;:&quot;Knowledge Graph&quot;,&quot;url&quot;:&quot;/graph/&quot;}}];
+  renderGraph("#graph-container", elements);
+</script>
+
+    </main>
+  </body>
+</html>
