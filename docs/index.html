@@ -9,6 +9,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Home</title>
+  <script>window.__PATH_PREFIX__ = "";</script>
   <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Cytoscape from CDN -->
@@ -69,18 +70,18 @@
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
               <!-- Folder name is plain text, not a link -->
-              <span class="font-medium">arts and media</span>
+              <span class="font-medium">arts</span>
               <button
-                @click="open['/arts and media/'] = !open['/arts and media/']"
-                aria-label="Toggle arts and media"
+                @click="open['/arts/'] = !open['/arts/']"
+                aria-label="Toggle arts"
                 class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <span x-show="!open['/arts and media/']">▶</span>
-                <span x-show=" open['/arts and media/']">▼</span>
+                <span x-show="!open['/arts/']">▶</span>
+                <span x-show=" open['/arts/']">▼</span>
               </button>
             </div>
             <ul
-              x-show="open['/arts and media/']"
+              x-show="open['/arts/']"
               x-transition
               class="pl-4 overflow-hidden"
             >
@@ -91,10 +92,22 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/arts and media/directory/"
+              href="/blog/arts/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               directory
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/arts/monet/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              monet
             </a>
           
         </li>
@@ -143,10 +156,22 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/morality/base-tenets/"
+              href="/blog/morality/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              base tenets
+              directory
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/morality/tenets/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              tenets
             </a>
           
         </li>
@@ -219,11 +244,12 @@
       <h1 id="welcome" tabindex="-1">Welcome</h1>
 <p>Hello! I’m Adam Kocsis, thanks for reading my blog. I’m not sure if blog is the right word for it, it is more of a place for me to write down some of my thoughts, share my interests, or just ramble in general. Below is a knoweldge graph I will aim to expand with different articles and concepts, this should provide some insignt into the areas and patterns of my interests and beliefs.</p>
 <!-- add some wiki-links so graphData isn’t empty: -->
-<p>If you are intereted in my more moral / philosophical rambilgs check out <a href="/blog/morality/basetenets/">Morality</a>.
-If you are interested in some scientific topics check out <a href="/blog/science/AI/">science</a>.</p>
+<p>If you are intereted in my more moral / philosophical rambilgs check out <a href="/blog/morality/directory/">Morality</a>.
+If you are interested in some scientific topics check out <a href="/blog/science/directory/">Science</a>.
+For arts and media check out <a href="/blog/arts/directory/">Arts and Media</a>.</p>
 <div id="graph-container" class="h-96 border"></div>
 <script id="graph-data" type="application/json">
-[{"data":{"id":"index","label":"Home","url":"/"}},{"data":{"id":"morality-base-tenets","label":"Morality","url":"/blog/morality/base-tenets/"}},{"data":{"source":"index","target":"morality-base-tenets"}},{"data":{"id":"science-ai","label":"science","url":"/blog/science/ai/"}},{"data":{"source":"index","target":"science-ai"}},{"data":{"id":"science-directory","label":"Science Directory","url":"/science/directory/"}},{"data":{"source":"science-directory","target":"science-ai"}},{"data":{"id":"arts-and-media-directory","label":"Arts Directory","url":"/arts and media/directory/"}},{"data":{"source":"arts-and-media-directory","target":"science-ai"}}]
+[{"data":{"id":"blog","label":"Home","url":"/blog/"}},{"data":{"id":"blog-morality-directory","label":"Morality","url":"/blog/morality/directory/"}},{"data":{"source":"blog","target":"blog-morality-directory"}},{"data":{"id":"blog-science-directory","label":"Science","url":"/blog/science/directory/"}},{"data":{"source":"blog","target":"blog-science-directory"}},{"data":{"id":"blog-arts-directory","label":"Arts and Media","url":"/blog/arts/directory/"}},{"data":{"source":"blog","target":"blog-arts-directory"}},{"data":{"id":"blog-morality-tenets","label":"tenets","url":"/blog/morality/tenets/"}},{"data":{"id":"blog-science-AI","label":"AI","url":"/blog/science/AI/"}},{"data":{"source":"blog-science-directory","target":"blog-science-AI"}},{"data":{"id":"blog-arts-monet","label":"Monet","url":"/blog/arts/monet/"}},{"data":{"source":"blog-arts-directory","target":"blog-arts-monet"}},{"data":{"source":"blog-morality-directory","target":"blog-morality-tenets"}}]
 </script>
 
     </article>

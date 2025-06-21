@@ -8,8 +8,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Science Directory</title>
-  <script>window.__PATH_PREFIX__ = "";</script>
+  <title>Arts Directory</title>
   <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Cytoscape from CDN -->
@@ -70,18 +69,18 @@
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
               <!-- Folder name is plain text, not a link -->
-              <span class="font-medium">arts</span>
+              <span class="font-medium">arts and media</span>
               <button
-                @click="open['/arts/'] = !open['/arts/']"
-                aria-label="Toggle arts"
+                @click="open['/arts-and-media/'] = !open['/arts-and-media/']"
+                aria-label="Toggle arts and media"
                 class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <span x-show="!open['/arts/']">▶</span>
-                <span x-show=" open['/arts/']">▼</span>
+                <span x-show="!open['/arts-and-media/']">▶</span>
+                <span x-show=" open['/arts-and-media/']">▼</span>
               </button>
             </div>
             <ul
-              x-show="open['/arts/']"
+              x-show="open['/arts-and-media/']"
               x-transition
               class="pl-4 overflow-hidden"
             >
@@ -92,8 +91,8 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/arts/directory/"
-              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+              href="/blog/arts-and-media/directory/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
             >
               directory
             </a>
@@ -104,7 +103,7 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/arts/monet/"
+              href="/blog/arts-and-media/monet/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               monet
@@ -156,10 +155,10 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/morality/directory/"
+              href="/blog/morality/base-tenets/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              directory
+              base tenets
             </a>
           
         </li>
@@ -168,10 +167,10 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/morality/tenets/"
+              href="/blog/morality/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              tenets
+              directory
             </a>
           
         </li>
@@ -221,7 +220,7 @@
             <!-- Leaf page: clickable link -->
             <a
               href="/blog/science/directory/"
-              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               directory
             </a>
@@ -241,12 +240,12 @@
 
   <main class="flex-1 overflow-y-auto p-6">
     <article class="prose lg:prose-lg mx-auto dark:prose-invert">
-      <h1 id="science-directory" tabindex="-1">Science Directory</h1>
-<h2 id="this-is-the-main-science-directory-that-should-connect-all-of-the-scientific-posts" tabindex="-1">This is the main science directory that should connect all of the scientific posts</h2>
+      <h1 id="arts-directory" tabindex="-1">Arts Directory</h1>
+<h2 id="this-is-the-main-arts-and-media-directory-that-should-connect-all-of-the-scientific-posts" tabindex="-1">This is the main arts and media directory that should connect all of the scientific posts</h2>
 <ul>
 <li>
 <ol>
-<li><a href="/blog/science/ai/">AI</a>.</li>
+<li><a href="/blog/artsandmedia/monet/">Monet</a>.</li>
 </ol>
 </li>
 </ul>

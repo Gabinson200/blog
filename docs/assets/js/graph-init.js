@@ -1,6 +1,7 @@
 // src/assets/js/graph-init.js
 
 document.addEventListener("DOMContentLoaded", () => {
+  const prefix = window.__PATH_PREFIX__ || "";
   const dataEl = document.getElementById("graph-data");
   if (!dataEl) {
     console.warn("No #graph-data element found");
@@ -57,6 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cy.on("tap","node", evt => {
     const url = evt.target.data("url");
-    if (url) window.location.href = url;
+    if (!url) return;
+    let href = (prefix + url).replace(/\/{2,}/g, "/");
+    window.location.href = href;
   });
 });

@@ -9,6 +9,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title></title>
+  <script>window.__PATH_PREFIX__ = "";</script>
   <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Cytoscape from CDN -->
@@ -69,18 +70,18 @@
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
               <!-- Folder name is plain text, not a link -->
-              <span class="font-medium">arts and media</span>
+              <span class="font-medium">arts</span>
               <button
-                @click="open['/arts and media/'] = !open['/arts and media/']"
-                aria-label="Toggle arts and media"
+                @click="open['/arts/'] = !open['/arts/']"
+                aria-label="Toggle arts"
                 class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <span x-show="!open['/arts and media/']">▶</span>
-                <span x-show=" open['/arts and media/']">▼</span>
+                <span x-show="!open['/arts/']">▶</span>
+                <span x-show=" open['/arts/']">▼</span>
               </button>
             </div>
             <ul
-              x-show="open['/arts and media/']"
+              x-show="open['/arts/']"
               x-transition
               class="pl-4 overflow-hidden"
             >
@@ -91,10 +92,22 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/arts and media/directory/"
+              href="/blog/arts/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               directory
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/arts/monet/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              monet
             </a>
           
         </li>
@@ -143,10 +156,22 @@
           
             <!-- Leaf page: clickable link -->
             <a
-              href="/blog/morality/base-tenets/"
+              href="/blog/morality/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              base tenets
+              directory
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/morality/tenets/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              tenets
             </a>
           
         </li>
@@ -221,9 +246,16 @@
       <ul class="pl-6 list-disc space-y-2">
         
         <li>
-          <a href="/morality/base-tenets/"
+          <a href="/morality/directory/"
              class="text-blue-600 hover:underline">
-            base tenets
+            directory
+          </a>
+        </li>
+      
+        <li>
+          <a href="/morality/tenets/"
+             class="text-blue-600 hover:underline">
+            tenets
           </a>
         </li>
       
