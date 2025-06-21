@@ -2,26 +2,39 @@
 module.exports = class {
   data() {
     return {
-      // Paginate OVER your directories (only those with children)
       pagination: {
-        data:   "collections.navDirs",
-        size:   1,
-        alias:  "folder"
+        data:  "collections.navDirs",
+        size:  1,
+        alias: "folder"
       },
-      // Use the URL you already computed on each folder
+      // We use the folder.url (like "/science/") as-is here.
       permalink: data => data.folder.url,
       layout:    "layouts/base.njk",
       eleventyExcludeFromCollections: true
     };
   }
 
-  render({ folder }) {
-    let list = folder.children
-      .map(c=>`<li><a href="${c.url}" class="text-blue-600 hover:underline">${c.title}</a></li>`)
-      .join("");
+  render({ folder, pathPrefix = "" }) {
+    // pathPrefix === "/blog/" (both locally in Eleventy Serve and in Pages)
+    let list = folder.children.map(child => {
+      // Always prepend pathPrefix, then collapse "//" → "/"
+      let href = (pathPrefix + child.url).replace(/\/{2,}/g, "/");
+
+      return `
+        <li>
+          <a href="${href}"
+             class="text-blue-600 hover:underline">
+            ${child.title}
+          </a>
+        </li>
+      `;
+    }).join("");
+
     return `
       <h1 class="text-3xl font-bold mb-4">${folder.title}</h1>
-      <ul class="list-disc pl-6 space-y-2">${list}</ul>
+      <ul class="pl-6 list-disc space-y-2">
+        ${list}
+      </ul>
     `;
   }
 };
