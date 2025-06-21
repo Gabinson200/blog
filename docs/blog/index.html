@@ -1,152 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title></title>
-    <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    <script defer src="/blog/assets/js/graph-init.js"></script>
-  </head>
-  <body class="flex h-screen bg-white text-gray-900">
-    
-<aside x-data="{ open: {} }" class="w-64 bg-gray-50 border-r hidden md:block">
-  <nav aria-label="Site Navigation" class="h-full overflow-auto">
+<html 
+  lang="en" 
+  x-data="themeToggle()" 
+  x-init="initTheme()" 
+  :class="{ 'dark': isDark }"
+>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title></title>
+  <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          // on init, check localStorage or prefers-color-scheme
+          let saved = localStorage.getItem('theme');
+          if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            this.isDark = true;
+          }
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+        }
+      }
+    }
+  </script>
+</head>
+<body class="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <!-- Toggle button -->
+  <div class="absolute top-4 right-4">
+    <button 
+      @click="toggleTheme()" 
+      class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none"
+      :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <!-- Sun icon when in dark (to switch back to light) -->
+      <svg x-show="isDark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 4.5a.75.75 0 01.75.75v1a.75.75 0 01-1.5 0v-1A.75.75 0 0110 4.5zm0 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM4.5 9.25a.75.75 0 010 1.5h-1a.75.75 0 010-1.5h1zM17.5 9.25a.75.75 0 010 1.5h-1a.75.75 0 010-1.5h1zM6.72 5.28a.75.75 0 011.06 0l.7.7a.75.75 0 01-1.06 1.06l-.7-.7a.75.75 0 010-1.06zM12.47 11.03a.75.75 0 011.06 0l.7.7a.75.75 0 01-1.06 1.06l-.7-.7a.75.75 0 010-1.06zM6.72 12.72a.75.75 0 010-1.06l.7-.7a.75.75 0 111.06 1.06l-.7.7a.75.75 0 01-1.06 0zM12.47 5.97a.75.75 0 010 1.06l-.7.7a.75.75 0 11-1.06-1.06l.7-.7a.75.75 0 011.06 0z" />
+      </svg>
+      <!-- Moon icon when in light (to switch to dark) -->
+      <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M17.293 13.293A8 8 0 016.707 2.707 8.001 8.001 0 1017.293 13.293z" />
+      </svg>
+    </button>
+  </div>
 
-    <ul>
+  
+<aside
+  x-data="{ open: {} }"
+  class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 hidden md:block"
+>
+  <nav aria-label="Site Navigation" class="h-full overflow-auto">
+    
+
+    
+      <ul class="space-y-1">
+      
         <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
               <a
                 href="/blog/"
-                class="font-medium text-blue-600"
+                class="font-medium text-blue-600 dark:text-blue-400"
               >
                 blog
               </a>
               <button
                 @click="open['/blog/'] = !open['/blog/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog/']"
+                aria-label="Toggle blog"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
                 <span x-show="!open['/blog/']">▶</span>
                 <span x-show=" open['/blog/']">▼</span>
               </button>
             </div>
-            <div
+            <ul
               x-show="open['/blog/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog/']}"
+              x-transition
+              class="pl-4 overflow-hidden"
             >
-              <ul>
+              
+      <ul class="space-y-1">
+      
         <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
-              <a
-                href="/blog/blog/blog3/"
-                class="font-medium "
-              >
-                blog3
-              </a>
-              <button
-                @click="open['/blog/blog3/'] = !open['/blog/blog3/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog/blog3/']"
-              >
-                <span x-show="!open['/blog/blog3/']">▶</span>
-                <span x-show=" open['/blog/blog3/']">▼</span>
-              </button>
-            </div>
-            <div
-              x-show="open['/blog/blog3/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog/blog3/']}"
-            >
-              <ul>
-        <li>
-            <a
-              href="/blog/blog/blog3/post-three/"
-              class="block px-4 py-2 hover:bg-gray-200 "
-            >
-              post three
-            </a>
-        </li>
-      </ul>
-            </div>
-        </li>
-        <li>
+          
             <a
               href="/blog/blog/post-one/"
-              class="block px-4 py-2 hover:bg-gray-200 "
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               post one
             </a>
+          
         </li>
+      
         <li>
+          
             <a
               href="/blog/blog/post-two/"
-              class="block px-4 py-2 hover:bg-gray-200 "
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               post two
             </a>
+          
         </li>
+      
       </ul>
-            </div>
+    
+            </ul>
+          
         </li>
+      
         <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
-              <a
-                href="/blog/blog2/"
-                class="font-medium "
-              >
-                blog2
-              </a>
-              <button
-                @click="open['/blog2/'] = !open['/blog2/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog2/']"
-              >
-                <span x-show="!open['/blog2/']">▶</span>
-                <span x-show=" open['/blog2/']">▼</span>
-              </button>
-            </div>
-            <div
-              x-show="open['/blog2/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog2/']}"
-            >
-              <ul>
-        <li>
-            <a
-              href="/blog/blog2/post-four/"
-              class="block px-4 py-2 hover:bg-gray-200 "
-            >
-              post four
-            </a>
-        </li>
-      </ul>
-            </div>
-        </li>
-        <li>
+          
             <a
               href="/blog/"
-              class="block px-4 py-2 hover:bg-gray-200 "
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               Home
             </a>
+          
         </li>
+      
+        <li>
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <a
+                href="/blog/morality/"
+                class="font-medium "
+              >
+                morality
+              </a>
+              <button
+                @click="open['/morality/'] = !open['/morality/']"
+                aria-label="Toggle morality"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span x-show="!open['/morality/']">▶</span>
+                <span x-show=" open['/morality/']">▼</span>
+              </button>
+            </div>
+            <ul
+              x-show="open['/morality/']"
+              x-transition
+              class="pl-4 overflow-hidden"
+            >
+              
+      <ul class="space-y-1">
+      
+        <li>
+          
+            <a
+              href="/blog/morality/base-tenets/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              base tenets
+            </a>
+          
+        </li>
+      
       </ul>
+    
+            </ul>
+          
+        </li>
+      
+        <li>
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <a
+                href="/blog/science/"
+                class="font-medium "
+              >
+                science
+              </a>
+              <button
+                @click="open['/science/'] = !open['/science/']"
+                aria-label="Toggle science"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span x-show="!open['/science/']">▶</span>
+                <span x-show=" open['/science/']">▼</span>
+              </button>
+            </div>
+            <ul
+              x-show="open['/science/']"
+              x-transition
+              class="pl-4 overflow-hidden"
+            >
+              
+      <ul class="space-y-1">
+      
+        <li>
+          
+            <a
+              href="/blog/science/AI/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              AI
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <a
+              href="/blog/science/directory/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              directory
+            </a>
+          
+        </li>
+      
+      </ul>
+    
+            </ul>
+          
+        </li>
+      
+      </ul>
+    
   </nav>
 </aside>
 
-    <main class="flex-1 overflow-y-auto p-6">
-        <article class="prose lg:prose-lg mx-auto">
-            
+  <main class="flex-1 overflow-y-auto p-6">
+    <article class="prose lg:prose-lg mx-auto dark:prose-invert">
+      
       <h1 class="text-3xl font-bold mb-4">blog</h1>
       <ul class="pl-6 list-disc space-y-2">
         <li>
-          <a href="/blog/blog3/" class="text-blue-600 hover:underline">
-            blog3
-          </a>
-        </li><li>
           <a href="/blog/post-one/" class="text-blue-600 hover:underline">
             post one
           </a>
@@ -157,7 +243,7 @@
         </li>
       </ul>
     
-        </article>
-    </main>
-  </body>
+    </article>
+  </main>
+</body>
 </html>

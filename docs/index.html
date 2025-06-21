@@ -1,154 +1,232 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Home</title>
-    <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    <script defer src="/blog/assets/js/graph-init.js"></script>
-  </head>
-  <body class="flex h-screen bg-white text-gray-900">
-    
-<aside x-data="{ open: {} }" class="w-64 bg-gray-50 border-r hidden md:block">
-  <nav aria-label="Site Navigation" class="h-full overflow-auto">
+<html 
+  lang="en" 
+  x-data="themeToggle()" 
+  x-init="initTheme()" 
+  :class="{ 'dark': isDark }"
+>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home</title>
+  <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Cytoscape from CDN -->
+  <script defer src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 
-    <ul>
+  <!-- Your init script, *also* via `url` filter so it resolves under /blog/ -->
+  <script defer src="/blog/assets/js/graph-init.js"></script>
+  <script>
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          // on init, check localStorage or prefers-color-scheme
+          let saved = localStorage.getItem('theme');
+          if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            this.isDark = true;
+          }
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+        }
+      }
+    }
+  </script>
+</head>
+<body class="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <!-- Toggle button -->
+  <div class="absolute top-4 right-4">
+    <button 
+      @click="toggleTheme()" 
+      class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none"
+      :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <!-- Sun icon when in dark (to switch back to light) -->
+      <svg x-show="isDark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 4.5a.75.75 0 01.75.75v1a.75.75 0 01-1.5 0v-1A.75.75 0 0110 4.5zm0 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM4.5 9.25a.75.75 0 010 1.5h-1a.75.75 0 010-1.5h1zM17.5 9.25a.75.75 0 010 1.5h-1a.75.75 0 010-1.5h1zM6.72 5.28a.75.75 0 011.06 0l.7.7a.75.75 0 01-1.06 1.06l-.7-.7a.75.75 0 010-1.06zM12.47 11.03a.75.75 0 011.06 0l.7.7a.75.75 0 01-1.06 1.06l-.7-.7a.75.75 0 010-1.06zM6.72 12.72a.75.75 0 010-1.06l.7-.7a.75.75 0 111.06 1.06l-.7.7a.75.75 0 01-1.06 0zM12.47 5.97a.75.75 0 010 1.06l-.7.7a.75.75 0 11-1.06-1.06l.7-.7a.75.75 0 011.06 0z" />
+      </svg>
+      <!-- Moon icon when in light (to switch to dark) -->
+      <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M17.293 13.293A8 8 0 016.707 2.707 8.001 8.001 0 1017.293 13.293z" />
+      </svg>
+    </button>
+  </div>
+
+  
+<aside
+  x-data="{ open: {} }"
+  class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 hidden md:block"
+>
+  <nav aria-label="Site Navigation" class="h-full overflow-auto">
+    
+
+    
+      <ul class="space-y-1">
+      
         <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
-              <a
-                href="/blog/"
-                class="font-medium "
-              >
-                blog
-              </a>
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">arts and media</span>
               <button
-                @click="open['/blog/'] = !open['/blog/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog/']"
+                @click="open['/arts and media/'] = !open['/arts and media/']"
+                aria-label="Toggle arts and media"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <span x-show="!open['/blog/']">▶</span>
-                <span x-show=" open['/blog/']">▼</span>
+                <span x-show="!open['/arts and media/']">▶</span>
+                <span x-show=" open['/arts and media/']">▼</span>
               </button>
             </div>
-            <div
-              x-show="open['/blog/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog/']}"
+            <ul
+              x-show="open['/arts and media/']"
+              x-transition
+              class="pl-4 overflow-hidden"
             >
-              <ul>
+              
+      <ul class="space-y-1">
+      
         <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
-              <a
-                href="/blog/blog/blog3/"
-                class="font-medium "
-              >
-                blog3
-              </a>
-              <button
-                @click="open['/blog/blog3/'] = !open['/blog/blog3/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog/blog3/']"
-              >
-                <span x-show="!open['/blog/blog3/']">▶</span>
-                <span x-show=" open['/blog/blog3/']">▼</span>
-              </button>
-            </div>
-            <div
-              x-show="open['/blog/blog3/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog/blog3/']}"
-            >
-              <ul>
-        <li>
+          
+            <!-- Leaf page: clickable link -->
             <a
-              href="/blog/blog/blog3/post-three/"
-              class="block px-4 py-2 hover:bg-gray-200 "
+              href="/blog/arts and media/directory/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              post three
+              directory
             </a>
+          
         </li>
+      
       </ul>
-            </div>
+    
+            </ul>
+          
         </li>
+      
         <li>
-            <a
-              href="/blog/blog/post-one/"
-              class="block px-4 py-2 hover:bg-gray-200 "
-            >
-              post one
-            </a>
-        </li>
-        <li>
-            <a
-              href="/blog/blog/post-two/"
-              class="block px-4 py-2 hover:bg-gray-200 "
-            >
-              post two
-            </a>
-        </li>
-      </ul>
-            </div>
-        </li>
-        <li>
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200">
-              <a
-                href="/blog/blog2/"
-                class="font-medium "
-              >
-                blog2
-              </a>
-              <button
-                @click="open['/blog2/'] = !open['/blog2/']"
-                class="focus:outline-none"
-                :aria-expanded="open['/blog2/']"
-              >
-                <span x-show="!open['/blog2/']">▶</span>
-                <span x-show=" open['/blog2/']">▼</span>
-              </button>
-            </div>
-            <div
-              x-show="open['/blog2/']"
-              class="pl-4 max-h-0 overflow-hidden transition-all duration-300"
-              x-bind:class="{'max-h-screen': open['/blog2/']}"
-            >
-              <ul>
-        <li>
-            <a
-              href="/blog/blog2/post-four/"
-              class="block px-4 py-2 hover:bg-gray-200 "
-            >
-              post four
-            </a>
-        </li>
-      </ul>
-            </div>
-        </li>
-        <li>
+          
+            <!-- Leaf page: clickable link -->
             <a
               href="/blog/"
-              class="block px-4 py-2 hover:bg-gray-200 bg-gray-200 font-semibold"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
             >
               Home
             </a>
+          
         </li>
+      
+        <li>
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">morality</span>
+              <button
+                @click="open['/morality/'] = !open['/morality/']"
+                aria-label="Toggle morality"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span x-show="!open['/morality/']">▶</span>
+                <span x-show=" open['/morality/']">▼</span>
+              </button>
+            </div>
+            <ul
+              x-show="open['/morality/']"
+              x-transition
+              class="pl-4 overflow-hidden"
+            >
+              
+      <ul class="space-y-1">
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/morality/base-tenets/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              base tenets
+            </a>
+          
+        </li>
+      
       </ul>
+    
+            </ul>
+          
+        </li>
+      
+        <li>
+          
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">science</span>
+              <button
+                @click="open['/science/'] = !open['/science/']"
+                aria-label="Toggle science"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span x-show="!open['/science/']">▶</span>
+                <span x-show=" open['/science/']">▼</span>
+              </button>
+            </div>
+            <ul
+              x-show="open['/science/']"
+              x-transition
+              class="pl-4 overflow-hidden"
+            >
+              
+      <ul class="space-y-1">
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/science/AI/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              AI
+            </a>
+          
+        </li>
+      
+        <li>
+          
+            <!-- Leaf page: clickable link -->
+            <a
+              href="/blog/science/directory/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
+            >
+              directory
+            </a>
+          
+        </li>
+      
+      </ul>
+    
+            </ul>
+          
+        </li>
+      
+      </ul>
+    
   </nav>
 </aside>
 
-    <main class="flex-1 overflow-y-auto p-6">
-        <article class="prose lg:prose-lg mx-auto">
-            <h1 id="welcome" tabindex="-1">Welcome</h1>
-<p>Hello! I’m Adam Kocsis, an AI &amp; embedded-systems tinkerer.</p>
+  <main class="flex-1 overflow-y-auto p-6">
+    <article class="prose lg:prose-lg mx-auto dark:prose-invert">
+      <h1 id="welcome" tabindex="-1">Welcome</h1>
+<p>Hello! I’m Adam Kocsis, thanks for reading my blog. I’m not sure if blog is the right word for it, it is more of a place for me to write down some of my thoughts, share my interests, or just ramble in general. Below is a knoweldge graph I will aim to expand with different articles and concepts, this should provide some insignt into the areas and patterns of my interests and beliefs.</p>
 <!-- add some wiki-links so graphData isn’t empty: -->
-<p>This blog has two main posts: <a href="/blog/post-one/">First Post</a> and <a href="/blog/post-two/">Second Post</a>.</p>
+<p>If you are intereted in my more moral / philosophical rambilgs check out <a href="/blog/morality/base-tenets/">Morality</a>.
+If you are interested in some scientific topics check out <a href="/blog/science/ai/">science</a>.</p>
 <div id="graph-container" class="h-96 border"></div>
 <script id="graph-data" type="application/json">
-[{"data":{"id":"home","label":"Home","url":"/"}},{"data":{"source":"home","target":"post-one"}},{"data":{"source":"home","target":"post-two"}},{"data":{"id":"post-one","label":"My First Post","url":"/blog/post-one/"}},{"data":{"source":"post-one","target":"post-two"}},{"data":{"id":"post-two","label":"My Second Post","url":"/blog/post-two/"}},{"data":{"source":"post-two","target":"post-one"}},{"data":{"id":"post-three","label":"My Third Post","url":"/blog/blog3/post-three/"}},{"data":{"source":"post-three","target":"post-two"}},{"data":{"id":"post-four","label":"My Fourth Post","url":"/blog2/post-four/"}},{"data":{"source":"post-four","target":"post-three"}}]
+[{"data":{"id":"index","label":"Home","url":"/"}},{"data":{"id":"morality-base-tenets","label":"Morality","url":"/blog/morality/base-tenets/"}},{"data":{"source":"index","target":"morality-base-tenets"}},{"data":{"id":"science-ai","label":"science","url":"/blog/science/ai/"}},{"data":{"source":"index","target":"science-ai"}},{"data":{"id":"science-directory","label":"Science Directory","url":"/science/directory/"}},{"data":{"source":"science-directory","target":"science-ai"}},{"data":{"id":"arts-and-media-directory","label":"Arts Directory","url":"/arts and media/directory/"}},{"data":{"source":"arts-and-media-directory","target":"science-ai"}}]
 </script>
 
-        </article>
-    </main>
-  </body>
+    </article>
+  </main>
+</body>
 </html>

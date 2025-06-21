@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My First Post</title>
+  <title>Base Tenets</title>
   <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
@@ -88,9 +88,52 @@
       
         <li>
           
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <a
+                href="/blog/blog/morality/"
+                class="font-medium "
+              >
+                morality
+              </a>
+              <button
+                @click="open['/blog/morality/'] = !open['/blog/morality/']"
+                aria-label="Toggle morality"
+                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span x-show="!open['/blog/morality/']">▶</span>
+                <span x-show=" open['/blog/morality/']">▼</span>
+              </button>
+            </div>
+            <ul
+              x-show="open['/blog/morality/']"
+              x-transition
+              class="pl-4 overflow-hidden"
+            >
+              
+      <ul class="space-y-1">
+      
+        <li>
+          
+            <a
+              href="/blog/blog/morality/base-tenets/"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
+            >
+              base tenets
+            </a>
+          
+        </li>
+      
+      </ul>
+    
+            </ul>
+          
+        </li>
+      
+        <li>
+          
             <a
               href="/blog/blog/post-one/"
-              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
+              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
               post one
             </a>
@@ -122,49 +165,6 @@
             >
               Home
             </a>
-          
-        </li>
-      
-        <li>
-          
-            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-              <a
-                href="/blog/morality/"
-                class="font-medium "
-              >
-                morality
-              </a>
-              <button
-                @click="open['/morality/'] = !open['/morality/']"
-                aria-label="Toggle morality"
-                class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                <span x-show="!open['/morality/']">▶</span>
-                <span x-show=" open['/morality/']">▼</span>
-              </button>
-            </div>
-            <ul
-              x-show="open['/morality/']"
-              x-transition
-              class="pl-4 overflow-hidden"
-            >
-              
-      <ul class="space-y-1">
-      
-        <li>
-          
-            <a
-              href="/blog/morality/base-tenets/"
-              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
-            >
-              base tenets
-            </a>
-          
-        </li>
-      
-      </ul>
-    
-            </ul>
           
         </li>
       
@@ -229,7 +229,10 @@
 
   <main class="flex-1 overflow-y-auto p-6">
     <article class="prose lg:prose-lg mx-auto dark:prose-invert">
-      <h1 id="my-first-post" tabindex="-1">My First Post</h1>
+      <h1 id="base-tenets-and-foundation-of-morality" tabindex="-1">Base Tenets and Foundation of morality</h1>
+<p>(IMHO)</p>
+<h2 id="details" tabindex="-1">Details</h2>
+<p>blah blah blah</p>
 <p>This post refers back to <a href="/blog/post-two/">the second post</a>.</p>
 
     </article>

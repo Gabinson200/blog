@@ -8,9 +8,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My First Post</title>
+  <title></title>
   <link href="/blog/assets/css/tailwind.css" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Cytoscape from CDN -->
+  <script defer src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+  <!-- Your init script, *also* via `url` filter so it resolves under /blog/ -->
+  <script defer src="/blog/assets/js/graph-init.js"></script>
   <script>
     function themeToggle() {
       return {
@@ -63,23 +68,19 @@
         <li>
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-              <a
-                href="/blog/"
-                class="font-medium "
-              >
-                blog
-              </a>
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">arts and media</span>
               <button
-                @click="open['/blog/'] = !open['/blog/']"
-                aria-label="Toggle blog"
+                @click="open['/arts and media/'] = !open['/arts and media/']"
+                aria-label="Toggle arts and media"
                 class="focus:outline-none p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <span x-show="!open['/blog/']">▶</span>
-                <span x-show=" open['/blog/']">▼</span>
+                <span x-show="!open['/arts and media/']">▶</span>
+                <span x-show=" open['/arts and media/']">▼</span>
               </button>
             </div>
             <ul
-              x-show="open['/blog/']"
+              x-show="open['/arts and media/']"
               x-transition
               class="pl-4 overflow-hidden"
             >
@@ -88,22 +89,12 @@
       
         <li>
           
+            <!-- Leaf page: clickable link -->
             <a
-              href="/blog/blog/post-one/"
-              class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-200 dark:bg-gray-700 font-semibold"
-            >
-              post one
-            </a>
-          
-        </li>
-      
-        <li>
-          
-            <a
-              href="/blog/blog/post-two/"
+              href="/blog/arts and media/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
             >
-              post two
+              directory
             </a>
           
         </li>
@@ -116,6 +107,7 @@
       
         <li>
           
+            <!-- Leaf page: clickable link -->
             <a
               href="/blog/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
@@ -128,12 +120,8 @@
         <li>
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-              <a
-                href="/blog/morality/"
-                class="font-medium "
-              >
-                morality
-              </a>
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">morality</span>
               <button
                 @click="open['/morality/'] = !open['/morality/']"
                 aria-label="Toggle morality"
@@ -153,6 +141,7 @@
       
         <li>
           
+            <!-- Leaf page: clickable link -->
             <a
               href="/blog/morality/base-tenets/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
@@ -171,12 +160,8 @@
         <li>
           
             <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-              <a
-                href="/blog/science/"
-                class="font-medium "
-              >
-                science
-              </a>
+              <!-- Folder name is plain text, not a link -->
+              <span class="font-medium">science</span>
               <button
                 @click="open['/science/'] = !open['/science/']"
                 aria-label="Toggle science"
@@ -196,6 +181,7 @@
       
         <li>
           
+            <!-- Leaf page: clickable link -->
             <a
               href="/blog/science/AI/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
@@ -207,6 +193,7 @@
       
         <li>
           
+            <!-- Leaf page: clickable link -->
             <a
               href="/blog/science/directory/"
               class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 "
@@ -229,9 +216,19 @@
 
   <main class="flex-1 overflow-y-auto p-6">
     <article class="prose lg:prose-lg mx-auto dark:prose-invert">
-      <h1 id="my-first-post" tabindex="-1">My First Post</h1>
-<p>This post refers back to <a href="/blog/post-two/">the second post</a>.</p>
-
+      
+      <h1 class="text-3xl font-bold mb-4">morality</h1>
+      <ul class="pl-6 list-disc space-y-2">
+        
+        <li>
+          <a href="/morality/base-tenets/"
+             class="text-blue-600 hover:underline">
+            base tenets
+          </a>
+        </li>
+      
+      </ul>
+    
     </article>
   </main>
 </body>
