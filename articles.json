@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "intro-to-cpp",
+    "title": "Intro to C++",
+    "category": "programming",
+    "subcategory": "beginner",
+    "summary": "An introduction to the C++ programming language and its basic syntax.",
+    "date": "2025-08-01",
+    "tags": ["programming", "C++"],
+    "links": []
+  },
+  {
+    "slug": "variables-and-types",
+    "title": "Variables and Data Types",
+    "category": "programming",
+    "subcategory": "beginner",
+    "summary": "Learn about variables, data types and memory in C++.",
+    "date": "2025-08-10",
+    "tags": ["programming", "C++"],
+    "links": ["intro-to-cpp"]
+  },
+  {
+    "slug": "pointers",
+    "title": "Understanding Pointers",
+    "category": "programming",
+    "subcategory": "intermediate",
+    "summary": "Demystifying pointers in C++ and how to use them safely.",
+    "date": "2025-08-20",
+    "tags": ["programming", "C++", "pointers"],
+    "links": ["variables-and-types"]
+  },
+  {
+    "slug": "gesture-recognition",
+    "title": "Gesture Recognition on Microcontrollers",
+    "category": "ai",
+    "subcategory": "tinyml",
+    "summary": "Building a hand gesture classifier using accelerometer data and TensorFlow Lite Micro.",
+    "date": "2025-09-01",
+    "tags": ["ai", "tinyml", "gesture"],
+    "links": []
+  },
+  {
+    "slug": "quantization-pruning",
+    "title": "Model Quantization and Pruning for TinyML",
+    "category": "ai",
+    "subcategory": "tinyml",
+    "summary": "Techniques for reducing model size and improving efficiency on embedded devices.",
+    "date": "2025-09-12",
+    "tags": ["ai", "tinyml", "optimization"],
+    "links": ["gesture-recognition"]
+  }
+]
