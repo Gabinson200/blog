@@ -149,14 +149,18 @@ a:hover {
 .article-content h4 {
   margin-top: 1.2rem;
 }
+
 .article-content pre {
   background: #f6f6f6;
+  color: #333;
   padding: 0.75rem;
   overflow-x: auto;
   border-radius: 4px;
 }
+
 .article-content code {
   background: #f6f6f6;
+  color: #333;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -183,5 +187,13 @@ a:hover {
   .category-card,
   .article-card {
     box-shadow: none;
+  }
+  .article-content pre {
+    background: #2e2e2e;
+    color: #eee;
+  }
+  .article-content code {
+    background: #2e2e2e;
+    color: #eee;
   }
 }

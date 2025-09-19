@@ -48,5 +48,25 @@
     "date": "2025-09-12",
     "tags": ["ai", "tinyml", "optimization"],
     "links": ["gesture-recognition"]
+  },
+  {
+    "slug": "Graphics",
+    "title": "Graphics",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Motivation for graphic articels.",
+    "date": "2025-09-17",
+    "tags": ["graphics", "programming"],
+    "links": ["graphics"]
+  },
+  {
+    "slug": "lines",
+    "title": "Lines",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Techniques for creating and manipulating lines in graphic design.",
+    "date": "2025-09-12",
+    "tags": ["graphics", "programming"],
+    "links": ["Graphics"]
   }
 ]

@@ -111,6 +111,13 @@ function displayArticle(markdown, metaFromManifest) {
     // Convert markdown to HTML using marked
     const html = marked.parse(body);
     contentEl.innerHTML = html;
+
+    // Tell MathJax to typeset the new content
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([contentEl]).catch((err) =>
+        console.error('MathJax typeset failed:', err)
+      );
+    }
   }
 }
 
