@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Article</title>
     <link rel="stylesheet" href="styles.css" />
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          packages: {'[+]': ['ams']}
+        },
+        loader: {load: ['[tex]/ams']},
+        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']} // don't typeset inside code blocks
+      };
+    </script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
   </head>
   <body>
     <header class="site-header">
@@ -30,21 +42,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/article.js"></script>
+
+    <!-- Marked library for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/article.js"></script>
   </body>
 </html>
-
-<!-- Configure MathJax (optional) -->
-<script>
-  window.MathJax = {
-    tex: {
-      // Tell MathJax which delimiters you plan to use for inline and display math.
-      // If you prefer the common `$...$` syntax, add ['$', '$'] to inlineMath.
-      inlineMath: [['\\(', '\\)'], ['$', '$']],  
-      displayMath: [['\\[', '\\]'], ['$$', '$$']]
-    }
-  };
-</script>
-
-<!-- Load MathJax from a CDN -->
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
-
