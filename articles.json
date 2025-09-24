@@ -19,7 +19,7 @@
     "date": "2025-09-12",
     "nodeType": "article",
     "tags": ["Bresenham's Algorithm", "definition"],
-    "links": ["Graphics"]
+    "links": ["programming/graphics/Graphics"]
   },
   {
     "slug": "programming/graphics/Triangles",
@@ -30,7 +30,7 @@
     "date": "2025-09-18",
     "nodeType": "article",
     "tags": ["Article"],
-    "links": ["Graphics"]
+    "links": ["programming/graphics/Graphics"]
   },
   {
     "slug": "programming/graphics/rasterization",
@@ -41,7 +41,7 @@
     "date": "2025-09-18",
     "nodeType": "definition",
     "tags": ["pixels"],
-    "links": ["programming/graphics/Lines"]
+    "links": ["programming/graphics/Graphics"]
   }
 
 ]
