@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "programming/graphics/Graphics",
+    "title": "Graphics",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Motivation for graphic articles.",
+    "date": "2025-09-17",
+    "nodeType": "subtopic",
+    "tags": ["subtopic"],
+    "links": [""]
+  },
+  {
+    "slug": "programming/graphics/Lines",
+    "title": "Lines",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Line drawing algorithms.",
+    "date": "2025-09-12",
+    "nodeType": "article",
+    "tags": ["Bresenham's Algorithm", "definition"],
+    "links": ["Graphics"]
+  },
+  {
+    "slug": "programming/graphics/Triangles",
+    "title": "Triangles",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Triangle drawing algorithms.",
+    "date": "2025-09-18",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["Graphics"]
+  },
+  {
+    "slug": "programming/graphics/rasterization",
+    "title": "Rasterization",
+    "category": "",
+    "subcategory": "",
+    "summary": "Triangle drawing algorithms.",
+    "date": "2025-09-18",
+    "nodeType": "definition",
+    "tags": ["pixels"],
+    "links": ["programming/graphics/Lines"]
+  }
+
+]

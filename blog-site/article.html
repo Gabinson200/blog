@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Article</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title"><a href="./">TheFirstMan's Blog</a></h1>
+      <nav class="site-nav">
+        <ul id="category-list" class="nav-list"></ul>
+      </nav>
+    </header>
+    <main class="site-main">
+      <article id="article">
+        <h2 id="article-title"></h2>
+        <p id="article-meta" class="article-meta"></p>
+        <div id="article-content" class="article-content"></div>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <p>
+        Built with love and hosted on
+        <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+      </p>
+    </footer>
+    <!-- Marked library for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/article.js"></script>
+  </body>
+</html>
+
+<!-- Configure MathJax (optional) -->
+<script>
+  window.MathJax = {
+    tex: {
+      // Tell MathJax which delimiters you plan to use for inline and display math.
+      // If you prefer the common `$...$` syntax, add ['$', '$'] to inlineMath.
+      inlineMath: [['\\(', '\\)'], ['$', '$']],  
+      displayMath: [['\\[', '\\]'], ['$$', '$$']]
+    }
+  };
+</script>
+
+<!-- Load MathJax from a CDN -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+

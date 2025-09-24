@@ -1,0 +1,199 @@
+/*
+  Base stylesheet for the blog site. These styles are intentionally simple
+  and easy to customise. Colours are defined as CSS variables for easy
+  theming. You can override these values in future to personalise your
+  site. All page layouts share the same header and footer definitions.
+*/
+
+/* Theme variables */
+:root {
+  --bg-color: #fdfdfd;
+  --text-color: #222;
+  --link-color: #0077cc;
+  --accent-color: #009688;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.site-header {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.site-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.site-title a {
+  color: var(--text-color);
+}
+.site-nav .nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.site-nav .nav-list li a {
+  color: var(--text-color);
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+.site-nav .nav-list li a:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.site-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.intro {
+  margin-bottom: 2rem;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+.category-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+.category-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.category-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+.subcategory-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.subcategory-list li {
+  margin: 0.25rem 0;
+}
+
+.articles-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.article-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+.article-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.article-card h3 {
+  margin: 0 0 0.5rem 0;
+}
+.article-card .meta {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.article-card p {
+  margin: 0;
+}
+
+.article-meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.article-content {
+  line-height: 1.7;
+}
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+  margin-top: 1.2rem;
+}
+
+.article-content pre {
+  background: #f6f6f6;
+  color: #333;
+  padding: 0.75rem;
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+.article-content code {
+  background: #f6f6f6;
+  color: #333;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.site-footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121212;
+    --text-color: #eee;
+    --link-color: #80d8ff;
+    --accent-color: #26a69a;
+    --card-bg: #1e1e1e;
+    --border-color: #333;
+  }
+  .site-card,
+  .category-card,
+  .article-card {
+    box-shadow: none;
+  }
+  .article-content pre {
+    background: #2e2e2e;
+    color: #eee;
+  }
+  .article-content code {
+    background: #2e2e2e;
+    color: #eee;
+  }
+}
