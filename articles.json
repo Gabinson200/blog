@@ -11,6 +11,18 @@
     "links": [""]
   },
   {
+    "slug": "ai/ML",
+    "title": "ML",
+    "category": "programming",
+    "subcategory": "ai",
+    "summary": "Motivation for ML articles.",
+    "date": "2025-09-17",
+    "nodeType": "subtopic",
+    "tags": ["subtopic"],
+    "links": [""]
+  },
+  
+  {
     "slug": "programming/graphics/Lines",
     "title": "Lines",
     "category": "programming",
@@ -33,6 +45,28 @@
     "links": ["programming/graphics/Graphics"]
   },
   {
+    "slug": "programming/graphics/Polygons",
+    "title": "Polygons",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Polygon convexity.",
+    "date": "2025-09-24",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "programming/graphics/2D and 3D Transformations",
+    "title": "2D and 3D Transformations",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "2D and 3D transformations in computer graphics.",
+    "date": "2025-09-25",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
     "slug": "programming/graphics/rasterization",
     "title": "Rasterization",
     "category": "",
@@ -42,6 +76,17 @@
     "nodeType": "definition",
     "tags": ["pixels"],
     "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "ai/ML/MLE and MAP",
+    "title": "MLE and MAP",
+    "category": "",
+    "subcategory": "",
+    "summary": "Explanation of MLE and MAP.",
+    "date": "2025-10-7",
+    "nodeType": "article",
+    "tags": ["statistics"],
+    "links": ["ai/ML"]
   }
 
 ]

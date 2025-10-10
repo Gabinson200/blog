@@ -130,6 +130,36 @@ async function displayArticle(markdown, metaFromManifest = {}) {
     }
     metaEl.textContent = pieces.join(' \u2022 ');
   }
+  // Keep math blocks intact so Marked won't inject <p>/<br> inside $$...$$
+  marked.use({
+    extensions: [{
+      name: 'mathBlock',
+      level: 'block',
+      start(src) { const i = src.indexOf('$$'); return i < 0 ? undefined : i; },
+      tokenizer(src) {
+        // Match $$ ... $$ across lines (greedy to the first closing $$)
+        const m = src.match(/^\$\$([\s\S]*?)\$\$/);
+        if (!m) return;
+        return {
+          type: 'mathBlock',
+          raw: m[0],
+          text: m[1].trim()
+        };
+      },
+      renderer(tok) {
+        // Return the math delimiters exactly as-is; MathJax will handle it
+        return `$$\n${tok.text}\n$$`;
+      }
+    }]
+  });
+
+  // (Optional but recommended) conservative Marked settings
+  marked.setOptions({
+    gfm: true,
+    breaks: false,      // don't turn single \n into <br> (bad inside math)
+    mangle: false,
+    headerIds: false
+  });
 
   if (contentEl) {
     // Convert markdown to HTML using marked

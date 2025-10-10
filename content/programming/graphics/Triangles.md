@@ -22,8 +22,9 @@ pm.x = (p2.x - p0.x) * ((p1.y - p0.y) / (p2.y - p0.y)) + p0.x
 pm.y = p1.y
 
 ```
-Now we are left with two triangles where two points on each triangle should have the same y coordinates. For the first type of triangle, one with a flat-bottom, we need to find the x-coordinates of each leg as we sweep down from the top of the triangle towards the base so we can use one of our previously discussed line drawing functions to fill in the pixels in that row. This is actually deceptively easy, all we have to do is find the change in x for each leg of the triangle for every step in the y direction, that is the change in x over the change in y or the inverse slope. 
-![flatbottom_triangle](https://www.sunshine2k.de/coding/java/TriangleRasterization/flatbottomtriangle.png)
+Now we are left with two triangles where two points on each triangle should have the same y coordinates. For the first type of triangle, one with a flat-bottom, we need to find the x-coordinates of each leg as we sweep down from the top of the triangle towards the base so we can use one of our previously discussed line drawing functions to fill in the pixels in that row. This is actually deceptively easy, all we have to do is find the change in x for each leg of the triangle for every step in the y direction, that is the change in x over the change in y or the inverse slope.  
+![flatbottom_triangle](https://www.sunshine2k.de/coding/java/TriangleRasterization/flatbottomtriangle.png)  
+  
 So in the case of the triangle above we have two inverse slopes: 
 $$invslope1 = \frac{(v2.x - v1.x)}{(v2.y - v1.y)}$$ and
 $$invslope2 = \frac{(v3.x - v1.x)}{(v3.y - v1.y)}$$
@@ -69,7 +70,7 @@ fillFlatTopTriangle(p0, p1, p2):
 
 Putting it all together we end up with:
 
-```
+```c++
 // Increasing y order
 p0, p1, p2 = sort_by_ascending_y(p0, p1, p2)
 
@@ -84,3 +85,19 @@ else:
     fillFlatBottomTriangle(p2, pm, p0)
     fillFlatTopTriangle(p0, pm, p2)
 ```
+
+The time compexity of this algorithm is just the area of the triangle, $O(A)$ since we use Bresenhams to draw the lines which runs in $O(l)$ where $l$ is the length of the line.   
+
+
+
+## Barycentric Algorithm
+I will not go into this because this is not the algorithm i sise in my eesp32 gfx implementation and I think I will keeo the scope of this website more narrow so I can spend time on other things.
+
+
+**Resources:**
+[scan-fill algo](https://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html)
+
+[barycentric algo 1](https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates.html)
+
+
+[barycentric algo interactive](https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates.html)
