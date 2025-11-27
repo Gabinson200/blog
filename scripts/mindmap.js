@@ -116,32 +116,104 @@ function renderGraph(graph) {
     window.location.href = `article.html?slug=${encodeURIComponent(d.id)}`;
   });
 
+
+function isTopicOrSubtopic(d) {
+  return d.nodeType === 'topic' || d.nodeType === 'subtopic';
+}
+
+function isLeaf(d) {
+  return d.nodeType === 'article' || d.nodeType === 'definition';
+}
+
   // Forces (uniform; no type inference)
-  const simulation = d3.forceSimulation(graph.nodes)
-    .force('link', d3.forceLink(graph.links).id(d => d.id).distance(90).strength(0.6))
-    .force('charge', d3.forceManyBody().strength(-80).distanceMax(220))
-    .force('collide', d3.forceCollide(d => d.r + 6).strength(0.75))
-    .force('x', d3.forceX(width / 2).strength(0.05))
-    .force('y', d3.forceY(height / 2).strength(0.05))
-    .alphaDecay(0.05)
-    .velocityDecay(0.4);
+  // Forces (type-aware)
+const simulation = d3.forceSimulation(graph.nodes)
+  .force(
+    'link',
+    d3.forceLink(graph.links)
+      .id(d => d.id)
+      .distance(link => {
+        const a = link.source;
+        const b = link.target;
+
+        // Articles/definitions stay fairly close to their topic/subtopic,
+        // giving that "circular halo" feeling.
+        if ((isLeaf(a) && isTopicOrSubtopic(b)) ||
+            (isLeaf(b) && isTopicOrSubtopic(a))) {
+          return 80;   // closer orbit around topics
+        }
+
+        // Topic–subtopic relationships can be a bit looser
+        if (isTopicOrSubtopic(a) && isTopicOrSubtopic(b)) {
+          return 200;
+        }
+
+        // Fallback for other links
+        return 100;
+      })
+      .strength(link => {
+        const a = link.source;
+        const b = link.target;
+
+        // Slightly stronger link between topic/subtopic and their leaves,
+        // so the leaves really "belong" to that hub.
+        if ((isLeaf(a) && isTopicOrSubtopic(b)) ||
+            (isLeaf(b) && isTopicOrSubtopic(a))) {
+          return 0.9;
+        }
+
+        // Weaker ties between topic/subtopic hubs
+        if (isTopicOrSubtopic(a) && isTopicOrSubtopic(b)) {
+          return 0.2;
+        }
+
+        return 0.6;
+      })
+  )
+  .force(
+    'charge',
+    d3.forceManyBody()
+      .strength(d => {
+        // 👉 Topic & subtopic nodes: *no repulsion*, even slight attraction
+        //   - use 0 for neutral, small positive for gentle attraction
+        if (isTopicOrSubtopic(d)) {
+          return -200;  // small positive => they pull toward each other
+        }
+
+        // Articles/definitions: keep repulsive so they spread
+        return -100;
+      })
+      .distanceMax(260)
+  )
+  .force('collide', d3.forceCollide(d => d.r + 6).strength(0.8))
+  .force(
+    'x',
+    d3.forceX(width / 2).strength(0)
+  )
+  .force(
+    'y',
+    d3.forceY(height / 2).strength(0)
+  )
+  .alphaDecay(0.06)
+  .velocityDecay(0.45);
 
   // Drag: disable repulsion while dragging to prevent neighbors from flying away
   node.call(
     d3.drag()
       .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.2).restart();
+        if (!event.active) simulation.alphaTarget(0.03).restart();
         d.fx = d.x; d.fy = d.y;
-        simulation.force('charge', d3.forceManyBody().strength(0));
+        //simulation.force('charge', d3.forceManyBody().strength(0));
       })
       .on('drag', (event, d) => {
         d.fx = clamp(event.x, 10, width - 10);
         d.fy = clamp(event.y, 10, height - 10);
+        //simulation.force('charge', d3.forceManyBody().strength(0));
       })
       .on('end', (event, d) => {
         if (!event.active) simulation.alphaTarget(0);
         d.fx = null; d.fy = null;
-        simulation.force('charge', d3.forceManyBody().strength(-80).distanceMax(220));
+        //simulation.force('charge', d3.forceManyBody().strength(0).distanceMax(0));
       })
   );
 

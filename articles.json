@@ -109,6 +109,67 @@
     "nodeType": "article",
     "tags": ["statistics"],
     "links": ["ai/ML"]
+  },
+  {
+    "slug": "geometric_algebra/Geometric Algebra",
+    "title": "Geometric Algebra",
+    "category": "",
+    "subcategory": "",
+    "summary": "Motivation for geometric algebra articles.",
+    "date": "2025-11-26",
+    "nodeType": "subtopic",
+    "links": [""]
+  },
+  {
+    "slug": "geometric_algebra/Algebra of Vectors",
+    "title": "Algebra of Vectors",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of algebra of vectors.",
+    "date": "2025-11-26",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra"]
+  },
+  {
+    "slug": "geometric_algebra/Bivectors",
+    "title": "Bivectors",
+    "category": "",
+    "subcategory": "",
+    "summary": "Bivectors.",
+    "date": "2025-11-26",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra"]
+  },
+  {
+    "slug": "geometric_algebra/Paravectors and Direct Sums",
+    "title": "Paravectors and Direct Sums",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of paravectors and direct sums.",
+    "date": "2025-11-26",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra"]
+  },
+  {
+    "slug": "geometric_algebra/Spaces, Spans, Basis, and Dimensions",
+    "title": "Spaces, Spans, Basis, and Dimensions",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of spaces, spans, basis, and dimensions.",
+    "date": "2025-11-26",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra"]
+  },
+  {
+    "slug": "geometric_algebra/Vectors in Geometric Algebra",
+    "title": "Vectors in Geometric Algebra",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of vectors in geometric algebra.",
+    "date": "2025-11-26",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra"]
   }
+
 
 ]
