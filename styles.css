@@ -166,6 +166,13 @@ a:hover {
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
 .site-footer {
   margin-top: 2rem;
   padding: 1rem;

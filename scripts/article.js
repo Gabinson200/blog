@@ -1,34 +1,28 @@
-/*
- * article.js
- *
- * Loads an individual article based on the slug in the URL. Metadata is
- * looked up in articles.json (if present) to provide title/date/tags. The
- * markdown content is then fetched, optional YAML front-matter is parsed,
- * and the body markdown is converted to HTML using Marked. After injecting
- * content, MathJax v3 is asked to typeset any LaTeX found.
- */
-
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const params = new URLSearchParams(location.search);
     const raw = params.get('slug') || '';
     if (!raw) throw new Error('Missing ?slug=');
 
-    // Normalize slug: decode, strip leading "./", "/", and any "content/"
+    // Normalize slug
     const slug = normalizeSlug(raw);
 
-    // Build relative path (important for project pages under /blog/)
+    // Build relative path
     const mdPath = `./content/${slug}.md`;
     console.log('[article] Fetching markdown from:', mdPath);
+
+    // Absolute URL for the MD file
+    const mdUrlAbs = new URL(mdPath, window.location.href);
+    const mdDirUrl = new URL('./', mdUrlAbs);
 
     // Fetch markdown file
     const resp = await fetch(mdPath, { cache: 'no-store' });
     if (!resp.ok) {
       throw new Error(`Failed to load markdown from ${mdPath}`);
     }
-    const md = await resp.text();
+    let markdown = await resp.text();
 
-    // Try to load metadata from articles.json (optional)
+    // Try to load metadata
     let metaFromManifest = {};
     try {
       const metaResp = await fetch('./articles.json', { cache: 'no-store' });
@@ -39,11 +33,136 @@ document.addEventListener('DOMContentLoaded', async () => {
           : {};
       }
     } catch {
-      // non-fatal; continue without manifest metadata
+      // non-fatal
     }
 
-    // Render the article (handles front-matter, title, meta, and MathJax)
-    await displayArticle(md, metaFromManifest);
+    // Parse front matter
+    const { frontMatter, body } = extractFrontMatter(markdown);
+    markdown = body;
+
+    // Optional per-article images base
+    let imagesBaseDirUrl = null;
+    if (frontMatter.imagesBase) {
+      const cleaned = String(frontMatter.imagesBase).replace(/\\/g, '/').replace(/^\/+/, '');
+      const baseCandidate = `./content/${cleaned}${cleaned.endsWith('/') ? '' : '/'}`;
+      imagesBaseDirUrl = new URL(baseCandidate, window.location.href);
+    }
+
+    // Merge metadata
+    const merged = { ...metaFromManifest, ...frontMatter };
+    const title = merged.title || metaFromManifest.title || 'Untitled';
+    const dateStr = merged.date || metaFromManifest.date || '';
+    const date = dateStr ? new Date(dateStr) : null;
+
+    document.title = `${title} - Science & Programming Blog`;
+
+    const titleEl = document.getElementById('article-title');
+    const metaEl = document.getElementById('article-meta');
+    const contentEl = document.getElementById('article-content');
+
+    if (titleEl) titleEl.textContent = title;
+
+    if (metaEl) {
+      const pieces = [];
+      if (date && !isNaN(date)) {
+        pieces.push(
+          date.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        );
+      }
+      const tags = merged.tags || merged.keywords || [];
+      if (Array.isArray(tags) && tags.length) {
+        pieces.push('Tags: ' + tags.join(', '));
+      }
+      metaEl.textContent = pieces.join(' \u2022 ');
+    }
+
+    // --- FIX: Robust Renderer for both New (v12+) and Old Marked Versions ---
+    const renderer = {
+      heading(arg1, arg2) {
+        let text, level;
+        // Check if arg1 is the object (New Marked)
+        if (typeof arg1 === 'object' && arg1 !== null) {
+          text = arg1.text;
+          level = arg1.depth;
+        } else {
+          // Old Marked (arg1 is text string, arg2 is level)
+          text = arg1;
+          level = arg2;
+        }
+        
+        const safeText = text || '';
+        const slug = slugify(safeText);
+        return `<h${level} id="${slug}">${safeText}</h${level}>`;
+      }
+    };
+
+    // Configure Marked
+    if (window.marked?.use) {
+      marked.use({
+        renderer, 
+        extensions: [{
+          name: 'mathBlock',
+          level: 'block',
+          start(src) { const i = src.indexOf('$$'); return i < 0 ? undefined : i; },
+          tokenizer(src) {
+            const m = src.match(/^\$\$([\s\S]*?)\$\$/);
+            if (!m) return;
+            return { type: 'mathBlock', raw: m[0], text: m[1].trim() };
+          },
+          renderer(tok) {
+            return `$$\n${tok.text}\n$$`;
+          }
+        }]
+      });
+    }
+
+    // Marked options
+    if (window.marked?.setOptions) {
+      marked.setOptions({
+        gfm: true,
+        breaks: false,
+        mangle: false,
+        headerIds: false,
+        // baseUrl: mdDirUrl.pathname // <-- REMOVED: Conflicting with anchors
+      });
+    }
+
+    // --- Pre-process Obsidian Links: [[#Heading]] -> [Heading](#heading) ---
+    markdown = markdown.replace(/\[\[#([^\]]+)\]\]/g, (match, captureGroup) => {
+      const linkText = captureGroup;
+      const linkId = slugify(linkText);
+      return `[${linkText}](#${linkId})`;
+    });
+
+    // Render markdown -> HTML
+    if (!contentEl) throw new Error('Missing #article-content container');
+    const html = (typeof marked?.parse === 'function') ? marked.parse(markdown) : marked(markdown);
+    contentEl.innerHTML = html;
+
+    // Rewrite relative URLs after render
+    rewriteLinksAndMedia(contentEl, mdDirUrl, imagesBaseDirUrl);
+
+    // Lazy-load & async decode images
+    contentEl.querySelectorAll('img').forEach((img) => {
+      if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+      img.decoding = 'async';
+    });
+
+    await typesetMath(contentEl);
+
+    // --- SCROLL FIX: If URL has #hash, scroll to it now that content exists ---
+    if (window.location.hash) {
+      const hashId = window.location.hash.substring(1);
+      // Wait a tick for DOM to settle
+      setTimeout(() => {
+        const target = document.getElementById(hashId);
+        if (target) target.scrollIntoView();
+      }, 0);
+    }
 
   } catch (err) {
     console.error(err);
@@ -51,172 +170,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-/**
- * Normalize a slug coming from the URL or manifest into a path under /content
- * (no leading "./", no leading "/", no leading "content/").
- */
+// ... [Existing Helpers] ...
+
 function normalizeSlug(raw) {
   return decodeURIComponent(raw)
-    .replace(/^(\.\/)+/, '')    // remove leading "./"
-    .replace(/^\/+/, '')        // remove leading "/"
-    .replace(/^content\//i, ''); // remove leading "content/"
+    .replace(/\\/g, '/')
+    .replace(/^(\.\/)+/, '')
+    .replace(/^\/+/, '')
+    .replace(/^content\//i, '');
 }
 
-/**
- * Build the file path for a markdown article based on its metadata.
- * (Kept for compatibility; not used by the main flow.)
- *
- * @param {Object} meta
- * @returns {string}
- */
-function buildMarkdownPath(meta) {
-  const parts = ['content'];
-  if (meta.category) parts.push(meta.category);
-  if (meta.subcategory) parts.push(meta.subcategory);
-  parts.push(`${meta.slug}.md`);
-  return parts.join('/');
+function extractFrontMatter(markdown) {
+  if (!markdown.startsWith('---')) return { frontMatter: {}, body: markdown };
+  const endIdx = markdown.indexOf('\n---', 3);
+  if (endIdx === -1) return { frontMatter: {}, body: markdown };
+  const fmText = markdown.slice(3, endIdx).trim();
+  const frontMatter = parseFrontMatter(fmText);
+  const body = markdown.slice(endIdx + 4);
+  return { frontMatter, body };
 }
 
-/**
- * Display the article on the page by parsing front-matter and converting
- * markdown to HTML. Also updates title/meta and triggers MathJax typesetting.
- *
- * @param {string} markdown
- * @param {Object} metaFromManifest
- */
-async function displayArticle(markdown, metaFromManifest = {}) {
-  // Extract front matter if present
-  let meta = {};
-  let body = markdown;
-  if (markdown.startsWith('---')) {
-    const endIdx = markdown.indexOf('\n---', 3);
-    if (endIdx !== -1) {
-      const fm = markdown.slice(3, endIdx).trim();
-      meta = parseFrontMatter(fm);
-      body = markdown.slice(endIdx + 4);
-    }
-  }
-
-  // Merge metadata from manifest and front matter (front matter wins)
-  const merged = { ...metaFromManifest, ...meta };
-  const title = merged.title || metaFromManifest.title || 'Untitled';
-  const dateStr = merged.date || metaFromManifest.date || '';
-  const date = dateStr ? new Date(dateStr) : null;
-
-  // Set document <title>
-  document.title = `${title} - Science & Programming Blog`;
-
-  // Populate DOM
-  const titleEl = document.getElementById('article-title');
-  const metaEl = document.getElementById('article-meta');
-  const contentEl = document.getElementById('article-content');
-
-  if (titleEl) titleEl.textContent = title;
-
-  if (metaEl) {
-    const pieces = [];
-    if (date && !isNaN(date)) {
-      pieces.push(
-        date.toLocaleDateString(undefined, {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
-      );
-    }
-    const tags = merged.tags || merged.keywords || [];
-    if (Array.isArray(tags) && tags.length) {
-      pieces.push('Tags: ' + tags.join(', '));
-    }
-    metaEl.textContent = pieces.join(' \u2022 ');
-  }
-  // Keep math blocks intact so Marked won't inject <p>/<br> inside $$...$$
-  marked.use({
-    extensions: [{
-      name: 'mathBlock',
-      level: 'block',
-      start(src) { const i = src.indexOf('$$'); return i < 0 ? undefined : i; },
-      tokenizer(src) {
-        // Match $$ ... $$ across lines (greedy to the first closing $$)
-        const m = src.match(/^\$\$([\s\S]*?)\$\$/);
-        if (!m) return;
-        return {
-          type: 'mathBlock',
-          raw: m[0],
-          text: m[1].trim()
-        };
-      },
-      renderer(tok) {
-        // Return the math delimiters exactly as-is; MathJax will handle it
-        return `$$\n${tok.text}\n$$`;
-      }
-    }]
-  });
-
-  // (Optional but recommended) conservative Marked settings
-  marked.setOptions({
-    gfm: true,
-    breaks: false,      // don't turn single \n into <br> (bad inside math)
-    mangle: false,
-    headerIds: false
-  });
-
-  if (contentEl) {
-    // Convert markdown to HTML using marked
-    contentEl.innerHTML = marked.parse(body);
-
-    // Typeset MathJax after content is injected
-    await typesetMath(contentEl);
-  }
-}
-
-/**
- * Ask MathJax v3 to typeset the given element. If MathJax hasn't loaded yet,
- * this waits for the script to finish loading first.
- *
- * @param {HTMLElement} el
- */
-async function typesetMath(el) {
-  // If MathJax hasn't been added yet, nothing to do.
-  if (!window.MathJax) return;
-
-  // If startup not ready yet, wait for the loader script (id="MathJax-script")
-  if (!MathJax.startup) {
-    const mjScript = document.getElementById('MathJax-script');
-    if (mjScript && !mjScript.dataset._bound) {
-      mjScript.dataset._bound = '1';
-      await new Promise((res) => mjScript.addEventListener('load', res, { once: true }));
-    }
-  }
-
-  if (MathJax.typesetPromise) {
-    try {
-      await MathJax.typesetPromise([el]);
-    } catch (e) {
-      console.error('MathJax typeset failed:', e);
-    }
-  }
-}
-
-/**
- * Render an error message on the page.
- *
- * @param {string} message
- */
-function renderError(message) {
-  const article = document.getElementById('article');
-  if (article) {
-    article.innerHTML = `<p>${message}</p>`;
-  }
-}
-
-/**
- * Very basic YAML front matter parser. Supports simple key: value pairs and
- * arrays defined with square brackets.
- *
- * @param {string} text
- * @returns {Object}
- */
 function parseFrontMatter(text) {
   const lines = text.split(/\r?\n/);
   const result = {};
@@ -225,14 +198,12 @@ function parseFrontMatter(text) {
     if (idx === -1) return;
     const key = line.slice(0, idx).trim();
     let value = line.slice(idx + 1).trim();
-    // Remove surrounding quotes
     if (
       (value.startsWith('"') && value.endsWith('"')) ||
       (value.startsWith("'") && value.endsWith("'"))
     ) {
       value = value.slice(1, -1);
     }
-    // Arrays: [a, b, c]
     if (value.startsWith('[') && value.endsWith(']')) {
       const arrStr = value.slice(1, -1).trim();
       result[key] = arrStr.length
@@ -245,9 +216,31 @@ function parseFrontMatter(text) {
   return result;
 }
 
-/**
- * Minimal HTML escaper for safe error rendering.
- */
+async function typesetMath(el) {
+  if (!window.MathJax) return;
+  if (!MathJax.startup) {
+    const mjScript = document.getElementById('MathJax-script');
+    if (mjScript && !mjScript.dataset._bound) {
+      mjScript.dataset._bound = '1';
+      await new Promise((res) => mjScript.addEventListener('load', res, { once: true }));
+    }
+  }
+  if (MathJax.typesetPromise) {
+    try {
+      await MathJax.typesetPromise([el]);
+    } catch (e) {
+      console.error('MathJax typeset failed:', e);
+    }
+  }
+}
+
+function renderError(message) {
+  const article = document.getElementById('article');
+  if (article) {
+    article.innerHTML = `<p>${message}</p>`;
+  }
+}
+
 function escapeHtml(s) {
   return String(s)
     .replaceAll('&', '&amp;')
@@ -255,4 +248,68 @@ function escapeHtml(s) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function isAbsoluteUrl(u) {
+  return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(u) || /^[a-z]+:/i.test(u);
+}
+
+// --- SKIP ANCHORS FIX ---
+function resolveRelativeUrl(raw, mdDirUrl, imagesBaseDirUrl) {
+  if (!raw) return raw;
+  let url = raw.replace(/\\/g, '/').trim();
+
+  // FIX: If this is an internal link (e.g. "#model-transform"), do NOT rewrite it.
+  if (url.startsWith('#')) return url;
+
+  if (isAbsoluteUrl(url)) return url;
+  if (url.startsWith('/')) return url;
+  if (url.startsWith('content/')) {
+    const abs = new URL(`./${url}`, window.location.href);
+    return abs.pathname + abs.search + abs.hash;
+  }
+  if (imagesBaseDirUrl && url.startsWith('@img/')) {
+    const abs = new URL(url.slice(5), imagesBaseDirUrl);
+    return abs.pathname + abs.search + abs.hash;
+  }
+  const abs = new URL(url, mdDirUrl);
+  return abs.pathname + abs.search + abs.hash;
+}
+
+function rewriteSrcset(el, attr, mdDirUrl, imagesBaseDirUrl) {
+  const srcset = el.getAttribute(attr);
+  if (!srcset) return;
+  const parts = srcset.split(',').map(s => s.trim()).filter(Boolean);
+  const rewritten = parts.map(part => {
+    const m = part.match(/^(\S+)(\s+.+)?$/);
+    if (!m) return part;
+    const url = resolveRelativeUrl(m[1], mdDirUrl, imagesBaseDirUrl);
+    const descriptor = (m[2] || '');
+    return `${url}${descriptor}`;
+  }).join(', ');
+  el.setAttribute(attr, rewritten);
+}
+
+function rewriteLinksAndMedia(container, mdDirUrl, imagesBaseDirUrl) {
+  container.querySelectorAll('img, a, video, audio, source').forEach((el) => {
+    const attr = el.tagName === 'A' ? 'href' : 'src';
+    const val = el.getAttribute(attr);
+    if (val) {
+      el.setAttribute(attr, resolveRelativeUrl(val, mdDirUrl, imagesBaseDirUrl));
+    }
+    if (el.hasAttribute('srcset')) {
+      rewriteSrcset(el, 'srcset', mdDirUrl, imagesBaseDirUrl);
+    }
+  });
+}
+
+// --- HELPER ---
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-');
 }

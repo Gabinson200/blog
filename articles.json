@@ -23,7 +23,7 @@
   },
   
   {
-    "slug": "programming/graphics/Lines",
+    "slug": "programming/graphics/Lines/Lines",
     "title": "Lines",
     "category": "programming",
     "subcategory": "graphics",
@@ -34,7 +34,7 @@
     "links": ["programming/graphics/Graphics"]
   },
   {
-    "slug": "programming/graphics/Triangles",
+    "slug": "programming/graphics/Triangles/Triangles",
     "title": "Triangles",
     "category": "programming",
     "subcategory": "graphics",
@@ -56,12 +56,34 @@
     "links": ["programming/graphics/Graphics"]
   },
   {
-    "slug": "programming/graphics/2D and 3D Transformations",
+    "slug": "programming/graphics/2D and 3D Transformations/2D and 3D Transformations",
     "title": "2D and 3D Transformations",
     "category": "programming",
     "subcategory": "graphics",
     "summary": "2D and 3D transformations in computer graphics.",
     "date": "2025-09-25",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "programming/graphics/Vertex Shader/Vertex Shader",
+    "title": "Vertex Shader",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Vertex Shader explanation.",
+    "date": "2025-11-25",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "programming/graphics/Clipping/Clipping",
+    "title": "Clipping",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Clipping explanation.",
+    "date": "2025-11-26",
     "nodeType": "article",
     "tags": ["Article"],
     "links": ["programming/graphics/Graphics"]
