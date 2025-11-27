@@ -83,22 +83,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- FIX: Robust Renderer for both New (v12+) and Old Marked Versions ---
     const renderer = {
       heading(arg1, arg2) {
-        let text, level;
-        // Check if arg1 is the object (New Marked)
+        // New Marked (v12+): arg1 is a token object
         if (typeof arg1 === 'object' && arg1 !== null) {
-          text = arg1.text;
-          level = arg1.depth;
-        } else {
-          // Old Marked (arg1 is text string, arg2 is level)
-          text = arg1;
-          level = arg2;
+          const token = arg1;
+          const level = token.depth || 1;
+
+          // Plain text (no HTML) for the slug/id
+          const plainText = token.text || '';
+
+          // Full inline HTML (this keeps [links](...) etc.)
+          const innerHtml = this.parser && this.parser.parseInline
+            ? this.parser.parseInline(token.tokens || [])
+            : plainText;
+
+          const id = slugify(plainText);
+          return `<h${level} id="${id}">${innerHtml}</h${level}>`;
         }
-        
-        const safeText = text || '';
-        const slug = slugify(safeText);
-        return `<h${level} id="${slug}">${safeText}</h${level}>`;
+
+        // Old Marked: fall back to simple behavior
+        const text = arg1 || '';
+        const level = arg2 || 1;
+        const id = slugify(text);
+        return `<h${level} id="${id}">${text}</h${level}>`;
       }
     };
+
 
     // Configure Marked
     if (window.marked?.use) {
@@ -254,13 +263,17 @@ function isAbsoluteUrl(u) {
   return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(u) || /^[a-z]+:/i.test(u);
 }
 
-// --- SKIP ANCHORS FIX ---
 function resolveRelativeUrl(raw, mdDirUrl, imagesBaseDirUrl) {
   if (!raw) return raw;
   let url = raw.replace(/\\/g, '/').trim();
 
-  // FIX: If this is an internal link (e.g. "#model-transform"), do NOT rewrite it.
+  // 1. In-page anchors: leave alone
   if (url.startsWith('#')) return url;
+
+  // 2. Links to the article template or other top-level pages: leave alone
+  if (url.startsWith('article.html?slug=')) return url;
+  // (optional, if you ever link these from markdown too)
+  // if (url === 'index.html' || url === 'list.html' || url === 'mindmap.html') return url;
 
   if (isAbsoluteUrl(url)) return url;
   if (url.startsWith('/')) return url;

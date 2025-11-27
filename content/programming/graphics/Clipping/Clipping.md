@@ -34,6 +34,9 @@ $$
 If both inequalities hold, the point is visible; otherwise, it is outside and can be rejected.
 This simple test is the building block for more complex clipping, like lines and polygons.
 
+---
+---
+
 ## Line Clipping
 
 A line segment is defined by its two endpoints: $P_0 = (x_0, y_0)$ and  $P_1 = (x_1, y_1)$

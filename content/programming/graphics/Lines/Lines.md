@@ -15,11 +15,11 @@ $$r(t) = r_0 + tv, t \in R$$ where $r_0$ is a point in the n-dimensional space a
 
 Given two points in 2D $(x_1, y_1)$ and $(x_2, y_2)$ an equation of a line can be written as $$y = mx+b$$ where b is the intersection with the y-axis and m is the slope $m = \frac{\Delta y}{\Delta x}$ = $\frac{(y_2 - y_1)}{(x_2 - x_1)}$. The trigonometric interpretation is that the change in $x$ and change in $y$ define the side lengths of a right angle triangle $tan(\theta) = \frac{\Delta y}{\Delta x}$ thus $m = tan(\theta)$.
 
-----------------------------------------
-  
-----------------------------------------
+---
+---
 
-## [Digital Differential Analyzer (DDA) Algorithm](https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm))
+
+## [Digital Differential Analyzer Algorithm](https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm))
 
 This is conceptually the simples algorithm to start with as it most closely resembles the algebraic definition of a line. The idea behind DDA is for a given line we want to select the pixels on the screen that are closest to the $x$ and $y$ values of the line at a given point on the line, but since pixels are not continuous and have a preset resolution / size we have to consider along which dimension to sample pixels from. There are 3 main types of 2D lines: vertical, horizontal, and diagonal. Approaching the vertical and horizontal cases programmatically we could iterate over the y and x coordinates of a line starting from the bottom or leftmost point respectively and draw a pixel until the end coordinate is reached. For diagonal lines with slope m, our first idea might be to just iterate over the x values between the two points and get the corresponding y values after plugging in the x values into the line equation to get the y coordinates along the line which we can round to "snap" into integer pixel positions. The issue with this approach is if the change in y is greater than the change in x:  
 $(y_2 - y_1) > (x_2 - x_1)$ aka the slope $(y_2 - y_1) \div (x_2 - x_1)$ is greater than 1 then we are not sampling enough times in the x dimension to produce enough pixels that will create a continuous line. Sampling in the y dimension when the change in x is greater than the change in y aka the slope is less than 1 will result in the same sub-sampling issue. To solve this issue DDA pick the axes to sample by finding the dimension along which the change is greatest and sampling in that dimension. 
@@ -58,10 +58,8 @@ This algorithm has runtime $O(N)$ where $N=max(∣Δx∣,∣Δy∣)$ = number of
 
 One positive aspect of this algorithm compared to the upcoming ones is there is no extra tests needed to determine the slope and order of the points. However, the major drawback is that we are using and having to round floating-point values per pixel. This is not as expensive as floating-point division per say but we can do better.
 
-----------------------------------------
-  
-----------------------------------------
-
+---  
+---
 
 ## [Bresenham's line drawing algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
 

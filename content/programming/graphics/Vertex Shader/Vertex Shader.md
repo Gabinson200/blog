@@ -1,9 +1,15 @@
-GREAT RESOURCE: https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/projection-matrix-introduction.html
+GREAT RESOURCE: [Scratch-a-pixel](https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/projection-matrix-introduction.html)
+  
 
-**Prerequisites**:
-[2D and 3D Transformations], [Cameras]
+**Prerequisites:**  
+
+[2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations)
+and [Cameras](article.html?slug=programming/graphics/Cameras/Cameras). 
 So far we have looked at transformations you can apply to a set of points to change them in space and how homogeneous coordinates can be used to combine those transformations into a single matrix. Additionally, we have some background on how cameras are designed/defined both physically and conceptually. 
-****
+
+  
+---
+---
 
 # Objective:
 
@@ -17,9 +23,12 @@ To manage this objective, we’ll break it into a series of stages, each with it
 
 After these steps are complete we could perform rasterization and draw the pixels in our frame buffer onto the screen.
 
+---
+---
+
 # Model Transform
 
-Let's say we want to create a crate object in the shape of a cube that is defined by a set of 8 vertices in 3D. These vertices are typically defined in the cube’s **local (object) space**, not directly in their final position and orientation in the world. However, as we have seen in the [2D and 3D Transformations] article we can chain together our 4 by 4 homogeneous transformation matrices and apply a single composite transformation to our points to get them in our desired position and orientation. An important thing to keep in mind is that transformations are generally not commutative i.e. a translation followed by a rotation is not the same as a rotation followed by a translation. This is especially important since the local origin of the cube defines its pivot. Depending on how the coordinates of our cube were initially given the local origin of our cube may be one of the bottom corners of the cube, the center of the cube, or somewhere else entirely. Rotation and scaling will happen around that pivot point. In more complex designs such as a character, the upper arm, forearm, and hand each have their own local origin (pivot), and we arrange them in a hierarchy: the hand is transformed relative to the forearm, the forearm relative to the upper arm, and so on. Changing the parent’s model transform moves all its children, but each child still rotates around its own pivot in its own local space.
+Let's say we want to create a crate object in the shape of a cube that is defined by a set of 8 vertices in 3D. These vertices are typically defined in the cube’s **local (object) space**, not directly in their final position and orientation in the world. However, as we have seen in the [2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations) article we can chain together our 4 by 4 homogeneous transformation matrices and apply a single composite transformation to our points to get them in our desired position and orientation. An important thing to keep in mind is that transformations are generally not commutative i.e. a translation followed by a rotation is not the same as a rotation followed by a translation. This is especially important since the local origin of the cube defines its pivot. Depending on how the coordinates of our cube were initially given the local origin of our cube may be one of the bottom corners of the cube, the center of the cube, or somewhere else entirely. Rotation and scaling will happen around that pivot point. In more complex designs such as a character, the upper arm, forearm, and hand each have their own local origin (pivot), and we arrange them in a hierarchy: the hand is transformed relative to the forearm, the forearm relative to the upper arm, and so on. Changing the parent’s model transform moves all its children, but each child still rotates around its own pivot in its own local space.
 ![[Pasted image 20251120180548.png]]Additionally, if we want to change the pivot around which we rotate an object we need to translate that pivot to be at the origin, apply the rotation, and translate back: $M_{pivot-rot}=T(p)RT(-p)$.
 ![[Pasted image 20251120180644.png]]Mathematically, if we have the points defining the vertices of our cube in 3D space as a list of x, y, and z coordinates: $[p_1, p_2, ... p_8]$ where $p_n = \begin{pmatrix}x_n & y_n & z_n\\ \end{pmatrix}$ we "lift" each point into homogeneous coordinates by appending a 1; $p_{h(n)} = \begin{pmatrix}x_n & y_n & z_n & 1\\ \end{pmatrix}$. Given a $4 \times 4$ **model matrix** $(M_{\text{model}})$, which encodes the combined scaling, rotation, and translation for the crate, we obtain the corresponding **world-space** positions by applying it to each point $p_{h(n)}$.
 $$p_{m(n)} = M_{\text{model}} \, p_{h(n)}$$
@@ -32,6 +41,9 @@ $$
 P_m = M_{\text{model}} \, P_h.
 $$
 
+---
+---
+  
 
 # Camera Transform
 ## World to camera coordinates (change of bases)
@@ -67,7 +79,7 @@ Algebraically, both points of view are encoded by the same matrices: one time we
 ## Coordinate System Transformation
 
 ![[Pasted image 20251120180817.png]]
-**Here is the cool part**: As we have seen in the [2D and 3D Transformations] article we can express any 3D transformation as a 4 by 4 matrix. The transformation matrix to go from a point defined in the local coordinate system to the world coordinate system is defined as: a top left 3 by 3 matrix with columns being the $X_l, Y_l, Z_l$ basis of the local object and the fourth column being the origin of the object. all defined in world coordinates.
+**Here is the cool part**: As we have seen in the [2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations) article we can express any 3D transformation as a 4 by 4 matrix. The transformation matrix to go from a point defined in the local coordinate system to the world coordinate system is defined as: a top left 3 by 3 matrix with columns being the $X_l, Y_l, Z_l$ basis of the local object and the fourth column being the origin of the object. all defined in world coordinates.
 $$
 LtoW =
 \begin{pmatrix}
@@ -87,30 +99,38 @@ e_zx & e_zy & e_zz & o_z \\
 $$
 where $e_{(x,y,z)}x$ is the world coordinates of the unit length local basis vector $X_l$ , $e_{(x,y,z)}y$ and $e_{(x,y,z)}z$ similarly defined. The last column is the local origin expressed in the world coordinate system. In other words, we use the orientation of the $X_l, Y_l, Z_l$ basis and position of the object relative to the world coordinate system to construct a transformation matrix $LtoW$ that when applied to points defined in the local coordinate system returns their coordinates in the world coordinate system. Some notable properties / interpretations of this matrix are:
 1. The transformation is affine (preserves straight lines and parallelism and also preserves ratios along lines).
-2. In homogeneous coordinates where a 3D point $\begin{pmatrix}x\\y\\z \end{pmatrix}$ is defined as $\begin{pmatrix}x\\y\\z\\w \end{pmatrix}$ when $w=0$ it defines a  homogeneous direction/ vector, but when $w=1$ it defines a homogeneous point. Meaning that the 1 guarantees translations only affects points but not directions. The columns of $LtoW$ also demonstrate this as the columns that represent the basis vectors of the local coordinate system have $w=0$ since they define directions but the actual location of the object in 3D space is a point, meaning that the last column of $LtoW$ must have $w=1$.
+2. In homogeneous coordinates where a 3D point $\begin{pmatrix}x\\ y\\ z \end{pmatrix}$ is defined as $\begin{pmatrix}x\\ y\\ z\\ w \end{pmatrix}$ when $w=0$ it defines a  homogeneous direction/ vector, but when $w=1$ it defines a homogeneous point. Meaning that the 1 guarantees translations only affects points but not directions. The columns of $LtoW$ also demonstrate this as the columns that represent the basis vectors of the local coordinate system have $w=0$ since they define directions but the actual location of the object in 3D space is a point, meaning that the last column of $LtoW$ must have $w=1$.
 3. The last column encodes a translation by $o_l$ (the local origin in world space), and the top-left 3×3 block encodes a rotation that aligns the object’s local basis with the world basis.
 
-To transform a point in camera coordinates to world coordinates $(p_c\rightarrow p_w)$ we matrix multiplying the homogeneous transformation matrix $CtoW$ (same as the local-to-world matrix but now the arbitrary object is the camera) with a homogeneous point defined in camera coordinates $\begin{pmatrix}x_c&y_c&z_c&1 \end{pmatrix}^T$: $$\begin{pmatrix}
+
+To transform a point in camera coordinates to world coordinates $(p_c\rightarrow p_w)$ we matrix multiplying the homogeneous transformation matrix $CtoW$ (same as the local-to-world matrix but now the arbitrary object is the camera) with a homogeneous point defined in camera coordinates $\begin{pmatrix}x_c & y_c & z_c & 1 \end{pmatrix}^T$: 
+
+$$
+\begin{pmatrix}
 c_xx & c_xy & c_xz & o_x \\
 c_yx & c_yy & c_yz & o_y \\
 c_zx & c_zy & c_zz & o_z \\
 0 & 0 & 0 & 1
 \end{pmatrix}
-\begin{pmatrix}x_c\\y_c\\z_c\\1 \end{pmatrix}
+\begin{pmatrix}x_c\\ y_c\\ z_c\\ 1 \end{pmatrix}
 =
-\begin{pmatrix}x_w\\y_w\\z_w\\1 \end{pmatrix}
+\begin{pmatrix}x_w\\ y_w\\ z_w\\ 1 \end{pmatrix}
+$$  
+
+Inversely, we can apply the inverse of $CtoW$ (usually referred to as world-to-camera matrix, $WtoC$) to a world coordinate point to find its camera coordinate equivalent  $(p_w \rightarrow p_c)$:
+
 $$
-Inversely, we can apply the inverse of $CtoW$ (usually referred to as world-to-camera matrix, $WtoC$) to a world coordinate point to find its camera coordinate equivalent  $(p_w\rightarrow p_c)$:
-$$\begin{pmatrix}
+\begin{pmatrix}
 c_xx & c_xy & c_xz & o_x \\
 c_yx & c_yy & c_yz & o_y \\
 c_zx & c_zy & c_zz & o_z \\
 0 & 0 & 0 & 1
 \end{pmatrix}^{-1}
-\begin{pmatrix}x_w\\y_w\\z_w\\1 \end{pmatrix}
+\begin{pmatrix}x_w\\ y_w\\ z_w\\ 1 \end{pmatrix}
 =
-\begin{pmatrix}x_c\\y_c\\z_c\\1 \end{pmatrix}
+\begin{pmatrix}x_c\\ y_c\\ z_c\\ 1 \end{pmatrix}
 $$
+
 This may seem a little backwards, after all the original camera to world transformation matrix was derived based on the representation of the local or camera coordinate system in terms of the world coordinate system so shouldn't applying this transformation to a point in the world coordinate give us a camera coordinate? A way to think about it is that the camera describes a point in space using a coordinate system or more abstractly a "language" that is defined by the camera's coordinate system and the transformation matrix $CtoW$ "reinterprets" or "translates" the camera's description of the point in terms of world coordinates. $CtoW$ answers the question “given the camera’s description of a point, where is it in world coordinates?". $WtoC$ answers “given the world’s description of a point, where is it relative to the camera?” I recommend this [3Blue1Brown change of basis video](https://www.youtube.com/watch?v=P2LTAUO1TdA) or [this](https://youtu.be/Qp96zg5YZ_8?si=BSzLqWSQxv9zOlWf)video to further explore change of basis. 
 ![[Pasted image 20251120180903.png]]
 
@@ -123,7 +143,7 @@ If you want a deeper dive into cameras i.e. hardware, intrinsic / extrinsic prop
 
 ### Look-At
 
-As we have seen we can move and orient the camera in any way we want and then use the camera transform to "describe" all our other objects in the camera's coordinate system. Let's say I want to point the camera at some object or point in our 3D world, it would be nice to have a way to determine how the camera should be rotated to look at an arbitrary point, given the position of the point and the camera. Ok, so far we know the camera's local basis $x_c, y_c, z_c$ , the position of the camera $o_c$, and the position of the point we want to look at $p$ . The first step is to make sure that the camera's negative z-axis is facing towards the point, this vector will defined our "forward" camera direction, as is computed as:$$-z_c = norm(p-o_c)$$
+As we have seen we can move and orient the camera in any way we want and then use the camera transform to "describe" all our other objects in the camera's coordinate system. Let's say I want to point the camera at some object or point in our 3D world, it would be nice to have a way to determine how the camera should be rotated to look at an arbitrary point, given the position of the point and the camera. Ok, so far we know the camera's local basis $x_c, y_c, z_c$ , the position of the camera $o_c$, and the position of the point we want to look at $p$ . The first step is to make sure that the camera's negative z-axis is facing towards the point, this vector will defined our "forward" camera direction, as is computed as: $$-z_c = norm(p-o_c)$$
 ![[Pasted image 20251120181013.png]]
 
 Now we know how to orient in the z-direction but we still need to find how to orient along the camera's x and y directions. We also know that $x_c, y_c, z_c$ define an orthonormal basis so $y_c, z_c$ must be mutually orthogonal to each other and $z_c$. So as long as we can find an additional vector we'll call $up$: $(0, 1, 0)_w$ that is in the same $y_cz_c$ plane as $z_c$ then the cross product of $up$ and $z_c$ will necessarily produce a new vector that is orthogonal to both and can be used to find the $x_c$ basis vector for the camera. Additionally, if $|up| \neq 1$ we can add in a normalization so that $x_c$ will be unit length. Thus, $$x_c = norm(-z_c \times up)$$ or alternatively: $$x_c = norm(up \times z_c)$$
@@ -158,9 +178,11 @@ $$
 
 **Caveats:**
 It should be noted that you cannot account for camera roll using the look-at approach above since the camera's local up direction $y_c$ is constrained by our global $up$ direction producing a right vector $x_c$ is always in the camera's $xz$-plane. In other words, this look-at construction effectively locks the camera’s “up” to the supplied $up$ vector, so you don’t get to choose roll independently. To incorporate camera roll, we first need to rotate the camera around the z-axis and then multiply that by the look-at matrix constructed above. Additionally, if the camera's z or forward face is parallel to the $up$ vector then the cross-product used to find $x_c$ becomes zero, since the magnitude of the cross product between two vectors is equal to the determinant or the area of the parallelogram defined by the two vectors. The way to fix this is to detect when this edge case occurs and nudge the $up$ vector in the camera's y-z plane until $z_c$ and $up$ are not parallel. 
-https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/lookat-function/framing-lookat-function.html
 
-https://www.youtube.com/watch?v=G6skrOtJtbM
+Look-at resources:
+- [Scratch-a-pixel](https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/lookat-function/framing-lookat-function.html)
+- [Short YT video](https://www.youtube.com/watch?v=G6skrOtJtbM)
+
 ### Let's recap:
 So far all we have done is place objects in our world and go from the world coordinate system to the camera coordinate system. Paradoxically, this step is both conceptually the hardest since you have to reframe matrix transformations as change of bases but algebraically quite simple. 
 - Model transform: $$
@@ -172,6 +194,9 @@ $$P_c = (WtoC)P_m$$
 $$P_c = (WtoC)M_{\text{model}} \, \tilde{P}$$
 ![[Pasted image 20251120181313.png]]
 
+---
+---
+  
 # Projection Transform
 
 An important attribute of the camera transform is that it only **re-expresses** points in a new coordinate system: straight lines stay straight, parallel lines stay parallel, and ratios along lines are preserved. In other words, the camera transform is **affine**.
@@ -243,7 +268,7 @@ $$
 You can already see the perspective effect: the division by $z_c$ means points with more negative $z_c$ (farther away) are pulled closer to the center of the near plane.
 
 Before moving forward lets do a quick recap, so far we have a few variables that define the viewing frustum which we want to transform into a canonical view volume (a generic cube ranging from -1 to 1), additionally we have a handy relationship between how far away a point is from the camera and where it will be projected to in the near plane. We need to find a perspective transformation matrix $P$ that transforms all the points in camera space to clip space, that respects the equations for projected point we found using the similar triangles:
-
+ 
 $$
 \begin{pmatrix}
 A & B & C & D \\
@@ -251,12 +276,19 @@ E & F & G & H \\
 I & J & K & L \\
 0 & 0 & 0 & 1
 \end{pmatrix}
-\begin{pmatrix}x_c\\y_c\\z_c\\1 \end{pmatrix}
+\begin{pmatrix}x_c\\ y_c\\ z_c\\ 1 \end{pmatrix}
 =
-\begin{pmatrix}-\frac{n}{z_c}x_c\\ -\frac{n}{z_c}y_c\\?\\1 \end{pmatrix}
+\begin{pmatrix}-\frac{n}{z_c}*x_c \\ -\frac{n}{z_c}*y_c \\ ? \\ 1 
+\end{pmatrix}
 $$
-The first step is to somehow take care of the division by $z$ (depth) of the $x$ and $y$ values, since matrix multiplication is a linear operation, we cannot directly perform division within the matrix itself. In the  [[2D and 3D Transformations]] article we saw that to go from homogeneous to Euclidean coordinates we have to divide all the components of the point by the newly introduced $w$ dimension. This dimension was always 1 in the case of affine transformations but now we can make it anything that we want. Well, in this case we want to divide the $x$ and $y$ coordinates by $-z_c$ so lets set $w=-z_c$: $\begin{pmatrix}nx_c\\ ny_c\\ \frac{z_c}{?}\\-z_c \end{pmatrix}$
-This allows us to solve for the first two and last row of our perspective transformation matrix, but we encounter a small issue:
+
+
+The first step is to somehow take care of the division by $z$ (depth) of the $x$ and $y$ values, since matrix multiplication is a linear operation, we cannot directly perform division within the matrix itself. In the [2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations) article we saw that to go from homogeneous to Euclidean coordinates we have to divide all the components of the point by the newly introduced $w$ dimension. This dimension was always 1 in the case of affine transformations but now we can make it anything that we want. Well, in this case we want to divide the $x$ and $y$ coordinates by $-z_c$ so lets set $w=-z_c$:
+
+$\begin{pmatrix} nx_c\\ ny_c\\ \frac{z_c}{?}\\ -z_c \end{pmatrix}$
+
+This allows us to solve for the first two and last row of our perspective transformation matrix, but we encounter a small issue: 
+
 $$
 \begin{pmatrix}
 n & 0 & 0 & 0 \\
@@ -264,23 +296,27 @@ n & 0 & 0 & 0 \\
 0 & 0 & K & L \\
 0 & 0 & -1 & 0
 \end{pmatrix}
-\begin{pmatrix}x_c\\y_c\\z_c\\1 \end{pmatrix}
+\begin{pmatrix}x_c\\ y_c\\ z_c\\ 1 \end{pmatrix}
 =
-\begin{pmatrix}nx_c\\ ny_c\\ Kz_c+L\\-z_c \end{pmatrix}
+\begin{pmatrix}nx_c\\ ny_c\\ Kz_c+L\\ -z_c \end{pmatrix}
 $$
+
 The first two rows correctly give us the scaled $x$ and $y$ coordinates and the last row allows us to place $-z_c$ into the $w$ position of the homogeneous coordinate so that when we convert to Euclidean coordinates we can divide by $-z_c$ (this is often referred to as the perspective divide). Now we need to solve for K and L in the third row. If we simply ignored $z_c$ or set it to a constant, we would lose all depth information, making it impossible to determine which objects are in front of others (Z-buffering).
 This is kind of a tricky conundrum, we need to find some values for $K$ and $L$ that when multiplied by $z_c$ and $1$ will result in a value that when perspective divided will be the depth or $z_c$ coordinate of our point. To keep our $z_c$ values we need the output's $z$ coordinate to be mapped somewhere in the $[-1, 1]$ $z$ range of the canonical view volume, meaning that after the perspective divide:
 $$z_{ndc} = \frac{Kz_c + L}{-z_c}$$
 This is an equation with two unknowns so we have to find two constraints to try to solve this equation; what inequalities may constrain the depth of our viewing frustrum? Well, we know that our viewing frustum starts at a depth $n$ away, defining the near plane and extends to a maximum depth of $f$, which defines the far plane. We need the near plane to be at -1 in the NDC and the far plane to be at +1. Thus, we can set the constraints: $z_c = -n$ when $z_{ndc}=-1$ and $z_c = -f$ when $z_{ndc}=+1$ for the equation above, producing two equations which we can solve for $K$ and $L$:
+
 $$-1 = \frac{K(-n) + L}{-(-n)} \space\text{ and }\space 1 = \frac{K(-f) + L}{-(-f)}$$
 $$-n = -Kn+L \space\text{ and }\space f = -Kf+L$$
 $$f+n = Kn-Kf$$
 $$f+n = K(n-f)$$
 $$K = \frac{f+n}{n-f} \space\text{ or equivalently }\space K = -\frac{f+n}{f-n}$$
+
 plugging back in we find:
+
 $$L=Kn-n => L = ( \frac{f+n}{n-f})n-n$$
 $$L=\frac{n(f+n)-n(n-f)}{n-f}$$
-$$L=\frac{nf+n^2-n^2+nf)}{n-f}$$
+$$L=\frac{(nf+n^2-n^2+nf)}{n-f}$$
 $$L=\frac{2nf}{n-f} \space\text{ or equivalently }\space L = -\frac{2nf}{f-n}$$
 $$
 \begin{pmatrix}
@@ -289,10 +325,11 @@ n & 0 & 0 & 0 \\
 0 & 0 & -\frac{f+n}{f-n} & -\frac{2nf}{f-n} \\
 0 & 0 & -1 & 0
 \end{pmatrix}
-\begin{pmatrix}x_c\\y_c\\z_c\\1 \end{pmatrix}
+\begin{pmatrix}x_c\\ y_c\\ z_c\\1 \end{pmatrix}
 =
 \begin{pmatrix}nx_c\\ ny_c\\ -\frac{f+n}{f-n}z_c-\frac{2nf}{f-n}\\-z_c \end{pmatrix}
 $$
+
 It is important to note that the relationship between the input $z_c$​ and the final depth value is nonlinear due to the division by $−z_c$​. The precision is very high for objects close to the near plane and drops off as we approach the far plane. This is actually desirable, as visual artifacts are much more noticeable on objects close to the camera than on those far away.
 
 ## Bringing it together
@@ -355,6 +392,7 @@ $$F = 1 - \frac{2r}{r - l}$$
 $$F = \frac{r - l}{r - l} - \frac{2r}{r - l}$$
 $$F = \frac{r - l - 2r}{r - l}$$
 $$F = -\frac{r + l}{r - l}$$
+
 ### Final Result
 This gives us the standard coefficients for the general projection matrix:
 
@@ -372,3 +410,6 @@ Look closely at the term in the third column, row 1: $\frac{r+l}{r-l}$.
 In our previous symmetric derivation using FOV, the right side was the exact opposite of the left side ($r = -l$).
 $$r + l = r + (-r) = 0$$
 Therefore, the term $\frac{0}{r-l}$ became 0. Similarly for the y-axis, if the top is equal to the negative bottom ($t = -b$), the term $\frac{t+b}{t-b}$ becomes **0**. This explains why standard projection matrices have zeros in the third column: they assume a perfectly centered camera. But if you ever need to create an off-center projection (for stereo rendering, VR, or tiled displays), you simply populate those terms with the ratio of the asymmetry to the width.
+
+---
+---

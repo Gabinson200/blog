@@ -5,6 +5,9 @@ This page will describe two approaches to creating and filling in triangles for 
 
 **Triangles**: Are the simples shapes that can define an area in 2D or in other words a flat surface in 3D. 2 points can define a line but 3 points can define an area given, of course, that the points do not fall on the exact same plane which would degenerate to a line or even point. 4 points can define a rectangle but any rectangle can be defined by 2 triangles. Note, to define a rectangle 2 triangles are needed which means we must define 6 points instead of 4 for a rectangle but as we will see later if we know which points are shared between the two triangles we only really need to store 4 points.
 
+---
+---
+
 ## Scan-fill Algorithm
 
 The idea behind the scan-fill algorithm is simple, given any kind of  triangle we can split it up into two simpler component triangles, ones with a flat-bottom and one with a flat-top that we can fill in by "scanning" across it in the x direction.
@@ -88,10 +91,11 @@ else:
 
 The time compexity of this algorithm is just the area of the triangle, $O(A)$ since we use Bresenhams to draw the lines which runs in $O(l)$ where $l$ is the length of the line.   
 
-
+---
+---
 
 ## Barycentric Algorithm
-I will not go into this because this is not the algorithm i sise in my eesp32 gfx implementation and I think I will keeo the scope of this website more narrow so I can spend time on other things.
+I will not go into this because this is not the algorithm I use in my esp32 gfx implementation and I think I will keep the scope of this website more narrow so I can spend time on other things.
 
 
 **Resources:**
