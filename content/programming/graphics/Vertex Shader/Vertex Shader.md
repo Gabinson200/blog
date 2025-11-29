@@ -18,8 +18,10 @@ Our goal at this stage in the graphics pipeline is to take in the set of points 
 To manage this objective, we’ll break it into a series of stages, each with its own subtopics that build the necessary foundation.
 1. **[[#Model Transform]]**: Local space to world space
 2. **[[#Camera Transform]]**: World to camera coordinates (mathematical background: change of bases)
-3. **[[#Projection Transform]]**: Camera space to clip space (mathematical background: projection)
-4. **Viewport transform**: NDC to pixel coordinates 
+3. **[[#Projection Transform]]**: Camera space to clip space 
+(mathematical background: projection)
+4.  **[[#Clipping and Perspective Divide]]**: clip space to NDC.
+5. **Viewport transform**: NDC to pixel coordinates 
 
 After these steps are complete we could perform rasterization and draw the pixels in our frame buffer onto the screen.
 
@@ -136,7 +138,7 @@ c_zx & c_zy & c_zz & o_z \\
 $$
 
 This may seem a little backwards, after all the original camera to world transformation matrix was derived based on the representation of the local or camera coordinate system in terms of the world coordinate system so shouldn't applying this transformation to a point in the world coordinate give us a camera coordinate? A way to think about it is that the camera describes a point in space using a coordinate system or more abstractly a "language" that is defined by the camera's coordinate system and the transformation matrix $CtoW$ "reinterprets" or "translates" the camera's description of the point in terms of world coordinates. $CtoW$ answers the question “given the camera’s description of a point, where is it in world coordinates?". $WtoC$ answers “given the world’s description of a point, where is it relative to the camera?” I recommend this [3Blue1Brown change of basis video](https://www.youtube.com/watch?v=P2LTAUO1TdA) or [this](https://youtu.be/Qp96zg5YZ_8?si=BSzLqWSQxv9zOlWf)video to further explore change of basis. 
-![Pasted image]( 20251120180903.png)
+![Pasted image](20251120180903.png)
 
 
 ## A bit more on cameras (Z axis and Look-At)
@@ -148,7 +150,7 @@ If you want a deeper dive into cameras i.e. hardware, intrinsic / extrinsic prop
 ### Look-At
 
 As we have seen we can move and orient the camera in any way we want and then use the camera transform to "describe" all our other objects in the camera's coordinate system. Let's say I want to point the camera at some object or point in our 3D world, it would be nice to have a way to determine how the camera should be rotated to look at an arbitrary point, given the position of the point and the camera. Ok, so far we know the camera's local basis $x_c, y_c, z_c$ , the position of the camera $o_c$, and the position of the point we want to look at $p$ . The first step is to make sure that the camera's negative z-axis is facing towards the point, this vector will defined our "forward" camera direction, as is computed as: $$-z_c = norm(p-o_c)$$
-![Pasted image](20251120181013.pn)
+![Pasted image](20251120181013.png)
 
 Now we know how to orient in the z-direction but we still need to find how to orient along the camera's x and y directions. We also know that $x_c, y_c, z_c$ define an orthonormal basis so $y_c, z_c$ must be mutually orthogonal to each other and $z_c$. So as long as we can find an additional vector we'll call $up$: $(0, 1, 0)_w$ that is in the same $y_cz_c$ plane as $z_c$ then the cross product of $up$ and $z_c$ will necessarily produce a new vector that is orthogonal to both and can be used to find the $x_c$ basis vector for the camera. Additionally, if $|up| \neq 1$ we can add in a normalization so that $x_c$ will be unit length. Thus, $$x_c = norm(-z_c \times up)$$ or alternatively: $$x_c = norm(up \times z_c)$$
 ![Pasted image](20251120181146.png)
@@ -419,3 +421,66 @@ Therefore, the term $\frac{0}{r-l}$ became 0. Similarly for the y-axis, if the t
 
 ---
 ---
+
+# Clipping and Perspective Divide
+
+
+## Clip Space, Clipping, and the Perspective Divide
+
+At this point we have constructed a 4×4 **projection matrix** $P$ that maps camera-space points $p_c = \begin{pmatrix} x_c \\ y_c \\ z_c \\ 1 \end{pmatrix}$
+
+to **clip-space** points
+
+$$
+p_{\text{clip}} = P \, p_c =
+\begin{pmatrix}
+x_{\text{clip}} \\
+y_{\text{clip}} \\
+z_{\text{clip}} \\
+w_{\text{clip}}
+\end{pmatrix}.
+$$
+
+This is still a homogeneous 4D coordinate. The canonical view volume is not defined directly in $(x_{\text{clip}},y_{\text{clip}},z_{\text{clip}})$, but in terms of the **ratios** $\frac{x_{\text{clip}}}{w_{\text{clip}}}$, $\frac{y_{\text{clip}}}{w_{\text{clip}}}$, and $\frac{z_{\text{clip}}}{w_{\text{clip}}}$.
+
+The usual pipeline conceptually does the following:
+
+1. **Clipping in clip space.**  
+   Before we divide by $w$, we test primitives against the clip volume. In homogeneous form, the visible region is described by inequalities like
+
+   $$
+   -w_{\text{clip}} \le x_{\text{clip}} \le w_{\text{clip}}, \quad
+   -w_{\text{clip}} \le y_{\text{clip}} \le w_{\text{clip}}, \quad
+   -w_{\text{clip}} \le z_{\text{clip}} \le w_{\text{clip}}
+   $$
+
+   (or a variant such as $0 \le z_{\text{clip}} \le w_{\text{clip}}$ depending on the API).  
+   Triangles that lie completely outside this region can be discarded, and triangles that cross the boundary are **clipped**: new vertices are created exactly on the planes of the view frustum.
+
+2. **Perspective divide: clip space → NDC.**  
+   After clipping, we convert homogeneous coordinates back to 3D by dividing by $w$:
+
+   $$
+   x_{\text{ndc}} = \frac{x_{\text{clip}}}{w_{\text{clip}}}, \quad
+   y_{\text{ndc}} = \frac{y_{\text{clip}}}{w_{\text{clip}}}, \quad
+   z_{\text{ndc}} = \frac{z_{\text{clip}}}{w_{\text{clip}}}.
+   $$
+
+   The result $(x_{\text{ndc}},y_{\text{ndc}},z_{\text{ndc}})$ lives in **Normalized Device Coordinates (NDC)**, where the canonical view volume is the cube
+
+   $$
+   -1 \le x_{\text{ndc}} \le 1,\quad
+   -1 \le y_{\text{ndc}} \le 1,\quad
+   -1 \le z_{\text{ndc}} \le 1
+   $$
+
+   (or $[0,1]$ for $z$, depending on convention). At this stage, everything is **device-agnostic**: the units are “normalized” and do not yet know anything about actual pixels.
+
+In other words:
+
+- **Model + Camera transforms**: affine; keep straight lines straight.  
+- **Projection**: introduces the homogeneous $w$ needed for perspective.  
+- **Clipping**: throw away/all adjust primitives that are outside the view frustum.  
+- **Perspective divide**: turn homogeneous clip coordinates into NDC in the cube $[-1,1]^3$.
+
+Once we have NDC, we are ready for the final step: mapping these normalized coordinates to the actual pixels of our framebuffer using the **viewport transform**.
