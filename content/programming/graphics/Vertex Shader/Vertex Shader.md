@@ -29,8 +29,12 @@ After these steps are complete we could perform rasterization and draw the pixel
 # Model Transform
 
 Let's say we want to create a crate object in the shape of a cube that is defined by a set of 8 vertices in 3D. These vertices are typically defined in the cube’s **local (object) space**, not directly in their final position and orientation in the world. However, as we have seen in the [2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations) article we can chain together our 4 by 4 homogeneous transformation matrices and apply a single composite transformation to our points to get them in our desired position and orientation. An important thing to keep in mind is that transformations are generally not commutative i.e. a translation followed by a rotation is not the same as a rotation followed by a translation. This is especially important since the local origin of the cube defines its pivot. Depending on how the coordinates of our cube were initially given the local origin of our cube may be one of the bottom corners of the cube, the center of the cube, or somewhere else entirely. Rotation and scaling will happen around that pivot point. In more complex designs such as a character, the upper arm, forearm, and hand each have their own local origin (pivot), and we arrange them in a hierarchy: the hand is transformed relative to the forearm, the forearm relative to the upper arm, and so on. Changing the parent’s model transform moves all its children, but each child still rotates around its own pivot in its own local space.
-![[Pasted image 20251120180548.png]]Additionally, if we want to change the pivot around which we rotate an object we need to translate that pivot to be at the origin, apply the rotation, and translate back: $M_{pivot-rot}=T(p)RT(-p)$.
-![[Pasted image 20251120180644.png]]Mathematically, if we have the points defining the vertices of our cube in 3D space as a list of x, y, and z coordinates: $[p_1, p_2, ... p_8]$ where $p_n = \begin{pmatrix}x_n & y_n & z_n\\ \end{pmatrix}$ we "lift" each point into homogeneous coordinates by appending a 1; $p_{h(n)} = \begin{pmatrix}x_n & y_n & z_n & 1\\ \end{pmatrix}$. Given a $4 \times 4$ **model matrix** $(M_{\text{model}})$, which encodes the combined scaling, rotation, and translation for the crate, we obtain the corresponding **world-space** positions by applying it to each point $p_{h(n)}$.
+  
+![Pasted image 1](\20251120180548.png)
+  
+Additionally, if we want to change the pivot around which we rotate an object we need to translate that pivot to be at the origin, apply the rotation, and translate back: $M_{pivot-rot}=T(p)RT(-p)$.
+![Pasted image 2](\20251120180644.png)
+Mathematically, if we have the points defining the vertices of our cube in 3D space as a list of x, y, and z coordinates: $[p_1, p_2, ... p_8]$ where $p_n = \begin{pmatrix}x_n & y_n & z_n\\ \end{pmatrix}$ we "lift" each point into homogeneous coordinates by appending a 1; $p_{h(n)} = \begin{pmatrix}x_n & y_n & z_n & 1\\ \end{pmatrix}$. Given a $4 \times 4$ **model matrix** $(M_{\text{model}})$, which encodes the combined scaling, rotation, and translation for the crate, we obtain the corresponding **world-space** positions by applying it to each point $p_{h(n)}$.
 $$p_{m(n)} = M_{\text{model}} \, p_{h(n)}$$
 If we stack all the homogeneous vertex positions into a single matrix
 $$
@@ -78,7 +82,7 @@ Algebraically, both points of view are encoded by the same matrices: one time we
 
 ## Coordinate System Transformation
 
-![[Pasted image 20251120180817.png]]
+![Pasted image](20251120180817.png)
 **Here is the cool part**: As we have seen in the [2D and 3D Transformations](article.html?slug=programming/graphics/2D%20and%203D%20Transformations/2D%20and%203D%20Transformations) article we can express any 3D transformation as a 4 by 4 matrix. The transformation matrix to go from a point defined in the local coordinate system to the world coordinate system is defined as: a top left 3 by 3 matrix with columns being the $X_l, Y_l, Z_l$ basis of the local object and the fourth column being the origin of the object. all defined in world coordinates.
 $$
 LtoW =
@@ -132,7 +136,7 @@ c_zx & c_zy & c_zz & o_z \\
 $$
 
 This may seem a little backwards, after all the original camera to world transformation matrix was derived based on the representation of the local or camera coordinate system in terms of the world coordinate system so shouldn't applying this transformation to a point in the world coordinate give us a camera coordinate? A way to think about it is that the camera describes a point in space using a coordinate system or more abstractly a "language" that is defined by the camera's coordinate system and the transformation matrix $CtoW$ "reinterprets" or "translates" the camera's description of the point in terms of world coordinates. $CtoW$ answers the question “given the camera’s description of a point, where is it in world coordinates?". $WtoC$ answers “given the world’s description of a point, where is it relative to the camera?” I recommend this [3Blue1Brown change of basis video](https://www.youtube.com/watch?v=P2LTAUO1TdA) or [this](https://youtu.be/Qp96zg5YZ_8?si=BSzLqWSQxv9zOlWf)video to further explore change of basis. 
-![[Pasted image 20251120180903.png]]
+![Pasted image]( 20251120180903.png)
 
 
 ## A bit more on cameras (Z axis and Look-At)
@@ -144,14 +148,14 @@ If you want a deeper dive into cameras i.e. hardware, intrinsic / extrinsic prop
 ### Look-At
 
 As we have seen we can move and orient the camera in any way we want and then use the camera transform to "describe" all our other objects in the camera's coordinate system. Let's say I want to point the camera at some object or point in our 3D world, it would be nice to have a way to determine how the camera should be rotated to look at an arbitrary point, given the position of the point and the camera. Ok, so far we know the camera's local basis $x_c, y_c, z_c$ , the position of the camera $o_c$, and the position of the point we want to look at $p$ . The first step is to make sure that the camera's negative z-axis is facing towards the point, this vector will defined our "forward" camera direction, as is computed as: $$-z_c = norm(p-o_c)$$
-![[Pasted image 20251120181013.png]]
+![Pasted image](20251120181013.pn)
 
 Now we know how to orient in the z-direction but we still need to find how to orient along the camera's x and y directions. We also know that $x_c, y_c, z_c$ define an orthonormal basis so $y_c, z_c$ must be mutually orthogonal to each other and $z_c$. So as long as we can find an additional vector we'll call $up$: $(0, 1, 0)_w$ that is in the same $y_cz_c$ plane as $z_c$ then the cross product of $up$ and $z_c$ will necessarily produce a new vector that is orthogonal to both and can be used to find the $x_c$ basis vector for the camera. Additionally, if $|up| \neq 1$ we can add in a normalization so that $x_c$ will be unit length. Thus, $$x_c = norm(-z_c \times up)$$ or alternatively: $$x_c = norm(up \times z_c)$$
-![[Pasted image 20251120181146.png]]
+![Pasted image](20251120181146.png)
 
 Now that we have both $x_c$ and $z_c$ we can find $y_c$ by performing another cross product producing our last needed orthonormal basis element:
 $$y_c = x_c\times -z_c$$
-![[Pasted image 20251120181227.png]]
+![Pasted image](20251120181227.png)
 
 Finally we can create our 4 by 4 matrix using $x_c, y_c, z_c$ as our basis vectors:
 $$
@@ -192,7 +196,7 @@ $$
 $$P_c = (WtoC)P_m$$
 - Combined:
 $$P_c = (WtoC)M_{\text{model}} \, \tilde{P}$$
-![[Pasted image 20251120181313.png]]
+![Pasted image](20251120181313.png)
 
 ---
 ---
@@ -217,7 +221,7 @@ with our convention:
 - the camera is at the origin,
 - it looks along **$-Z_c$**
 - objects in front of the camera have $z_c < 0$.
-![[Pasted image 20251120181351.png]]
+![Pasted image](20251120181351.png)
 
 ## View Frustum
 
@@ -226,7 +230,8 @@ We define a **view frustum** using four parameters:
 - A **far** plane distance: $f > 0$ (camera plane at $z_c = -f$),
 - A horizontal field of view $\text{fov}_x$
 - An aspect ratio $a = \dfrac{\text{height}}{\text{width}}$.
-![[Pasted image 20251120181415.png]]
+![Pasted image](20251120181415.png)
+
 ### Near plane:
 The near plane defines the closest plane to the camera from which points will be projected. The near plane distance is the minimum distance an object may be placed in front of a camera to avoid numerical issues and define a useful start for the view volume.. 
 
@@ -246,13 +251,13 @@ From these four variables we can find all the information we need to produce add
 
 First, let's find the dimensions of the near and far planes:
 At the near plane $z_c = -n$, the visible rectangle has width $2n \tan(\text{fov}_x / 2)$ and height $2n \tan(\text{fov}_x / 2)\, a.$ Similarly, at the far plane $z_c = -f$, the rectangle has width $2f \tan(\text{fov}_x / 2)$ and height $2f \tan(\text{fov}_x / 2)\, a.$ These equations can be found using simple trigonometry and the given aspect ratio. Additionally, if the field of view was given to us in terms of y and the aspect ratio as width over height then the calculations for the areas of the planes would have the same form just with the width and height flipped. Try to keep these results for the dimensions of the near and far plane in mind as we will use them at the end of the projective transform.
-![[Pasted image 20251120181501.png]]
+![Pasted image](20251120181501.png)
 Now that we know where the viewing frustum begins and ends, and the sizes of its near and far planes, the next question is:  
 How do points inside this frustum get transformed when we map it into the NDC cube?
 
 ## Perspective via similar triangles
 
-![[Pasted image 20251120183106.png]]
+![Pasted image](20251120183106.png)
 Now imagine we are looking at the scene above from the side where the camera is pointed at an object. A point $p$ on the object will be projected onto the near plane and becomes $p'$. What geometric property of $p$ and $p'$ can we utilize? We can see two similar triangles: one defined by the camera origin, the near plane distance, and the projected point's height; the other by the camera origin, the point's actual distance $z_c$, and the point's actual height. Since the viewing frustum has a rectangular base the same kind of similar triangles appear whether we look at the scene from the side or from above, as we have done previously. Because of the these similar triangles, the ratio between the near plane distance and the projected coordinate must equal the ratio between the point's distance and its actual coordinate:
 
 $$
@@ -336,7 +341,8 @@ It is important to note that the relationship between the input $z_c$​ and the
 
 Geometrically, when we apply the transformation above the viewing frustum becomes a rectangle with height and width equal to that of the near view plane and depth (or length) between -1 and 1. Since we want our points to be inside the canonical view volume, a cube: $[-1,1]^3$ defined by Normalized Device Coordinates (**NDC**) system we must map the $x$ and $y$ coordinates from the near plane to a plane with $-1\leq x \leq +1$ and $-1\leq y \leq +1$. 
 We can do this normalization by simply dividing the parts of the matrix responsible for scaling $x$ and $y$ by the width and height of the near plane respectively. Since we already derived the length and width of the near plane earlier we can just divide by those values, which leads to a nice cancelation of $n$ and makes it so the scaling can be fully specified with the FOV and aspect ratio. Recall:
-![[Pasted image 20251120181501.png]]
+![Pasted image](20251120181501.png)
+
 At the near plane $z_c = -n$, the visible rectangle has width $2n \tan(\text{fov}_x / 2)$ and height $2n \tan(\text{fov}_x / 2)\, a$. Note, that since we want to map to values between -1 and 1 and not 0 and 1, what we want to do is map the width from the center of the near plane to right side of the plane to $[0, 1]$ and the width from the center to the left between $[0, -1]$ and similarly the height between the top and bottom of the near plane. Thus, we just divide by half of the total width and height: $w = n \tan(\text{fov}_x / 2)$ and $h=n \tan(\text{fov}_x / 2)\, a$.
 Thus:
 $$
