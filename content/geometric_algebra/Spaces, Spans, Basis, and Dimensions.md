@@ -30,4 +30,4 @@ In general the lengths of an $D$-dimensional vector expressed in standard basis 
 
 Every basis for a D-dimensional space has exactly D basis vectors, any less and you cannot span the entire space, any more and your set of basis vectors becomes linearly dependent. But what defines the dimensionality of a space? Well, since we know that the size of basis must equal the dimension of a space lets express the dimension of a space (a linear space to be exact) as the size of a basis for that space. This equality between the dimension of a space and the size of its basis provides an algebraic abstraction that will become especially useful when dealing with arbitrarily large dimensions. 
 
-Next Article: [[Paravectors and Direct Sums]] 
+Next Article: [Paravectors and Direct Sums](article.html?slug=\geometric_algebra\Paravectors%20and%20Direct%20Sums)

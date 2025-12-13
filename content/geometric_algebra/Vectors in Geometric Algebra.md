@@ -22,5 +22,5 @@ We can see that a vector does not depend on where it is placed in space or in ot
 
 For our upcoming objective of defining operations on vectors we can think of vectors as arrows that are translation invariant. I will express vectors as letters in notation usually in terms of $u$, $v$, and $w$. 
 
-The next article is [[Algebra of Vectors]]
+The next article is [Algebra of Vectors](article.html?slug=\geometric_algebra\Algebra%20of%20Vectors)
 

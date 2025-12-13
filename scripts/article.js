@@ -161,7 +161,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       img.decoding = 'async';
     });
 
+    // Apply Syntax Highlighting
+    if (window.hljs) {
+      hljs.highlightAll();
+    }
+
     await typesetMath(contentEl);
+
+    // Check if this is a reload and if we have saved state for this specific article
+    const navEntry = performance.getEntriesByType("navigation")[0];
+    if (navEntry && navEntry.type === 'reload') {
+      try {
+        const savedState = JSON.parse(sessionStorage.getItem('scrollState'));
+        // Only restore if the saved slug matches the current slug
+        // (This prevents jumping down if you reload, then quickly navigate elsewhere)
+        if (savedState && savedState.slug === raw) { 
+          // Slight delay to ensure images/layout have stabilized
+          setTimeout(() => {
+            window.scrollTo(0, savedState.scrollY);
+          }, 10);
+        }
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
+    }
 
     // --- SCROLL FIX: If URL has #hash, scroll to it now that content exists ---
     if (window.location.hash) {
@@ -315,6 +338,19 @@ function rewriteLinksAndMedia(container, mdDirUrl, imagesBaseDirUrl) {
     }
   });
 }
+
+window.addEventListener('beforeunload', () => {
+  // Only save if we are on an article page
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  if (slug) {
+    const state = {
+      slug: slug,
+      scrollY: window.scrollY
+    };
+    sessionStorage.setItem('scrollState', JSON.stringify(state));
+  }
+});
 
 // --- HELPER ---
 function slugify(text) {

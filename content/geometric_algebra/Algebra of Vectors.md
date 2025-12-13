@@ -48,4 +48,4 @@ Lastly and somewhat importantly:
 ### Normalization
 $\frac{v}{|v|} = \hat{v}$ or in other words a vector divided by its length is the same vector but now with length of one aka a unit vector. 
 
-Next article: [[Spaces, Spans, Basis, and Dimensions]] 
+Next article: [Spaces, Spans, Basis, and Dimensions](article.html?slug=\geometric_algebra\Spaces,%20Spans,%20Basis,%20and%20Dimensions)
