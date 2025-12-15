@@ -1,5 +1,17 @@
 [
   {
+    "slug": "programming/Programming",
+    "title": "Programming",
+    "category": "programming",
+    "subcategory": "",
+    "summary": "Motivation for programming articles.",
+    "date": "2025-12-13",
+    "nodeType": "topic",
+    "tags": ["topic"],
+    "links": [""]
+
+  },
+  {
     "slug": "programming/graphics/Graphics",
     "title": "Graphics",
     "category": "programming",
@@ -8,7 +20,7 @@
     "date": "2025-09-17",
     "nodeType": "subtopic",
     "tags": ["subtopic"],
-    "links": [""]
+    "links": ["programming/Programming"]
   },
   {
     "slug": "ai/ML",
@@ -51,6 +63,17 @@
     "subcategory": "graphics",
     "summary": "Polygon convexity.",
     "date": "2025-09-24",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "programming/graphics/Collisions/Collisions",
+    "title": "Collisions",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Collision detection algorithms.",
+    "date": "2025-12-14",
     "nodeType": "article",
     "tags": ["Article"],
     "links": ["programming/graphics/Graphics"]
@@ -105,7 +128,7 @@
     "category": "",
     "subcategory": "",
     "summary": "Rodrigues rotation algorithm and explanation.",
-    "date": "2025-09-18",
+    "date": "2025-12-13",
     "nodeType": "article",
     "tags": [""],
     "links": ["programming/graphics/Graphics"]
@@ -180,6 +203,16 @@
     "date": "2025-11-26",
     "nodeType": "article",
     "links": ["geometric_algebra/Geometric Algebra"]
+  },
+  {
+    "slug": "programming/products/Products",
+    "title": "Products",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of products.",
+    "date": "2025-12-13",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
   }
 
 
