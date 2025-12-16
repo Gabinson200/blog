@@ -89,6 +89,17 @@
     "tags": ["Article"],
     "links": ["programming/graphics/Graphics"]
   },
+     {
+    "slug": "programming/graphics/Splines/Splines",
+    "title": "Splines",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Article on splines, curves, and spline surfaces.",
+    "date": "2025-12-16",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
   {
     "slug": "programming/graphics/2D and 3D Transformations/2D and 3D Transformations",
     "title": "2D and 3D Transformations",
