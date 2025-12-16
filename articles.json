@@ -78,6 +78,17 @@
     "tags": ["Article"],
     "links": ["programming/graphics/Graphics"]
   },
+   {
+    "slug": "programming/graphics/Surfaces/Surfaces",
+    "title": "Surfaces",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Implicit, Parametric, and Quadric Surfaces",
+    "date": "2025-12-16",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
   {
     "slug": "programming/graphics/2D and 3D Transformations/2D and 3D Transformations",
     "title": "2D and 3D Transformations",

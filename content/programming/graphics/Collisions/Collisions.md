@@ -203,18 +203,21 @@ If a point lies outside, expand the sphere just enough to include it while keepi
 Let:
 $$d = |p_i - c|$$
 If $d > r$, update:
-- new radius is halfway between $r$ and $d$:
+
+$$r' = \frac{1}{2}(d-r) + r$$ where $(d-r)/2$ is the additional radius contributed by $p_i$.  
+Equivalently we can just say new radius is halfway between $r$ and $d$:
 $$r' = \frac{r + d}{2}$$
 - shift the center towards $p_i$ along the direction from $c$ to $p_i$:
-$$c' = c + \left(\frac{r' - r}{d}\right)(p_i - c)$$
+$$c' = c + (\frac{p_i - c}{d})(r' - r)$$ 
+Note: $\frac{p_i - c}{d} = \frac{p_i - c}{|p_i - c|}$ is just the unit length vector denoting the direction of the shift and $(r' - r)$ is the magnitude of the shift. 
 Then set $c = c'$, $r = r'$ and continue.
 
 Intuition: the new sphere is the smallest sphere that contains the old sphere and the point $p_i$, and the new center lies on the line segment from $c$ to $p_i$.
 
 ### Computational Notes:
 - Runtime is $O(N)$ (two farthest-point scans + one pass to grow).
-- The result is not guaranteed to be the true minimum bounding sphere, but it is usually very close for real geometry.
-- If you want it tighter, you can run the algorithm multiple times with different starting points and keep the smallest sphere.
+- The result is not guaranteed to be the true minimum bounding sphere, but it is usually very close for real geometry. Usually off by (5%-20%)
+- If we want it tighter, we can run the algorithm multiple times with different starting points and keep the smallest sphere.
 
 ## Sphere-Sphere Collision
 
@@ -225,6 +228,8 @@ $$|c_1 - c_2| \leq r_1 + r_2$$
 
 A plane can be represented by a point $p_0$ on the plane and a unit normal $N$. The signed distance from a point $x$ to the plane is:
 $$d(x) = (x - p_0)\cdot N$$
+The above can be proven by the fact that $a \cdot b = |a||b|cos(\theta)$, $a = (x - p_0)$, $b = N$, since $|N|=1$ $d(x) = |(x - p_0)|cos(\theta)$
+
 For a sphere with center $c$ and radius $r$, collision occurs when the sphere intersects or touches the plane:
 $$(c - p_0)\cdot N \le r$$
 (If the plane is two-sided, use $|(c - p_0)\cdot N| \le r$.)
