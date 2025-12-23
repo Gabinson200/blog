@@ -2,7 +2,7 @@
 
 In this article I want to explore the basic products used throughout different algebraic mathematics and their relationships. Additionally, I want to also take a computational approach and see how they may be leveraged for optimizations as modern GPUs and NPUs are built for maximizing MACs (matrix multiplications and additions).
 
-> The following article will introduce the geometric product first and then try to decompose it into the dot and wedge products, this is a little backwards as conceptually it is easier to build the geometric product up but I want the article to take a top-down style approach.
+> The following article will introduce the geometric product first and then try to decompose it into the dot and wedge products, this is a little backwards as conceptually it is easier to build the geometric product up but I want the article to take a top-down style approach to demonstrate how we can "pull out" the products we are familiar with from the geometric product.
 
 
 # THE (geometric) product 
@@ -20,11 +20,13 @@ If we go forward in time to Egypt around 1770 BC when the concept of zero was fi
 If we go forward in time to around 3rd-2nd century BCE China when negative numbers were first used we can find the:
 - Rules for signs: $-a \times b = -(a \times b)$ and $-a \times -b = a \times b$
 
-The above is the definition and properties of THE (geometric) product in 1D (for scalars).
+(The above is the definition and properties of THE (geometric) product in 1D (for scalars).)
 
-I explicitly write out these properties of multiplication not because I assume you are around the age of 10 but because by modifying or adding / subtracting from them we can create new types of products. 
+I explicitly write out these properties of multiplication not because I assume you are around the age of 10 but because by modifying or adding / subtracting from them we can create new types of products.
 
-Finally, since we will be working with vectors lets define $v_1, v_2, ... v_k$ k vectors in $R^n$ where each vector has an n-dimensional orthonormal basis ${e_1, e_2, ... e_n}$
+**Motivation:** The next question you might have is: can we multiply together two vectors the same way as we do with simple numbers? Furthermore, what might the geometric interpretation of this operation be?
+
+Since we will be working with vectors lets define $v_1, v_2, ... v_k$ k vectors in $R^n$ where each vector has an n-dimensional orthonormal basis ${e_1, e_2, ... e_n}$
 
 > From now on assume all our basis are orthonormal ie perpendicular to each other and unit length.
 
@@ -40,9 +42,9 @@ $$aa=(3e_1​)(3e_1​) =
 3\times 3\times (e_1​e_1​) = 
 a^2=9e_1^2​$$
 
-For this to match the reality we live in, where $3\times 3$ is simply the scalar 9, we are forced to conclude that $e_1^2$​ must equal 1.
+For this to match the reality we live in, where $3\times 3$ is simply the scalar 9, we would be wise to decide that $e_1^2$​ must equal 1.
 This gives us our first fundamental geometric rule: Squaring a unit basis vector yields the scalar. $$e^2 = 1$$ or in general $$v^2 = |v|^2$$
-This seems trivial, but it has a profound physical implication: multiplying two parallel vectors (like $e_1$​ and $e_1$​) results in a pure scalar quantity. The "direction" is consumed, leaving only magnitude. Additionally, if $e^2 = 0$ or some other vector, we couldn't easily undo multiplication. By setting $e^2 = 1$, we ensure that $e$ is its own inverse. This allows us to divide by vectors, something that we could not do with the dot or cross products. Another way to justify $v^2 = |v|^2$ is by using $|a|^2 = |a_1e_1|^2 + |a_2e_2|^2$. We know $a$ is a 2D vector that is defined by the addition of two 1D vectors. Lets assume the the side lengths of a right triangle are 1, 1, $\sqrt 2$ as found by the scalar version of Pythagoras formula. Thus:
+This seems trivial, but it has a profound implication: multiplying two parallel vectors (like $e_1$​ and $e_1$​) results in a pure scalar quantity. The "direction" is consumed, leaving only magnitude. Additionally, if $e^2 = 0$ or some other vector, we couldn't easily undo multiplication. By setting $e^2 = 1$, we ensure that $e$ is its own inverse. This allows us to divide by vectors, something that we could not do with the dot or cross products. Another way to justify $v^2 = |v|^2$ is by using $|a|^2 = |a_1e_1|^2 + |a_2e_2|^2$. We know $a$ is a 2D vector that is defined by the addition of two 1D vectors. Lets assume the the side lengths of a right triangle are 1, 1, $\sqrt 2$ as found by the scalar version of Pythagoras formula. Thus:
 $$|a| = \sqrt 2 \rightarrow |a|^2 = 2 = |a_1e_1|^2 + |a_2e_2|^2 \rightarrow e_1 /e_2 = 1$$
 
 
@@ -51,7 +53,7 @@ $$vw = (v_1e_1 + v_2e_2)(w_1e_1 + w_2e_2) = v_1w_1e_1^2 + v_1w_2e_1e_2 + v_2w_1e
 $e_1^2 \text{ and } e_2^2 \rightarrow 1$ thus:
 $$v_1w_1 + v_1w_2e_1e_2 + v_2w_1e_1e_2 + v_2w_2$$
 
-Now we hit a snag. What is the relationship between $e_1​e_2$​ and $e_2​e_1$​? Are they the same? Let's use the fact that squaring measures length on the vector sum ($e_1​+e_2$​). Geometrically, $e_1​+e_2$​ is the diagonal of a unit square. By Pythagoras, its length squared is 2. Algebraically, we expand:
+Now we hit a snag. What is the relationship between $e_1​e_2$​ and $e_2​e_1$​? Are they the same? Let's use the fact that squaring measures length on the vector sum ($e_1​+e_2$​). Geometrically, $e_1​+e_2$​ is the diagonal of a unit square ($\sqrt 2$). By Pythagoras, its length squared is 2. Algebraically, we expand:
 $$(e_1 + e_2)^2 = e_1^2 + e_1e_2 + e_2e_1+ e_2^2$$
 $$2 = 1 + (e_1e_2 + e_2e_1) + 1$$
 $$0 = e_1e_2 + e_2e_1$$
@@ -67,10 +69,15 @@ Now we have successfully decomposed the geometric product into two distinct part
 1. The scalar part (Dot product): $(v_1w_1 + v_2w_2)$
 2. The Bivector Part (Wedge Product): $(v_1w_2 - v_2w_1)e_1e_2$
 
-using caveman logic and the two additionally derived properties of geometric products:
+Lets recap, using caveman logic and the two additionally derived properties of geometric products:
 - $v^2 = |v|^2$
 - $-e_1e_2 = e_2e_1$
+we found the geometric product which I will denote as $#$ for the rest of the article.
+> In most mathematical settings the geometric product just uses juxtaposition $ab$ to denote the geometric product between $a$ and $b$, and sometimes even use the $\Pi$ symbol. 
 
+We also found that the geometric product is the addition of a scalar component which encodes some information about magnitude and a (bi)vector component that encodes some information about orientation. The next logical question we might have is: this is all nice and all but how the hell do we add together a scalar and a vector or bivector and what is its geometric interpretation? At first this seems like an impossible proposition but remember that for polar coordinates: $a+bi$ we add together a real and imaginary part. There is no way to actually combine a real and imaginary parts into a single value but we can still interpret their addition as a 2D coordinate. The same thing applies for the geometric product, we cannot add and thus reduce the equation into one irreducible mathematical object but we can view the addition as a oriented plane segments with some size in 3D space, for 2D vector geometric products. Geometrically, the bivector $e_1e_2$ part defines an oriented plane which $e_1$ and $e_2$ "span", and the scalar part represents a magnitude associated with that plane. (In a physics context the scalar part represents a "time-like" part).
+
+Geometrically, this this makes much more sense to me than when I first learnt the dot and cross products since multiplying two 2D vectors together should logically define some area with size in 3D space and since vectors also have a direction they are generally not commutative so some notion of orientation (clockwise vs counter clockwise) needs to be accounted for. 
 
 # Wedge Product 
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Webring - TheFirstMan</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .member-list { list-style: none; padding: 0; }
+      .member-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
+      .code-block { background: #000000; padding: 1rem; border-radius: 4px; overflow-x: auto; font-family: monospace; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title"><a href="./">TheFirstMan's Blog</a></h1>
+      <nav class="site-nav">
+        <ul id="category-list" class="nav-list"></ul>
+      </nav>
+    </header>
+    <main class="site-main">
+      <h2>The Webring</h2>
+      <p>A collection of personal websites from my friends and peers.</p>
+      
+      <div id="thefirstman-webring"></div>
+
+      <h3>Member List</h3>
+      <ul id="full-member-list" class="member-list"></ul>
+
+      <h3>Join the Ring</h3>
+      <p>To join, ask me to add you to the database. Then, add this snippet to your site:</p>
+      <pre class="code-block">
+&lt;div id="thefirstman-webring"&gt;&lt;/div&gt;
+&lt;script src="https://YOUR_USERNAME.github.io/REPO_NAME/scripts/webring-widget.js"&gt;&lt;/script&gt;
+      </pre>
+    </main>
+    <footer class="site-footer">
+    </footer>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/webring-widget.js"></script>
+    <script>
+      // Simple script to render the full list on this specific page
+      fetch('webring.json')
+        .then(r => r.json())
+        .then(data => {
+          const list = document.getElementById('full-member-list');
+          data.forEach(m => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong><a href="${m.url}">${m.name}</a></strong> <small>(${m.owner})</small>`;
+            list.appendChild(li);
+          });
+        });
+    </script>
+  </body>
+</html>

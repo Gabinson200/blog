@@ -59,14 +59,15 @@ function collectCategories(articles) {
  *
  * @param {Object} categories
  */
+/* In scripts/main.js */
+
 function buildNavigation(categories) {
   const navList = document.getElementById('category-list');
   if (!navList) return;
-  // Clear existing nav items
   navList.innerHTML = '';
-  Object.keys(categories)
-    .sort()
-    .forEach((cat) => {
+  
+  // 1. Categories
+  Object.keys(categories).sort().forEach((cat) => {
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = `list.html?category=${encodeURIComponent(cat)}`;
@@ -74,13 +75,22 @@ function buildNavigation(categories) {
       li.appendChild(a);
       navList.appendChild(li);
     });
-  // Additional link to mindmap
+
+  // 2. Mindmap Link
   const mindLi = document.createElement('li');
   const mindA = document.createElement('a');
   mindA.href = 'mindmap.html';
   mindA.textContent = 'Mindmap';
   mindLi.appendChild(mindA);
   navList.appendChild(mindLi);
+
+  // 3. NEW: Webring Link
+  const ringLi = document.createElement('li');
+  const ringA = document.createElement('a');
+  ringA.href = 'webring.html';
+  ringA.textContent = 'Webring';
+  ringLi.appendChild(ringA);
+  navList.appendChild(ringLi);
 }
 
 /**
