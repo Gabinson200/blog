@@ -235,6 +235,16 @@
     "date": "2025-12-13",
     "nodeType": "article",
     "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
+  },
+  {
+    "slug": "hardware/micro memory/micro_memory",
+    "title": "Products",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of products.",
+    "date": "2025-12-13",
+    "nodeType": "article",
+    "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
   }
 
 
