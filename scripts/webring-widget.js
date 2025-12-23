@@ -46,7 +46,7 @@
 
       // Inject HTML
       const html = `
-        <div style="font-family: sans-serif; border: 1px solid #ccc; padding: 1rem; border-radius: 6px; text-align: center; max-width: 400px; margin: 1rem auto; background: #f9f9f9;">
+        <div style="font-family: sans-serif; border: 1px solid #358150ff; padding: 1rem; border-radius: 6px; text-align: center; max-width: 400px; margin: 1rem auto; background: #000000ff;">
           <div style="margin-bottom: 0.5rem; font-weight: bold;">TheFirstMan's Webring</div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <a href="${prev.url}" title="${prev.name}">&larr; ${prev.name}</a>
