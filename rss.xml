@@ -5,7 +5,7 @@
     <link>https://gabinson200.github.io/blog/</link>
     <atom:link href="https://gabinson200.github.io/blog/rss.xml" rel="self" type="application/rss+xml" />
     <description>Explorations in science, programming and curiosity.</description>
-    <lastBuildDate>Thu, 15 Jan 2026 21:41:13 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 15 Jan 2026 21:51:28 GMT</lastBuildDate>
     <language>en-us</language>
     <item>
         <title>Lecture 5 Differential Forms</title>
@@ -25,8 +25,8 @@
     </item>
     <item>
         <title>Overview</title>
-        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FOverview</link>
-        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FOverview</guid>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FDDG</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FDDG</guid>
         <description>Overview of discrete differential geometry.</description>
         <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
         <category>General</category>
@@ -104,10 +104,10 @@
         <category>General</category>
     </item>
     <item>
-        <title>Products</title>
+        <title>Micro Memory</title>
         <link>https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory</guid>
-        <description>Brief description of products.</description>
+        <description>Different types of memory in microcontrollers.</description>
         <pubDate>Sat, 13 Dec 2025 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>

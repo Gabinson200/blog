@@ -238,16 +238,16 @@
   },
   {
     "slug": "hardware/micro memory/micro_memory",
-    "title": "Products",
+    "title": "Micro Memory",
     "category": "",
     "subcategory": "",
-    "summary": "Brief description of products.",
+    "summary": "Different types of memory in microcontrollers.",
     "date": "2025-12-13",
     "nodeType": "article",
-    "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
+    "links": ["programming/Programming"]
   },
   {
-    "slug": "Discrete Differential Geometry/Overview",
+    "slug": "Discrete Differential Geometry/DDG",
     "title": "Overview",
     "category": "",
     "subcategory": "",
@@ -264,7 +264,7 @@
     "summary": "Brief description of spaces, spans, basis, and dimensions.",
     "date": "2026-1-13",
     "nodeType": "article",
-    "links": ["Discrete Differential Geometry/Overview"]
+    "links": ["Discrete Differential Geometry/DDG"]
   },
   {
     "slug": "Discrete Differential Geometry/Lecture2_meshes",
@@ -274,7 +274,7 @@
     "summary": "Meshes, manifolds, and related concepts.",
     "date": "2026-1-13",
     "nodeType": "article",
-    "links": ["Discrete Differential Geometry/Overview"]
+    "links": ["Discrete Differential Geometry/DDG"]
   },
   {
     "slug": "Discrete Differential Geometry/Lecture3_exterior_algebra",
@@ -284,7 +284,7 @@
     "summary": "Exterior algebra in the context of DDG.",
     "date": "2026-1-13",
     "nodeType": "article",
-    "links": ["Discrete Differential Geometry/Overview"]
+    "links": ["Discrete Differential Geometry/DDG"]
   },
   {
     "slug": "Discrete Differential Geometry/Lecture4_kforms",
@@ -294,7 +294,7 @@
     "summary": "K-forms as a way to generalize measurement.",
     "date": "2026-1-14",
     "nodeType": "article",
-    "links": ["Discrete Differential Geometry/Overview"]
+    "links": ["Discrete Differential Geometry/DDG"]
   },
   {
     "slug": "Discrete Differential Geometry/Lecture5_differential_forms",
@@ -304,7 +304,7 @@
     "summary": "Differential forms that allows the application of k-forms to fields.",
     "date": "2026-1-15",
     "nodeType": "article",
-    "links": ["Discrete Differential Geometry/Overview"]
+    "links": ["Discrete Differential Geometry/DDG"]
   }
 
 ]
