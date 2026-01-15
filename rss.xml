@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+    <title>TheFirstMan&apos;s Blog</title>
+    <link>https://gabinson200.github.io/blog/</link>
+    <atom:link href="https://gabinson200.github.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+    <description>Explorations in science, programming and curiosity.</description>
+    <lastBuildDate>Thu, 15 Jan 2026 21:41:13 GMT</lastBuildDate>
+    <language>en-us</language>
+    <item>
+        <title>Lecture 5 Differential Forms</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</guid>
+        <description>Differential forms that allows the application of k-forms to fields.</description>
+        <pubDate>Thu, 15 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Lecture 4 K Forms</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</guid>
+        <description>K-forms as a way to generalize measurement.</description>
+        <pubDate>Wed, 14 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Overview</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FOverview</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FOverview</guid>
+        <description>Overview of discrete differential geometry.</description>
+        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Lecture 1</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</guid>
+        <description>Brief description of spaces, spans, basis, and dimensions.</description>
+        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Lecture 2 Meshes</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</guid>
+        <description>Meshes, manifolds, and related concepts.</description>
+        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Lecture 3 Exterior Algebra</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</guid>
+        <description>Exterior algebra in the context of DDG.</description>
+        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Surfaces</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSurfaces%2FSurfaces</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSurfaces%2FSurfaces</guid>
+        <description>Implicit, Parametric, and Quadric Surfaces</description>
+        <pubDate>Tue, 16 Dec 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Splines</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSplines%2FSplines</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSplines%2FSplines</guid>
+        <description>Article on splines, curves, and spline surfaces.</description>
+        <pubDate>Tue, 16 Dec 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Collisions</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FCollisions%2FCollisions</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FCollisions%2FCollisions</guid>
+        <description>Collision detection algorithms.</description>
+        <pubDate>Sun, 14 Dec 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Programming</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2FProgramming</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2FProgramming</guid>
+        <description>Motivation for programming articles.</description>
+        <pubDate>Sat, 13 Dec 2025 00:00:00 GMT</pubDate>
+        <category>programming</category>
+    </item>
+    <item>
+        <title>Rodrigues Rotation</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRodrigues%20Rotation%2FRodrigues%20Rotation</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRodrigues%20Rotation%2FRodrigues%20Rotation</guid>
+        <description>Rodrigues rotation algorithm and explanation.</description>
+        <pubDate>Sat, 13 Dec 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Products</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fproducts%2FProducts</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fproducts%2FProducts</guid>
+        <description>Brief description of products.</description>
+        <pubDate>Sat, 13 Dec 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Products</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory</guid>
+        <description>Brief description of products.</description>
+        <pubDate>Sat, 13 Dec 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Clipping</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FClipping%2FClipping</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FClipping%2FClipping</guid>
+        <description>Clipping explanation.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Geometric Algebra</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FGeometric%20Algebra</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FGeometric%20Algebra</guid>
+        <description>Motivation for geometric algebra articles.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Algebra of Vectors</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FAlgebra%20of%20Vectors</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FAlgebra%20of%20Vectors</guid>
+        <description>Brief description of algebra of vectors.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Bivectors</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FBivectors</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FBivectors</guid>
+        <description>Bivectors.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Paravectors and Direct Sums</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FParavectors%20and%20Direct%20Sums</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FParavectors%20and%20Direct%20Sums</guid>
+        <description>Brief description of paravectors and direct sums.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Spaces, Spans, Basis, and Dimensions</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FSpaces%2C%20Spans%2C%20Basis%2C%20and%20Dimensions</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FSpaces%2C%20Spans%2C%20Basis%2C%20and%20Dimensions</guid>
+        <description>Brief description of spaces, spans, basis, and dimensions.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Vectors in Geometric Algebra</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FVectors%20in%20Geometric%20Algebra</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FVectors%20in%20Geometric%20Algebra</guid>
+        <description>Brief description of vectors in geometric algebra.</description>
+        <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Vertex Shader</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FVertex%20Shader%2FVertex%20Shader</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FVertex%20Shader%2FVertex%20Shader</guid>
+        <description>Vertex Shader explanation.</description>
+        <pubDate>Tue, 25 Nov 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>MLE and MAP</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</guid>
+        <description>Explanation of MLE and MAP.</description>
+        <pubDate>Tue, 07 Oct 2025 04:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>2D and 3D Transformations</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2F2D%20and%203D%20Transformations%2F2D%20and%203D%20Transformations</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2F2D%20and%203D%20Transformations%2F2D%20and%203D%20Transformations</guid>
+        <description>2D and 3D transformations in computer graphics.</description>
+        <pubDate>Thu, 25 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Polygons</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FPolygons</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FPolygons</guid>
+        <description>Polygon convexity.</description>
+        <pubDate>Wed, 24 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Triangles</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTriangles%2FTriangles</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTriangles%2FTriangles</guid>
+        <description>Triangle drawing algorithms.</description>
+        <pubDate>Thu, 18 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>Rasterization</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2Frasterization</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2Frasterization</guid>
+        <description>Triangle drawing algorithms.</description>
+        <pubDate>Thu, 18 Sep 2025 00:00:00 GMT</pubDate>
+        <category>General</category>
+    </item>
+    <item>
+        <title>Graphics</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FGraphics</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FGraphics</guid>
+        <description>Motivation for graphic articles.</description>
+        <pubDate>Wed, 17 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+    <item>
+        <title>ML</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=ai%2FML</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=ai%2FML</guid>
+        <description>Motivation for ML articles.</description>
+        <pubDate>Wed, 17 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / ai</category>
+    </item>
+    <item>
+        <title>Lines</title>
+        <link>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FLines%2FLines</link>
+        <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FLines%2FLines</guid>
+        <description>Line drawing algorithms.</description>
+        <pubDate>Fri, 12 Sep 2025 00:00:00 GMT</pubDate>
+        <category>programming / graphics</category>
+    </item>
+</channel>
+</rss>
