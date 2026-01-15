@@ -245,7 +245,66 @@
     "date": "2025-12-13",
     "nodeType": "article",
     "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Overview",
+    "title": "Overview",
+    "category": "",
+    "subcategory": "",
+    "summary": "Overview of discrete differential geometry.",
+    "date": "2026-1-13",
+    "nodeType": "subtopic",
+    "links": []
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture1",
+    "title": "Lecture 1",
+    "category": "",
+    "subcategory": "",
+    "summary": "Brief description of spaces, spans, basis, and dimensions.",
+    "date": "2026-1-13",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/Overview"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture2_meshes",
+    "title": "Lecture 2 Meshes",
+    "category": "",
+    "subcategory": "",
+    "summary": "Meshes, manifolds, and related concepts.",
+    "date": "2026-1-13",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/Overview"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture3_exterior_algebra",
+    "title": "Lecture 3 Exterior Algebra",
+    "category": "",
+    "subcategory": "",
+    "summary": "Exterior algebra in the context of DDG.",
+    "date": "2026-1-13",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/Overview"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture4_kforms",
+    "title": "Lecture 4 K Forms",
+    "category": "",
+    "subcategory": "",
+    "summary": "K-forms as a way to generalize measurement.",
+    "date": "2026-1-14",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/Overview"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture5_differential_forms",
+    "title": "Lecture 5 Differential Forms",
+    "category": "",
+    "subcategory": "",
+    "summary": "Differential forms that allows the application of k-forms to fields.",
+    "date": "2026-1-15",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/Overview"]
   }
-
 
 ]

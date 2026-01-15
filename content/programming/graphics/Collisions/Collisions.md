@@ -204,11 +204,19 @@ Let:
 $$d = |p_i - c|$$
 If $d > r$, update:
 
-$$r' = \frac{1}{2}(d-r) + r$$ where $(d-r)/2$ is the additional radius contributed by $p_i$.  
+$$r' = \frac{1}{2} (d-r) + r$$
+
+where $(d-r)/2$ is the additional radius contributed by $p_i$.
+
 Equivalently we can just say new radius is halfway between $r$ and $d$:
-$$r' = \frac{r + d}{2}$$
+
+$$r' = \frac{r + d}{2} $$
+
+
 - shift the center towards $p_i$ along the direction from $c$ to $p_i$:
-$$c' = c + (\frac{p_i - c}{d})(r' - r)$$ 
+
+$$c' = c + \frac{p_i - c}{d} (r' - r)$$
+
 Note: $\frac{p_i - c}{d} = \frac{p_i - c}{|p_i - c|}$ is just the unit length vector denoting the direction of the shift and $(r' - r)$ is the magnitude of the shift. 
 Then set $c = c'$, $r = r'$ and continue.
 
