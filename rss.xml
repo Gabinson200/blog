@@ -5,14 +5,14 @@
     <link>https://gabinson200.github.io/blog/</link>
     <atom:link href="https://gabinson200.github.io/blog/rss.xml" rel="self" type="application/rss+xml" />
     <description>Explorations in science, programming and curiosity.</description>
-    <lastBuildDate>Thu, 15 Jan 2026 21:51:28 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 15 Jan 2026 21:52:25 GMT</lastBuildDate>
     <language>en-us</language>
     <item>
         <title>Lecture 5 Differential Forms</title>
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</guid>
         <description>Differential forms that allows the application of k-forms to fields.</description>
-        <pubDate>Thu, 15 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -20,7 +20,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</guid>
         <description>K-forms as a way to generalize measurement.</description>
-        <pubDate>Wed, 14 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Wed, 14 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -28,7 +28,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FDDG</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FDDG</guid>
         <description>Overview of discrete differential geometry.</description>
-        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Tue, 13 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -36,7 +36,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</guid>
         <description>Brief description of spaces, spans, basis, and dimensions.</description>
-        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Tue, 13 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -44,7 +44,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</guid>
         <description>Meshes, manifolds, and related concepts.</description>
-        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Tue, 13 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -52,7 +52,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</guid>
         <description>Exterior algebra in the context of DDG.</description>
-        <pubDate>Tue, 13 Jan 2026 05:00:00 GMT</pubDate>
+        <pubDate>Tue, 13 Jan 2026 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
@@ -180,7 +180,7 @@
         <link>https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</link>
         <guid isPermaLink="true">https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</guid>
         <description>Explanation of MLE and MAP.</description>
-        <pubDate>Tue, 07 Oct 2025 04:00:00 GMT</pubDate>
+        <pubDate>Tue, 07 Oct 2025 00:00:00 GMT</pubDate>
         <category>General</category>
     </item>
     <item>
