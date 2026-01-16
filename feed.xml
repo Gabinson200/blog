@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>TheFirstMan&apos;s Blog</title>
+    <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
+    <link href="https://gabinson200.github.io/blog/"/>
+    <updated>2026-01-15T05:00:00.000Z</updated>
+    <id>https://gabinson200.github.io/blog/</id>
+    <author>
+        <name>TheFirstMan</name>
+    </author>
+
+    <entry>
+        <title>Lecture 5 Differential Forms</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</id>
+        <published>2026-01-15T05:00:00.000Z</published>
+        <updated>2026-01-15T05:00:00.000Z</updated>
+        <summary>Differential forms that allows the application of k-forms to fields.</summary>
+        
+    </entry>
+    <entry>
+        <title>Lecture 4 K Forms</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</id>
+        <published>2026-01-14T05:00:00.000Z</published>
+        <updated>2026-01-14T05:00:00.000Z</updated>
+        <summary>K-forms as a way to generalize measurement.</summary>
+        
+    </entry>
+    <entry>
+        <title>Lecture 1</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</id>
+        <published>2026-01-13T05:00:00.000Z</published>
+        <updated>2026-01-13T05:00:00.000Z</updated>
+        <summary>Brief description of spaces, spans, basis, and dimensions.</summary>
+        
+    </entry>
+    <entry>
+        <title>Lecture 2 Meshes</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</id>
+        <published>2026-01-13T05:00:00.000Z</published>
+        <updated>2026-01-13T05:00:00.000Z</updated>
+        <summary>Meshes, manifolds, and related concepts.</summary>
+        
+    </entry>
+    <entry>
+        <title>Lecture 3 Exterior Algebra</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</id>
+        <published>2026-01-13T05:00:00.000Z</published>
+        <updated>2026-01-13T05:00:00.000Z</updated>
+        <summary>Exterior algebra in the context of DDG.</summary>
+        
+    </entry>
+    <entry>
+        <title>Surfaces</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSurfaces%2FSurfaces"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSurfaces%2FSurfaces</id>
+        <published>2025-12-16T00:00:00.000Z</published>
+        <updated>2025-12-16T00:00:00.000Z</updated>
+        <summary>Implicit, Parametric, and Quadric Surfaces</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Splines</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSplines%2FSplines"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FSplines%2FSplines</id>
+        <published>2025-12-16T00:00:00.000Z</published>
+        <updated>2025-12-16T00:00:00.000Z</updated>
+        <summary>Article on splines, curves, and spline surfaces.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Collisions</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FCollisions%2FCollisions"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FCollisions%2FCollisions</id>
+        <published>2025-12-14T00:00:00.000Z</published>
+        <updated>2025-12-14T00:00:00.000Z</updated>
+        <summary>Collision detection algorithms.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Rodrigues Rotation</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRodrigues%20Rotation%2FRodrigues%20Rotation"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRodrigues%20Rotation%2FRodrigues%20Rotation</id>
+        <published>2025-12-13T00:00:00.000Z</published>
+        <updated>2025-12-13T00:00:00.000Z</updated>
+        <summary>Rodrigues rotation algorithm and explanation.</summary>
+        
+    </entry>
+    <entry>
+        <title>Products</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fproducts%2FProducts"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fproducts%2FProducts</id>
+        <published>2025-12-13T00:00:00.000Z</published>
+        <updated>2025-12-13T00:00:00.000Z</updated>
+        <summary>Brief description of products.</summary>
+        
+    </entry>
+    <entry>
+        <title>Micro Memory</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=hardware%2Fmicro%20memory%2Fmicro_memory</id>
+        <published>2025-12-13T00:00:00.000Z</published>
+        <updated>2025-12-13T00:00:00.000Z</updated>
+        <summary>Different types of memory in microcontrollers.</summary>
+        
+    </entry>
+    <entry>
+        <title>Clipping</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FClipping%2FClipping"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FClipping%2FClipping</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Clipping explanation.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Algebra of Vectors</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FAlgebra%20of%20Vectors"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FAlgebra%20of%20Vectors</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Brief description of algebra of vectors.</summary>
+        
+    </entry>
+    <entry>
+        <title>Bivectors</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FBivectors"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FBivectors</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Bivectors.</summary>
+        
+    </entry>
+    <entry>
+        <title>Paravectors and Direct Sums</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FParavectors%20and%20Direct%20Sums"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FParavectors%20and%20Direct%20Sums</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Brief description of paravectors and direct sums.</summary>
+        
+    </entry>
+    <entry>
+        <title>Spaces, Spans, Basis, and Dimensions</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FSpaces%2C%20Spans%2C%20Basis%2C%20and%20Dimensions"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FSpaces%2C%20Spans%2C%20Basis%2C%20and%20Dimensions</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Brief description of spaces, spans, basis, and dimensions.</summary>
+        
+    </entry>
+    <entry>
+        <title>Vectors in Geometric Algebra</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FVectors%20in%20Geometric%20Algebra"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=geometric_algebra%2FVectors%20in%20Geometric%20Algebra</id>
+        <published>2025-11-26T00:00:00.000Z</published>
+        <updated>2025-11-26T00:00:00.000Z</updated>
+        <summary>Brief description of vectors in geometric algebra.</summary>
+        
+    </entry>
+    <entry>
+        <title>Vertex Shader</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FVertex%20Shader%2FVertex%20Shader"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FVertex%20Shader%2FVertex%20Shader</id>
+        <published>2025-11-25T00:00:00.000Z</published>
+        <updated>2025-11-25T00:00:00.000Z</updated>
+        <summary>Vertex Shader explanation.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>MLE and MAP</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</id>
+        <published>2025-10-07T04:00:00.000Z</published>
+        <updated>2025-10-07T04:00:00.000Z</updated>
+        <summary>Explanation of MLE and MAP.</summary>
+        
+    </entry>
+    <entry>
+        <title>2D and 3D Transformations</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2F2D%20and%203D%20Transformations%2F2D%20and%203D%20Transformations"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2F2D%20and%203D%20Transformations%2F2D%20and%203D%20Transformations</id>
+        <published>2025-09-25T00:00:00.000Z</published>
+        <updated>2025-09-25T00:00:00.000Z</updated>
+        <summary>2D and 3D transformations in computer graphics.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Polygons</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FPolygons"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FPolygons</id>
+        <published>2025-09-24T00:00:00.000Z</published>
+        <updated>2025-09-24T00:00:00.000Z</updated>
+        <summary>Polygon convexity.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Triangles</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTriangles%2FTriangles"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTriangles%2FTriangles</id>
+        <published>2025-09-18T00:00:00.000Z</published>
+        <updated>2025-09-18T00:00:00.000Z</updated>
+        <summary>Triangle drawing algorithms.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Lines</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FLines%2FLines"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FLines%2FLines</id>
+        <published>2025-09-12T00:00:00.000Z</published>
+        <updated>2025-09-12T00:00:00.000Z</updated>
+        <summary>Line drawing algorithms.</summary>
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+</feed>
