@@ -8,9 +8,23 @@
     <style>
       /* Additional styles specifically for mindmap */
       #mindmap {
-        width: 100%;
-        height: 70vh;
+        /* Break out of the parent container width */
+        width: 84vw; 
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -42vw;
+        margin-right: -42vw;
+        
+        /* Height */
+        height: 85vh;
+        
+        /* Visuals */
         margin-top: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden; /* Important for zoom/pan */
+        background-color: var(--bg-color);
       }
       .node circle {
         fill: var(--accent-color);

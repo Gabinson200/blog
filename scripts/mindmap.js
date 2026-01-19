@@ -58,7 +58,7 @@ function buildGraph(articles) {
 /** Render graph into #mindmap */
 function renderGraph(graph) {
   const container = document.getElementById('mindmap');
-  if (!container) return; // mindmap.html provides this container
+  if (!container) return;
   container.innerHTML = '';
 
   const width  = container.clientWidth  || 900;
@@ -66,9 +66,24 @@ function renderGraph(graph) {
 
   const svg = d3.select(container).append('svg')
     .attr('width', width)
-    .attr('height', height);
+    .attr('height', height)
+    .style('background', 'var(--bg-color)'); // Ensure background matches theme
 
-  // Arrow marker for links
+  // 1. Create a "g" group to hold everything (this is what we will zoom)
+  const gContent = svg.append('g');
+
+  // 2. Add Zoom Behavior
+  const zoom = d3.zoom()
+    .scaleExtent([0.1, 8]) // Zoom out to 0.1x, in to 8x
+    .on('zoom', (event) => {
+      gContent.attr('transform', event.transform);
+    });
+
+  // Attach zoom to SVG
+  svg.call(zoom)
+     .on("dblclick.zoom", null); // Disable double-click zoom
+
+  // Define Arrow Markers
   const defs = svg.append('defs');
   defs.append('marker')
     .attr('id', 'arrow')
@@ -82,23 +97,35 @@ function renderGraph(graph) {
     .attr('d', 'M0,-5L10,0L0,5')
     .attr('fill', 'currentColor');
 
-  const gLinks = svg.append('g').attr('class', 'links');
-  const gNodes = svg.append('g').attr('class', 'nodes');
-
-  const link = gLinks.selectAll('line')
-    .data(graph.links, d => `${d.source}->${d.target}`)
+  // 3. Append links/nodes to gContent (NOT svg)
+  const link = gContent.append('g').attr('class', 'links')
+    .selectAll('line')
+    .data(graph.links)
     .join('line')
     .attr('class', 'link')
     .attr('stroke-width', 1.1)
     .attr('marker-end', 'url(#arrow)');
 
-  const node = gNodes.selectAll('g.node')
-    .data(graph.nodes, d => d.id)
+  const node = gContent.append('g').attr('class', 'nodes')
+    .selectAll('g.node')
+    .data(graph.nodes)
     .join('g')
     .attr('class', 'node')
-    .style('cursor', 'pointer');
+    .call(d3.drag()
+      .on('start', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on('drag', (event, d) => {
+        d.fx = event.x;
+        d.fy = event.y;
+      })
+      .on('end', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null; d.fy = null;
+      })
+    );
 
-  // Use inline style for fill so it overrides page CSS
   node.append('circle')
     .attr('r', d => d.r)
     .style('fill', d => d.color)
@@ -108,129 +135,32 @@ function renderGraph(graph) {
   node.append('text')
     .attr('dy', 4)
     .attr('x', d => d.r + 6)
-    .attr('text-anchor', 'start')
     .text(d => d.label);
 
-  // Click: navigate to the article page for any node
   node.on('click', (event, d) => {
+    // Check if we are dragging (don't navigate if just dragging)
+    if (event.defaultPrevented) return;
     window.location.href = `article.html?slug=${encodeURIComponent(d.id)}`;
   });
 
+  // 4. Forces - Centered but NO clamping
+  const simulation = d3.forceSimulation(graph.nodes)
+    .force('link', d3.forceLink(graph.links).id(d => d.id).distance(100))
+    .force('charge', d3.forceManyBody().strength(-300))
+    .force('collide', d3.forceCollide(d => d.r + 10))
+    .force('x', d3.forceX(width / 2).strength(0.05)) // Gentle pull to center
+    .force('y', d3.forceY(height / 2).strength(0.05));
 
-function isTopicOrSubtopic(d) {
-  return d.nodeType === 'topic' || d.nodeType === 'subtopic';
-}
-
-function isLeaf(d) {
-  return d.nodeType === 'article' || d.nodeType === 'definition';
-}
-
-  // Forces (uniform; no type inference)
-  // Forces (type-aware)
-const simulation = d3.forceSimulation(graph.nodes)
-  .force(
-    'link',
-    d3.forceLink(graph.links)
-      .id(d => d.id)
-      .distance(link => {
-        const a = link.source;
-        const b = link.target;
-
-        // Articles/definitions stay fairly close to their topic/subtopic,
-        // giving that "circular halo" feeling.
-        if ((isLeaf(a) && isTopicOrSubtopic(b)) ||
-            (isLeaf(b) && isTopicOrSubtopic(a))) {
-          return 80;   // closer orbit around topics
-        }
-
-        // Topic–subtopic relationships can be a bit looser
-        if (isTopicOrSubtopic(a) && isTopicOrSubtopic(b)) {
-          return 200;
-        }
-
-        // Fallback for other links
-        return 100;
-      })
-      .strength(link => {
-        const a = link.source;
-        const b = link.target;
-
-        // Slightly stronger link between topic/subtopic and their leaves,
-        // so the leaves really "belong" to that hub.
-        if ((isLeaf(a) && isTopicOrSubtopic(b)) ||
-            (isLeaf(b) && isTopicOrSubtopic(a))) {
-          return 0.9;
-        }
-
-        // Weaker ties between topic/subtopic hubs
-        if (isTopicOrSubtopic(a) && isTopicOrSubtopic(b)) {
-          return 0.2;
-        }
-
-        return 0.6;
-      })
-  )
-  .force(
-    'charge',
-    d3.forceManyBody()
-      .strength(d => {
-        // 👉 Topic & subtopic nodes: *no repulsion*, even slight attraction
-        //   - use 0 for neutral, small positive for gentle attraction
-        if (isTopicOrSubtopic(d)) {
-          return -200;  // small positive => they pull toward each other
-        }
-
-        // Articles/definitions: keep repulsive so they spread
-        return -100;
-      })
-      .distanceMax(260)
-  )
-  .force('collide', d3.forceCollide(d => d.r + 6).strength(0.8))
-  .force(
-    'x',
-    d3.forceX(width / 2).strength(0)
-  )
-  .force(
-    'y',
-    d3.forceY(height / 2).strength(0)
-  )
-  .alphaDecay(0.06)
-  .velocityDecay(0.45);
-
-  // Drag: disable repulsion while dragging to prevent neighbors from flying away
-  node.call(
-    d3.drag()
-      .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.03).restart();
-        d.fx = d.x; d.fy = d.y;
-        //simulation.force('charge', d3.forceManyBody().strength(0));
-      })
-      .on('drag', (event, d) => {
-        d.fx = clamp(event.x, 10, width - 10);
-        d.fy = clamp(event.y, 10, height - 10);
-        //simulation.force('charge', d3.forceManyBody().strength(0));
-      })
-      .on('end', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null; d.fy = null;
-        //simulation.force('charge', d3.forceManyBody().strength(0).distanceMax(0));
-      })
-  );
-
-  // Keep nodes on screen
-  const pad = 20;
+  // 5. Tick function - Updates positions freely
   simulation.on('tick', () => {
-    for (const d of graph.nodes) {
-      d.x = clamp(d.x, pad, width - pad);
-      d.y = clamp(d.y, pad, height - pad);
-    }
     link
       .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
       .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+
     node.attr('transform', d => `translate(${d.x},${d.y})`);
   });
 
-  // Tiny legend: shows the 4 explicit types
+  // Legend (Stays fixed on SVG, does not zoom)
   makeLegend(svg, width, [
     { label: 'Topic',      type: 'topic' },
     { label: 'Subtopic',   type: 'subtopic' },
