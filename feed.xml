@@ -3,7 +3,7 @@
     <title>TheFirstMan&apos;s Blog</title>
     <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
     <link href="https://gabinson200.github.io/blog/"/>
-    <updated>2026-01-18T05:00:00.000Z</updated>
+    <updated>2026-01-18T00:00:00.000Z</updated>
     <id>https://gabinson200.github.io/blog/</id>
     <author>
         <name>TheFirstMan</name>
@@ -13,8 +13,8 @@
         <title>Lecture 7 Integration</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture7%2FLecture7_integration"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture7%2FLecture7_integration</id>
-        <published>2026-01-18T05:00:00.000Z</published>
-        <updated>2026-01-18T05:00:00.000Z</updated>
+        <published>2026-01-18T00:00:00.000Z</published>
+        <updated>2026-01-18T00:00:00.000Z</updated>
         <summary>Integration of differential forms and  Stoke&apos;s Theorem.</summary>
         
     </entry>
@@ -22,8 +22,8 @@
         <title>Lecture 6 Exterior Derivative</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture6%2FLecture6_exterior_derivative"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture6%2FLecture6_exterior_derivative</id>
-        <published>2026-01-17T05:00:00.000Z</published>
-        <updated>2026-01-17T05:00:00.000Z</updated>
+        <published>2026-01-17T00:00:00.000Z</published>
+        <updated>2026-01-17T00:00:00.000Z</updated>
         <summary>Derivative of differential forms and their associated rules / properties.</summary>
         
     </entry>
@@ -31,8 +31,8 @@
         <title>Lecture 5 Differential Forms</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms</id>
-        <published>2026-01-15T05:00:00.000Z</published>
-        <updated>2026-01-15T05:00:00.000Z</updated>
+        <published>2026-01-15T00:00:00.000Z</published>
+        <updated>2026-01-15T00:00:00.000Z</updated>
         <summary>Differential forms that allows the application of k-forms to fields.</summary>
         
     </entry>
@@ -40,8 +40,8 @@
         <title>Lecture 4 K Forms</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture4_kforms</id>
-        <published>2026-01-14T05:00:00.000Z</published>
-        <updated>2026-01-14T05:00:00.000Z</updated>
+        <published>2026-01-14T00:00:00.000Z</published>
+        <updated>2026-01-14T00:00:00.000Z</updated>
         <summary>K-forms as a way to generalize measurement.</summary>
         
     </entry>
@@ -49,8 +49,8 @@
         <title>Lecture 1 Intro</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</id>
-        <published>2026-01-13T05:00:00.000Z</published>
-        <updated>2026-01-13T05:00:00.000Z</updated>
+        <published>2026-01-13T00:00:00.000Z</published>
+        <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Brief description of spaces, spans, basis, and dimensions.</summary>
         
     </entry>
@@ -58,8 +58,8 @@
         <title>Lecture 2 Meshes</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture2_meshes</id>
-        <published>2026-01-13T05:00:00.000Z</published>
-        <updated>2026-01-13T05:00:00.000Z</updated>
+        <published>2026-01-13T00:00:00.000Z</published>
+        <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Meshes, manifolds, and related concepts.</summary>
         
     </entry>
@@ -67,8 +67,8 @@
         <title>Lecture 3 Exterior Algebra</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture3_exterior_algebra</id>
-        <published>2026-01-13T05:00:00.000Z</published>
-        <updated>2026-01-13T05:00:00.000Z</updated>
+        <published>2026-01-13T00:00:00.000Z</published>
+        <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Exterior algebra in the context of DDG.</summary>
         
     </entry>
@@ -193,8 +193,8 @@
         <title>MLE and MAP</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=ai%2FML%2FMLE%20and%20MAP</id>
-        <published>2025-10-07T04:00:00.000Z</published>
-        <updated>2025-10-07T04:00:00.000Z</updated>
+        <published>2025-10-07T00:00:00.000Z</published>
+        <updated>2025-10-07T00:00:00.000Z</updated>
         <summary>Explanation of MLE and MAP.</summary>
         
     </entry>
