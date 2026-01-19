@@ -248,7 +248,7 @@
   },
   {
     "slug": "Discrete Differential Geometry/DDG",
-    "title": "Overview",
+    "title": "DDG",
     "category": "",
     "subcategory": "",
     "summary": "Overview of discrete differential geometry.",
@@ -258,7 +258,7 @@
   },
   {
     "slug": "Discrete Differential Geometry/Lecture1",
-    "title": "Lecture 1",
+    "title": "Lecture 1 Intro",
     "category": "",
     "subcategory": "",
     "summary": "Brief description of spaces, spans, basis, and dimensions.",
@@ -305,6 +305,27 @@
     "date": "2026-1-15",
     "nodeType": "article",
     "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture6/Lecture6_exterior_derivative",
+    "title": "Lecture 6 Exterior Derivative",
+    "category": "",
+    "subcategory": "",
+    "summary": "Derivative of differential forms and their associated rules / properties.",
+    "date": "2026-1-17",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture7/Lecture7_integration",
+    "title": "Lecture 7 Integration",
+    "category": "",
+    "subcategory": "",
+    "summary": "Integration of differential forms and  Stoke's Theorem.",
+    "date": "2026-1-18",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
   }
+
 
 ]

@@ -3,12 +3,30 @@
     <title>TheFirstMan&apos;s Blog</title>
     <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
     <link href="https://gabinson200.github.io/blog/"/>
-    <updated>2026-01-15T05:00:00.000Z</updated>
+    <updated>2026-01-18T05:00:00.000Z</updated>
     <id>https://gabinson200.github.io/blog/</id>
     <author>
         <name>TheFirstMan</name>
     </author>
 
+    <entry>
+        <title>Lecture 7 Integration</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture7%2FLecture7_integration"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture7%2FLecture7_integration</id>
+        <published>2026-01-18T05:00:00.000Z</published>
+        <updated>2026-01-18T05:00:00.000Z</updated>
+        <summary>Integration of differential forms and  Stoke&apos;s Theorem.</summary>
+        
+    </entry>
+    <entry>
+        <title>Lecture 6 Exterior Derivative</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture6%2FLecture6_exterior_derivative"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture6%2FLecture6_exterior_derivative</id>
+        <published>2026-01-17T05:00:00.000Z</published>
+        <updated>2026-01-17T05:00:00.000Z</updated>
+        <summary>Derivative of differential forms and their associated rules / properties.</summary>
+        
+    </entry>
     <entry>
         <title>Lecture 5 Differential Forms</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture5_differential_forms"/>
@@ -28,7 +46,7 @@
         
     </entry>
     <entry>
-        <title>Lecture 1</title>
+        <title>Lecture 1 Intro</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture1</id>
         <published>2026-01-13T05:00:00.000Z</published>
