@@ -16,7 +16,7 @@
         <published>2026-01-18T00:00:00.000Z</published>
         <updated>2026-01-18T00:00:00.000Z</updated>
         <summary>Integration of differential forms and  Stoke&apos;s Theorem.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 6 Exterior Derivative</title>
@@ -25,7 +25,7 @@
         <published>2026-01-17T00:00:00.000Z</published>
         <updated>2026-01-17T00:00:00.000Z</updated>
         <summary>Derivative of differential forms and their associated rules / properties.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 5 Differential Forms</title>
@@ -34,7 +34,7 @@
         <published>2026-01-15T00:00:00.000Z</published>
         <updated>2026-01-15T00:00:00.000Z</updated>
         <summary>Differential forms that allows the application of k-forms to fields.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 4 K Forms</title>
@@ -43,7 +43,7 @@
         <published>2026-01-14T00:00:00.000Z</published>
         <updated>2026-01-14T00:00:00.000Z</updated>
         <summary>K-forms as a way to generalize measurement.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 1 Intro</title>
@@ -52,7 +52,7 @@
         <published>2026-01-13T00:00:00.000Z</published>
         <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Brief description of spaces, spans, basis, and dimensions.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 2 Meshes</title>
@@ -61,7 +61,7 @@
         <published>2026-01-13T00:00:00.000Z</published>
         <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Meshes, manifolds, and related concepts.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Lecture 3 Exterior Algebra</title>
@@ -70,7 +70,7 @@
         <published>2026-01-13T00:00:00.000Z</published>
         <updated>2026-01-13T00:00:00.000Z</updated>
         <summary>Exterior algebra in the context of DDG.</summary>
-        
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
     </entry>
     <entry>
         <title>Surfaces</title>
@@ -115,7 +115,7 @@
         <published>2025-12-13T00:00:00.000Z</published>
         <updated>2025-12-13T00:00:00.000Z</updated>
         <summary>Brief description of products.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Micro Memory</title>
@@ -142,7 +142,7 @@
         <published>2025-11-26T00:00:00.000Z</published>
         <updated>2025-11-26T00:00:00.000Z</updated>
         <summary>Brief description of algebra of vectors.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Bivectors</title>
@@ -151,7 +151,7 @@
         <published>2025-11-26T00:00:00.000Z</published>
         <updated>2025-11-26T00:00:00.000Z</updated>
         <summary>Bivectors.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Paravectors and Direct Sums</title>
@@ -160,7 +160,7 @@
         <published>2025-11-26T00:00:00.000Z</published>
         <updated>2025-11-26T00:00:00.000Z</updated>
         <summary>Brief description of paravectors and direct sums.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Spaces, Spans, Basis, and Dimensions</title>
@@ -169,7 +169,7 @@
         <published>2025-11-26T00:00:00.000Z</published>
         <updated>2025-11-26T00:00:00.000Z</updated>
         <summary>Brief description of spaces, spans, basis, and dimensions.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Vectors in Geometric Algebra</title>
@@ -178,7 +178,7 @@
         <published>2025-11-26T00:00:00.000Z</published>
         <updated>2025-11-26T00:00:00.000Z</updated>
         <summary>Brief description of vectors in geometric algebra.</summary>
-        
+        <category term="Mathematics"/><category term="geometric algebra"/>
     </entry>
     <entry>
         <title>Vertex Shader</title>
