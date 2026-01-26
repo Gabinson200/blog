@@ -72,7 +72,7 @@ $$A = \begin{pmatrix} 3 & 0 \\\
       \end{pmatrix}
 $$
 
-![2D Scaling](\2D_scaling.png)
+![2D Scaling](2D_scaling.png)
 
 Additionally, a scaling transformation where we flip the sign of the basis vectors ie the signs of $s_x$ and $s_y$ produce reflections. For example if $s_y = -1$ then the y-coordinates of our vectors are flipped creating a reflection around the x-axis, the inverse is true if we flip $s_x$. If we flip both then the result is a reflection about the origin.
 
@@ -96,7 +96,7 @@ $$A = \begin{pmatrix} 1 & 2 \\\
 
 $$
 
-![2D Shearing](\2D_shearing.png)
+![2D Shearing](2D_shearing.png)
 
 
 ## 2D Rotation
@@ -118,7 +118,7 @@ $$A = \begin{pmatrix} cos(45) & -sin(45) \\\
       \end{pmatrix}
 $$
 
-![2D Rotation](\2D_rotation.png)
+![2D Rotation](2D_rotation.png)
 
 Another interesting way of looking at rotation matrices is that they encode a specific combination of shearing and scaling that ensure that length and parallelism between inputs remain but the overall angle of each vector is adjusted. One way to mathematically model this is that any invertible transformation matrix $A$ can be viewed as a rotation followed by a scaling, followed by a "corrective" rotation which could be found using Singular Value Decomposition. For pure rotation matrices the singular values all become 1 creating an identity matrix meaning that pure rotation matrices can be decomposed into a product of two rotations. (or a rotation and reflection). Rigorous derivation of rotation vectors from shearing and scaling vectors are beyond the scope of this article but the fact that trigonometric basis vectors like sin and cos produce linear mappings ie. $f(x + y) = f(x) + f(y)$ and $f(cx) = cf(x)$ is very cool and define the building block of Fourier transforms. 
 
@@ -146,7 +146,7 @@ b = \begin{pmatrix}2\\\
       \end{pmatrix}
 
 $$
-![2D Translation](\2D_translation.png)
+![2D Translation](2D_translation.png)
 
 
 # 3D Transformations
@@ -176,7 +176,7 @@ $$A = \begin{pmatrix} 2 & 0 & 0 \\\
       \end{pmatrix}
 $$
 
-![3D Scaling](\3D_scaling.png)
+![3D Scaling](3D_scaling.png)
 
 ## 3D Shearing
 $$A = \begin{pmatrix} 1 & k_{xy} & k_{xz}\\\
@@ -204,7 +204,7 @@ $$A = \begin{pmatrix} 1 & 0.5 & 0 \\\
       \end{pmatrix}
 $$
 
-![3D Skewing](\3D_shearing.png)
+![3D Skewing](3D_shearing.png)
 
 ## 3D Rotations
 - About the x-axis by $\theta$
@@ -247,7 +247,7 @@ $$A = \begin{pmatrix} cos(45) & -sin(45) & 0\\\
 
       \end{pmatrix}
 $$
-![3D Rotation](\3D_rotation.png)
+![3D Rotation](3D_rotation.png)
 
 ## 3D Translation
 $$A = \begin{pmatrix} 1 & 0 & 0\\\
@@ -278,7 +278,7 @@ b = \begin{pmatrix}1\\\
 
 $$
 
-![3D Translation](\3D_translation.png)
+![3D Translation](3D_translation.png)
 ​
 ## Recap
 I hope that looking at the examples and playing around with the website helped to gain some intuition about 2/3D transformations. However, as you may have encountered when trying to translate in 2D or 3D on the website there is no option for a $b$ matrix. If we want to express all 2D transformations in a single matrix so that we could take their products or in other words chain together and express several transformations as a single matrix we need to use another approach. 
@@ -418,10 +418,10 @@ $$T(t_x, t_y) = \begin{pmatrix} 1 & 0 & t_x \\\ 0 & 1 & t_y \\\ 0 & 0 & 1 \end{p
 we see they are equivalent if we set all out shearing factors to 0 except for $k_{xz}$ and $k_{yz}$, which we set to $t_x$ and $t_y$ respectively. 
 Thus we can see that a homogeneous translation matrix in 2D has the same shape as a 3D shearing matrix where we restrict our shearing to the xz and yz planes. The geometric interpretation of this is if we have a point in 2D $\begin{pmatrix}x \\\ y \end{pmatrix}$ then we can represent it as a homogeneous 2D point $\begin{pmatrix}x \\\ y \\\ 1\end{pmatrix}$ which we can visualize as a point in 3D in the same position on the xy plane as our original 2D point but now "floating" one unit up in the z direction. As noted before if we want to represent a 2D direction in homogeneous form then we simply switch the 1 off $\begin{pmatrix}x \\\ y \\\ 0\end{pmatrix}$ which can be interpreted as a point in 3D space that is restricted to the z = 0 plane. Continuing with our 3D shearing interpretation we shear the projected point $\begin{pmatrix}x \\\ y \\\ 1\end{pmatrix}$ by $xz = t_x$ which adds a multiple of z into x and since $z = 1$ and the multiple is $t_x$ it is like shifting all the points in the $z=1$ plane along the x axis by $t_x$, similarly we have the same thing happening when $xy = t_y$ but now along the y-direction in the $z=1$ plane. I encourage you to play around with this 3D shifting on the website just keep in mind that the red line represents the x-axis and the green line represents the y-axis. Ok so we transformed our point in 2D to 3D and applied the shearing in 3D which should be the same as the translation in 2D, our sheared 3D points now while in the correct xy-plane positions but are still sitting 1 unit up the z-axis. To convert between the new sheared 3D location and the translated 2D one we have to divide by the the 3D projected coordinate by $w$ which was equal to 1 in this case. Thus given a 3D vector representing a 2D homogeneous point $\begin{pmatrix}x \\\ y \\\ w\end{pmatrix}$ we have to divide by $w$ to get $\begin{pmatrix}x \\\ y \end{pmatrix} = \begin{pmatrix}x_h/w \\\ y_h / w \end{pmatrix}$ In the case of a point $w=1$ thus it is like directly projecting the points in the z=1 plane directly back down to the xy axis and if $w=0$ then we get a vision by 0 which cannot be interpreted as a finite point only as a pure direction. This means that homogeneous 2D points $(4, 6, 2), (2, 3, 1), (-2, -3, -1)$ all encode the same 2D euclidean point $(2, 3)$. Furthermore, if the x and y points remain the same but we set $w$ equal to something not equal to 0 or 1 then $w$ inversely scales the projection of points on the xy plane. For example if $w>1$ then the euclidean 2D point will have smaller x and y values. The two images below show the 2D homogeneous transformation using a 2D homogeneous translation matrix and the 3D Euclidean shearing equivalent.  
 
-![2D Homogeneous Translation](\2D_homogeneous_translation.png)  
+![2D Homogeneous Translation](2D_homogeneous_translation.png)  
 
 
-![3D Shearing Equivalent](\3D_shearing_equivalent.png)
+![3D Shearing Equivalent](3D_shearing_equivalent.png)
 
 
 ## Properties of Transformation Matrices
@@ -682,4 +682,4 @@ $$A = \begin{pmatrix} 1 & 0.5 & 0 \\\
       \end{pmatrix}
 $$
 
-![3D Skewing](\3D_shearing.png)
+![3D Skewing](3D_shearing.png)
