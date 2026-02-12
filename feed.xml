@@ -3,12 +3,21 @@
     <title>TheFirstMan&apos;s Blog</title>
     <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
     <link href="https://gabinson200.github.io/blog/"/>
-    <updated>2026-01-18T00:00:00.000Z</updated>
+    <updated>2026-02-01T00:00:00.000Z</updated>
     <id>https://gabinson200.github.io/blog/</id>
     <author>
         <name>TheFirstMan</name>
     </author>
 
+    <entry>
+        <title>Lecture 8 Discrete Differential Forms</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture8%2FLecture8_discrete_differential_forms"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture8%2FLecture8_discrete_differential_forms</id>
+        <published>2026-02-01T00:00:00.000Z</published>
+        <updated>2026-02-01T00:00:00.000Z</updated>
+        <summary>Discretization and interpolation of differential forms.</summary>
+        <category term="Mathematics"/><category term="discrete differential geometry"/>
+    </entry>
     <entry>
         <title>Lecture 7 Integration</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture7%2FLecture7_integration"/>
@@ -233,5 +242,14 @@
         <updated>2025-09-12T00:00:00.000Z</updated>
         <summary>Line drawing algorithms.</summary>
         <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Rusty Raytracing</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRaytracing%2Frusty_raytracing"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FRaytracing%2Frusty_raytracing</id>
+        <published>2025-02-01T00:00:00.000Z</published>
+        <updated>2025-02-01T00:00:00.000Z</updated>
+        <summary>Raytracing in one weekend implementation in Rust.</summary>
+        
     </entry>
 </feed>
