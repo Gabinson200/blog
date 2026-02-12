@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Me - TheFirstMan</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Page-specific styles that utilize the blog's theme variables */
+      .about-intro {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .project-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow 0.2s;
+      }
+
+      .project-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .project-card h4 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-size: 1.15rem;
+      }
+
+      .project-card p {
+        flex-grow: 1;
+        font-size: 0.95rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+      }
+
+      .project-link {
+        display: inline-block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      .project-link:hover {
+        text-decoration: underline;
+      }
+
+      .info-section {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+      }
+      
+      .info-list {
+        list-style: none;
+        padding: 0;
+      }
+      
+      .info-list li {
+        margin-bottom: 0.5rem;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: var(--text-color);
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title"><a href="./">TheFirstMan's Blog</a></h1>
+      <nav class="site-nav">
+        <ul id="category-list" class="nav-list"></ul>
+      </nav>
+    </header>
+
+    <main class="site-main">
+      <h2>About Me</h2>
+      <section class="about-intro">
+        <p>
+          Hello! I'm Adam, I've been into AI since 2016 and love exploring computer graphics and embedded systems.
+          This blog serves as a digital garden for my explorations in rendering, machine learning, embedded systems, mathematics, and more.
+        </p>
+      </section>
+
+      <h3>Projects</h3>
+      <div class="project-grid">
+        
+        <div class="project-card">
+          <h4>A-Mazing Marble Game</h4>
+          <p>Physical marble labyrinth game using the Seeed Studio XIAO nRF52840 Sense board with hardware sensor integration.</p>
+          <a href="https://github.com/Gabinson200/a-mazing-marble-game" class="project-link" target="_blank">View on GitHub &rarr;</a>
+        </div>
+
+        <div class="project-card">
+          <h4>Rusty Raytracing</h4>
+          <p>Implementation of ray tracing in one weekend books 1-2 in Rust and some extra goodies.</p>
+          <a href="https://github.com/Gabinson200/rusty_raytracing" class="project-link" target="_blank">View on GitHub &rarr;</a>
+        </div>
+
+        <div class="project-card">
+          <h4>Automatic Image Layering</h4>
+          <p> Transform simple 2D images into a collection of stackable layers. </p>
+          <a href="https://github.com/Gabinson200/automatic-image-layering" class="project-link" target="_blank">View on GitHub &rarr;</a>
+        </div>
+      </div>
+    
+      <div class="info-section">
+        <h3>Education & Connect</h3>
+        <ul class="info-list">
+          <li style="display: flex; align-items: baseline;">
+            <span class="info-label">Degrees:</span>
+            <div>
+                <div>M.S. in AI, Boston University</div>
+                <div style="margin-top: 0.2rem;">B.S. in Computer Science, University of Florida</div>
+            </div>
+          </li>
+          <li>
+            <span class="info-label">GitHub:</span> <a href="https://github.com/gabinson200">@Gabinson200</a>
+          </li>
+          <li>
+            <span class="info-label">LinkedIn:</span> <a href="https://www.linkedin.com/in/adamkocsis2002423622">Adam Kocsis</a>
+          </li>
+        </ul>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+      </p>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

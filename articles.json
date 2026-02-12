@@ -156,6 +156,17 @@
     "links": ["programming/graphics/Graphics"]
   },
   {
+    "slug": "programming/graphics/Raytracing/rusty_raytracing",
+    "title": "Rusty Raytracing",
+    "category": "",
+    "subcategory": "",
+    "summary": "Raytracing in one weekend implementation in Rust.",
+    "date": "2025-02-01",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
     "slug": "ai/ML/MLE and MAP",
     "title": "MLE and MAP",
     "category": "",
@@ -323,6 +334,16 @@
     "subcategory": "discrete differential geometry",
     "summary": "Integration of differential forms and  Stoke's Theorem.",
     "date": "2026-1-18",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture8/Lecture8_discrete_differential_forms",
+    "title": "Lecture 8 Discrete Differential Forms",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Discretization and interpolation of differential forms.",
+    "date": "2026-2-01",
     "nodeType": "article",
     "links": ["Discrete Differential Geometry/DDG"]
   }

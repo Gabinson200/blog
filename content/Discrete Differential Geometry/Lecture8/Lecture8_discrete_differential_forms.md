@@ -1,49 +1,91 @@
-# Discrete Differential Forms
+# Lecture 8: Discrete Differential Forms
 
-Example:
+## Overview: The "Discrete" Language
+The transition from continuous mathematics to computation on meshes is made powerful by a parallel language: every term in smooth exterior calculus has a corresponding analog in Discrete Exterior Calculus (DEC). By prepending the word "discrete" to our vocabulary (e.g., discrete differential forms), we can move fluidly between continuous geometry and algorithmic implementation.
 
-Question: Given a 2-form $w = dx \wedge dy$, find a 1-form $\alpha$ such that $d\alpha = w$. ie find the 1 form that when derived gives is a 2-form. (Remember, derivation raises the form by 1)
+---
 
-Any 1-form can be expressed as: $\alpha = udx + vdy$ for some pair of functions $u, v$. 
+## Motivation: The Hardship of "By-Hand" Calculus
+Solving even simple differential equations using pen and paper can be unintuitive and complex.
 
-So we can write $d\alpha$ as $d\alpha = du\wedge dx + dv \wedge dy$ 
+### Example: Finding a 1-form in $\mathbb{R}^2$
+Consider a constant 2-form $\omega = dx \wedge dy$. We want to find a 1-form $\alpha$ such that $d\alpha = \omega$.
+1. **Coordinate expansion**: Any 1-form is $\alpha = udx + vdy$.
+2. **Exterior derivative**: $d\alpha = du \wedge dx + dv \wedge dy$.
+3. **Antisymmetry**: Recall $dx \wedge dy = -dy \wedge dx$.
+4. **Solution**: One possible solution is $\alpha = \frac{1}{2}(xdy - ydx)$.
 
-We also know that $dx \wedge dy = -dy \wedge dx$
-
-Thus we can rewrite $w$ as $w = -0.5dy \wedge dx + 0.5dx \wedge dy$
-
-this means that $du$ in $\alpha$ must have the form $-0.5dy$ in $w$ after differentiation, the same thing applies to $dv$ and $dx$. Thus:
-$$u(x, y) = -0.5y + a, v(x, y) = 0.5x+b$$
-where $a,b \in R$
-
-This is somewhat paradoxical as $\alpha$ has some non-constant swirling that when derived does lead to a constant 2-form $w$. 
-
-As this shows derivation of even very easy differential equations are hard to do by hand, which is why we need a computational approach to approximate solutions. 
-
-## $\star$ Fundamental Approach
-Basic ideas to turn derivation into computation:
-- replace domain with mesh (work with an oriented simplicial complex)
-- replace differential forms with values on mesh (differential k-forms become values on k-simplicies)
-- replace differential operators with matrices (e.g. exterior derivative is given by signed incidence matrices)
+Geometrically, even though $\omega$ is constant, $\alpha$ represents a "swirling" behavior around a point. If the domain involves measured data (like a 3D scan), a closed-form solution is impossible. We must use computation to approximate these solutions.
 
 
-## Discretization and Interpolation
+## The Fundamental Approach of DEC
+To turn derivation into computation, we follow three primary replacements:
 
-**Discretization**: Given a continuous object, how do I turn it into a finite (discrete) collection of measurements. 
-
-**Interpolation**: given a discrete object (a finite collection of measurements), how do I come up with a continuous object that agrees with (interpolates) it. 
-
-In the case of differential k-forms:
-
-Discretization happens via integration over oriented k-simplices (de Rham map). 
-Interpolation is performed by taking linear combinations of continuous functions associated with k-simplices. (Whitney interpolation)
+| Continuous Object | Discrete Analog |
+| :--- | :--- |
+| **Domain** | **Oriented Simplicial Complex** (Mesh) |
+| **Differential $k$-form** | **Values on $k$-simplices** (Simplicial Cochains) |
+| **Differential Operator** | **Sparse Matrices** (e.g., Signed Incidence Matrices) |
 
 
-## Discretization
+## Discretization: The de Rham Map
+Discretization is the process of turning a continuous object into a finite collection of measurements. In DEC, this is performed by the de Rham map, which integrates a $k$-form over each $k$-simplex.
+
+### $k$-Form Discretization Logic
+For each $k$-simplex $\sigma$, the discrete value $\hat{\omega}_\sigma$ is:
+$$\hat{\omega}_\sigma := \int_\sigma \omega$$
+
+* **0-forms (Vertices)**: Integrating a 0-form over a vertex simply means sampling the function's value at that point: $\int_v \phi = \phi(p)$.
+* **1-forms (Edges)**: Measures the total circulation along an edge. This captures how much the 1-form "lines up" with the oriented edge.
+    * **Calculation**: $\hat{\alpha}_e = \int_e \alpha(T)ds$, where $T$ is the unit tangent.
+* **2-forms (Triangles)**: Measures alignment and area.
+    * **Calculation**: $\int_t \omega = \int_t \omega(T_1, T_2) dA$, using an orthonormal basis $\{T_1, T_2\}$.
+
+> **Note on Orientation**: Discrete values change sign under odd permutations. For an edge $ij$, the discrete 1-form satisfies $\alpha_{ij} = -\alpha_{ji}$.
 
 
+## Chains and Cochains: Primal vs. Dual
+The duality between "things that get measured" and "things that measure" is captured by chains and cochains.
+
+### Simplicial $k$-Chains ($C_k$)
+A $k$-chain is a linear combination of $k$-simplices, representing a region of the mesh.
+* **Arithmetic**: Chains can be added or subtracted to "fuse" regions or reverse orientations.
+* **Formally**: The chain group $C_k$ is the free abelian group generated by $k$-simplices.
+
+### Simplicial $k$-Cochains ($C^k$)
+A $k$-cochain is a linear map that takes a $k$-chain and returns a number.
+* **Discrete Differential Forms**: A $k$-cochain is exactly what we call a discrete differential $k$-form.
+* **Matrix Encoding**: A discrete $k$-form is stored as a column vector with entries corresponding to the number of $k$-simplices.
 
 
+## Boundary and Coboundary Operators
+These operators define how simplices relate to their neighbors of different dimensions.
+
+1. **Boundary Operator ($\partial$)**: Maps a $k$-simplex to a $(k-1)$-chain of its faces.
+    * **Fundamental Identity**: The boundary of a boundary is always empty: $\partial \circ \partial = \emptyset$.
+2. **Coboundary Operator ($\delta$)**: Maps a $k$-simplex to a collection of $(k+1)$-simplices that contain it and share the same relative orientation.
 
 
+## Interpolation: The Whitney Map
+Interpolation goes in the opposite direction: given discrete measurements, how do we recover a continuous object?
 
+### 0-Forms: Hat Functions
+We use the Lagrange basis (or hat function) $\phi_i$, which equals 1 at vertex $i$ and 0 at all other vertices.
+$$u(x) = \sum_i u_i \phi_i(x)$$
+These functions are explicitly defined by barycentric coordinates.
+
+### $k$-Forms: Whitney Bases
+Higher-degree forms are interpolated using Whitney bases, constructed from the derivatives of hat functions.
+* **Whitney 1-form**: $\phi_{ij} = \phi_i d\phi_j - \phi_j d\phi_i$.
+* **General Whitney $k$-form**: $\sum_{p=0}^k (-1)^p \phi_{i_p} d\phi_{i_0} \wedge \dots \wedge \widehat{d\phi_{i_p}} \wedge \dots \wedge d\phi_{i_k}$.
+
+### Consistency Property
+* **Discrete $\to$ Continuous $\to$ Discrete**: If we interpolate a discrete $k$-form with Whitney bases and then discretize it again via the de Rham map, we recover the exact same discrete $k$-form.
+* **Continuous $\to$ Discrete $\to$ Continuous**: This does not recover the original form, as discretization inherently involves information loss.
+
+---
+
+## Summary of Operations
+* **Discrete Exterior Derivative ($d_k$)**: Encoded as a signed incidence matrix.
+* **Discrete Hodge Star ($*_k$)**: Typically encoded as a diagonal matrix of geometric ratios (e.g., dual area / primal area).
+* **Building Complexity**: Operators like the Laplacian ($\Delta$) are constructed by composing these matrices: $\Delta = *^{-1}_0 d^T_0 *_{1} d_0$.

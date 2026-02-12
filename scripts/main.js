@@ -61,12 +61,27 @@ function collectCategories(articles) {
  */
 /* In scripts/main.js */
 
+/* In scripts/main.js */
+
+/**
+ * Build the top navigation bar listing all categories.
+ *
+ * @param {Object} categories
+ */
 function buildNavigation(categories) {
   const navList = document.getElementById('category-list');
   if (!navList) return;
   navList.innerHTML = '';
+
+  // 1. "About Me" Link (Added)
+  const aboutLi = document.createElement('li');
+  const aboutA = document.createElement('a');
+  aboutA.href = 'portfolio.html'; // Points to the new file
+  aboutA.textContent = 'About Me';
+  aboutLi.appendChild(aboutA);
+  navList.appendChild(aboutLi);
   
-  // 1. Categories
+  // 2. Categories (Dynamic from articles.json)
   Object.keys(categories).sort().forEach((cat) => {
       const li = document.createElement('li');
       const a = document.createElement('a');
@@ -76,7 +91,7 @@ function buildNavigation(categories) {
       navList.appendChild(li);
     });
 
-  // 2. Mindmap Link
+  // 3. Mindmap Link
   const mindLi = document.createElement('li');
   const mindA = document.createElement('a');
   mindA.href = 'mindmap.html';
@@ -84,7 +99,7 @@ function buildNavigation(categories) {
   mindLi.appendChild(mindA);
   navList.appendChild(mindLi);
 
-  // 3. NEW: Webring Link
+  // 4. Webring Link
   const ringLi = document.createElement('li');
   const ringA = document.createElement('a');
   ringA.href = 'webring.html';
