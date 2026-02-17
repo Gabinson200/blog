@@ -167,6 +167,17 @@
     "links": ["programming/graphics/Graphics"]
   },
   {
+    "slug": "programming/graphics/OBJ files/OBJ_files",
+    "title": "OBJ Files",
+    "category": "",
+    "subcategory": "",
+    "summary": "OBJ file format and handling.",
+    "date": "2026-02-16",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/graphics/Graphics"]
+  },
+  {
     "slug": "ai/ML/MLE and MAP",
     "title": "MLE and MAP",
     "category": "",
