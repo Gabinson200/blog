@@ -169,9 +169,20 @@
   {
     "slug": "programming/graphics/OBJ files/OBJ_files",
     "title": "OBJ Files",
-    "category": "",
-    "subcategory": "",
+    "category": "programming",
+    "subcategory": "graphics",
     "summary": "OBJ file format and handling.",
+    "date": "2026-02-16",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/graphics/Graphics"]
+  },
+   {
+    "slug": "programming/graphics/Textures/Textures",
+    "title": "Textures",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Texture mapping and mipmaps.",
     "date": "2026-02-16",
     "nodeType": "article",
     "tags": [""],

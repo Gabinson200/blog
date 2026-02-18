@@ -3,7 +3,6 @@
     <title>TheFirstMan&apos;s Blog</title>
     <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
     <link href="https://gabinson200.github.io/blog/"/>
-    <updated>2026-02-01T00:00:00.000Z</updated>
     <updated>2026-02-16T00:00:00.000Z</updated>
     <id>https://gabinson200.github.io/blog/</id>
     <author>
@@ -11,18 +10,22 @@
     </author>
 
     <entry>
-        <title>Lecture 8 Discrete Differential Forms</title>
-        <link href="https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture8%2FLecture8_discrete_differential_forms"/>
-        <id>https://gabinson200.github.io/blog/article.html?slug=Discrete%20Differential%20Geometry%2FLecture8%2FLecture8_discrete_differential_forms</id>
-        <published>2026-02-01T00:00:00.000Z</published>
-        <updated>2026-02-01T00:00:00.000Z</updated>
         <title>OBJ Files</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FOBJ%20files%2FOBJ_files"/>
         <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FOBJ%20files%2FOBJ_files</id>
         <published>2026-02-16T00:00:00.000Z</published>
         <updated>2026-02-16T00:00:00.000Z</updated>
         <summary>OBJ file format and handling.</summary>
-        
+        <category term="programming"/><category term="graphics"/>
+    </entry>
+    <entry>
+        <title>Textures</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTextures%2FTextures"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=programming%2Fgraphics%2FTextures%2FTextures</id>
+        <published>2026-02-16T00:00:00.000Z</published>
+        <updated>2026-02-16T00:00:00.000Z</updated>
+        <summary>Texture mapping and mipmaps.</summary>
+        <category term="programming"/><category term="graphics"/>
     </entry>
     <entry>
         <title>Lecture 8 Discrete Differential Forms</title>
