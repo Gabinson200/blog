@@ -177,6 +177,17 @@
     "tags": [""],
     "links": ["programming/graphics/Graphics"]
   },
+    {
+    "slug": "programming/misc/I'm packing (bits)",
+    "title": "I'm packing (bits)",
+    "category": "programming",
+    "subcategory": "misc",
+    "summary": "Packing bits in memory.",
+    "date": "2026-02-16",
+    "nodeType": "definition",
+    "tags": [""],
+    "links": ["programming/Programming"]
+  },
    {
     "slug": "programming/graphics/Textures/Textures",
     "title": "Textures",
