@@ -111,6 +111,17 @@
     "tags": ["Article"],
     "links": ["programming/graphics/Graphics"]
   },
+    {
+    "slug": "programming/graphics/Cameras/Cameras",
+    "title": "Cameras",
+    "category": "programming",
+    "subcategory": "graphics",
+    "summary": "Physical and conceptual camera models in computer graphics.",
+    "date": "2026-02-28",
+    "nodeType": "article",
+    "tags": ["Article"],
+    "links": ["programming/graphics/Graphics"]
+  },
   {
     "slug": "programming/graphics/Vertex Shader/Vertex Shader",
     "title": "Vertex Shader",
@@ -188,7 +199,7 @@
     "tags": [""],
     "links": ["programming/Programming"]
   },
-   {
+  {
     "slug": "programming/graphics/Textures/Textures",
     "title": "Textures",
     "category": "programming",
@@ -198,6 +209,28 @@
     "nodeType": "article",
     "tags": [""],
     "links": ["programming/graphics/Graphics"]
+  },
+  {
+    "slug": "programming/CV/ComputerVision",
+    "title": "Computer Vision",
+    "category": "programming",
+    "subcategory": "computer vision",
+    "summary": "Computer vision concepts and applications.",
+    "date": "2026-03-01",
+    "nodeType": "topic",
+    "tags": [""],
+    "links": ["programming/Programming"]
+  },
+  {
+    "slug": "programming/CV/Edge Detection/Edge Detection",
+    "title": "Edge Detection",
+    "category": "programming",
+    "subcategory": "computer vision",
+    "summary": "Edge detection algorithms and applications.",
+    "date": "2026-03-01",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/CV/ComputerVision"]
   },
   {
     "slug": "ai/ML/MLE and MAP",
@@ -377,6 +410,16 @@
     "subcategory": "discrete differential geometry",
     "summary": "Discretization and interpolation of differential forms.",
     "date": "2026-2-01",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture9/Lecture9_discrete_exterior_calc",
+    "title": "Lecture 9 Discrete exterior Calculus",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Calculus of discrete differential forms.",
+    "date": "2026-2-24",
     "nodeType": "article",
     "links": ["Discrete Differential Geometry/DDG"]
   }

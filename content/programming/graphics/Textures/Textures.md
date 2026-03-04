@@ -7,19 +7,26 @@ Textures are simply images that we want to apply to the surface(s) of a mesh.
 
 ## Texture Mapping
 Mapping a texture consists of defining a function that maps the 2D (u, v) coordinates and associated color of the flat texture image onto the surface of the mesh.
-More accurately, since the mesh is defined by triangles or other primitives what we want to do is for each primitive in the mesh assign it's vertices (which are in a 2D plane) to some position on the texture. So, instead of wrapping a texture image around a mesh we are flattening the mesh primitives onto the texture. This mapping is usually manually done by artists and programmers.
+More accurately, since the mesh is defined by triangles or other primitives what we want to do is for each primitive in the mesh assign it's vertices (which are in a 2D plane) to some position on the texture. So, instead of wrapping a texture image around a mesh we are conceptually flattening the mesh primitives onto the texture. This mapping is usually manually done by artists and programmers.
 
 ## Texture Sampling
 So, how do we assign a color at a specific 2D coordinate (u, v) to a 3D point (x, y, z) in world space? Furthermore, colors in a texture are represented by pixels which are quantized, non-continuous values. Consider an 8 by 8 grid of pixels with different colors in each pixel:
 
 ![example_texture_1](example_texture_1.png)
 
-The information represented by this image is that for integer coordinates (0...7, 0...7) there is a specific color value at that point in space, this bit of color information can be compressed into a point called a texel which can be thought of as the center of each pixel (0.5...7.5, 0.5...7.5). These colored texels can then be sampled at non-integer intervals to produce different color assignments based on some filtering function. Using the pixel height and width of the texture gives us the $u$ and $v$ coordinates and normalizing the height and width to $[0,1]x[0,1]$ yields the $s$ and $t$ coordinates. Note: when people refer to uv coordinates they usually mean the normalized st values. Working in normalized coordinates allows for easier switching of higher or lower resolution textures so that even when switching between textures the same st coordinates reference the same area in the textures. (This will come in handy with mipmaps)
+The information represented by this image is that for integer coordinates (0...7, 0...7) there is a specific color value at that point in space, this bit of color information can be compressed into a point called a texel which can be thought of as the center of each pixel (0.5...7.5, 0.5...7.5). These colored texels can then be sampled at non-integer intervals to produce different color assignments based on some filtering function. Using the pixel height and width of the texture gives us the $u$ and $v$ coordinates and normalizing the height and width to [0,1]x[0,1] yields the $s$ and $t$ coordinates. Note: when people refer to uv coordinates they usually mean the normalized st values. Working in normalized coordinates allows for easier switching of higher or lower resolution textures so that even when switching between textures the same $st$ coordinates reference the same area in the textures. (This will come in handy with mipmaps)
 
 ## Filtering Methods
 
+Ok so we have some texture made up of pixel, lets define different ways we can sample and assign those pixels with a process called filtering.
+
 ### Nearest Filtering
-Simply, take the color of the nearest texel. Note: if the texels are arranged in a grid of uniform spacing (such is the case with uniform pixel sizes) then any distance function manhattan or euclidean will return the same $argmin$ nearest point.
+This is the simples way to assign a pixel to a $uv$ coordinate, we just take the color of the nearest texel. Note: if the texels are arranged in a regular grid of uniform spacing (such is the case with uniform pixel sizes) then any distance function manhattan or euclidean will return the same $argmin$ nearest point. If the texels are non-uniformly distributed, the nearest assignment partitions the domain into regions of influence around each texel, effectively forming a Voronoi tessellation under the chosen distance metric. This could be used to create random natural looking textures for leafs, giraffes, or cracks in the earth all of which look like Voronoi diagrams. 
+
+#### [Procedural Textures](https://en.wikipedia.org/wiki/Procedural_texture)
+
+As described above instead of using a precomputed texture made up of pixels to sample from we can use a function from which we can sample colors from based on uv coordinates, this is obviously more computationally complex since we will have to solve an arbitrarily complex equation at every vertex or pixel but we can generate textures of infinite resolution and low storage requirements with no seams or tiling artifacts.
+
 
 ### Bilinear Filtering
 Take the 4 closest texels to the chosen point and interpolate twice along the horizontal or vertical sides of the square defined by the 4 nearest points and interpolate once more between those two points. Note: bilinear interpolation allows us to smoothly interpolate in 2D with 3 linear interpolations.
