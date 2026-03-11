@@ -188,13 +188,24 @@
     "tags": [""],
     "links": ["programming/graphics/Graphics"]
   },
-    {
+  {
     "slug": "programming/misc/I'm packing (bits)",
     "title": "I'm packing (bits)",
     "category": "programming",
     "subcategory": "misc",
     "summary": "Packing bits in memory.",
     "date": "2026-02-16",
+    "nodeType": "definition",
+    "tags": [""],
+    "links": ["programming/Programming"]
+  },
+  {
+    "slug": "programming/misc/Lagrangian/Lagrangian",
+    "title": "Lagrangian",
+    "category": "programming",
+    "subcategory": "misc",
+    "summary": "Lagrangian.",
+    "date": "2026-03-09",
     "nodeType": "definition",
     "tags": [""],
     "links": ["programming/Programming"]
@@ -228,6 +239,28 @@
     "subcategory": "computer vision",
     "summary": "Edge detection algorithms and applications.",
     "date": "2026-03-01",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/CV/ComputerVision"]
+  },
+  {
+    "slug": "programming/CV/Fiducial Markers/Fiducial_Markers",
+    "title": "Fiducial Markers",
+    "category": "programming",
+    "subcategory": "computer vision",
+    "summary": "Fiducial markers and their applications.",
+    "date": "2026-03-04",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/CV/ComputerVision"]
+  },
+  {
+    "slug": "programming/CV/Homography/Homography",
+    "title": "Homography",
+    "category": "programming",
+    "subcategory": "computer vision",
+    "summary": "Homography transformation and applications.",
+    "date": "2026-03-07",
     "nodeType": "article",
     "tags": [""],
     "links": ["programming/CV/ComputerVision"]

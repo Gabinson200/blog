@@ -236,16 +236,7 @@ This two-threshold hysteresis step helps suppress isolated noisy responses while
 
 Additionally, in most edge detection pipelines we will apply gaussian smoothing to reduce noise before we apply the gradient and laplacian convolution kernels. Since Gaussian smoothing is linear instead of smoothing the image and then finding the gradient we can instead smooth out the gradient finding kernel (derivative of Gaussian) and save ourselves an operation per pixel. The same can be done with the Laplacian (Laplacian of Gaussian).
 
-### Canny Edge Detector
 
-The Canny edge detector combines information from the gradient and laplacian to detect edges. The stages of the Canny edge detector are:
-- smooth image with 2D Gaussian
-- compute image gradient using Sobel operator
-    - find the gradient magnitude at each pixel
-    - find the gradient orientation at each pixel
-- Apply a 1D Laplacian along the gradient direction (normal to edge) yielding a 0-crossing on the edge where the change in derivative is near 0.
-
-The interpretation of this process is we use smoothing to reduce noise in the image after which we use the gradient to find the pixels with greatest change in intensity. We then use the Laplacian to localize where exactly the biggest change in intensity occurred on the edge and assign that as the final edge pixel.
 
 ### Canny Edge Detector
 
