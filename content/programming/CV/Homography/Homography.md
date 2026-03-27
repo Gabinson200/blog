@@ -326,11 +326,11 @@ $$
 h =
 \begin{bmatrix}
 h_1 \\ h_2 \\ h_3 \\ h_4 \\ h_5 \\ h_6 \\ h_7 \\ h_8 \\ h_9
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 Then each individual correspondence satisfies  
-$$A_i h = 0.$$
+$$A_i h = 0$$
 
 Stacking the equations for all $N$ correspondences gives one large linear system:  
 
@@ -390,7 +390,7 @@ We can expand the objective as
 $$ \|Ah\|^2 = (Ah)^T(Ah) = h^T A^T A h$$
 
 So the constrained minimization becomes
-$$ \min_{h} h^T A^T A h \quad \text{subject to} \quad h^T h = 1. $$
+$$ \min_{h} h^T A^T A h \quad \text{subject to} \quad h^T h = 1$$
 
 To solve this, we introduce a [Lagrange multiplier](article.html?slug=\programming\misc\Lagrangian\Lagrangian) $\lambda$ and define the Lagrangian
 
@@ -399,10 +399,10 @@ $$\mathcal{L}(h, \lambda) = h^T A^T A h - \lambda(h^Th - 1)$$
 Taking the derivative with respect to $h$ and setting it equal to zero gives:
 $$\frac{\partial \mathcal{L}}{\partial h} = 0$$
 which yields
-$$2A^TAh - 2\lambda h = 0.$$
+$$2A^TAh - 2\lambda h = 0$$
 
 Rearranging gives
-$$A^T A h = \lambda h.$$
+$$A^T A h = \lambda h$$
 
 This is just an eigenvalue problem. The homography vector $h$ must be an eigenvector of $A^T A$, and because we are minimizing the quadratic form $h^T A^TA h$ subject to unit norm, we choose the eigenvector corresponding to the **smallest eigenvalue**.
 
@@ -419,7 +419,7 @@ H =
 h_1 & h_2 & h_3 \\
 h_4 & h_5 & h_6 \\
 h_7 & h_8 & h_9
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 If the data were perfectly noise free, then $A$ would have an exact nullspace and the smallest eigenvalue would be exactly zero. In practice, noise perturbs the system so the smallest eigenvalue is only approximately zero, and the corresponding eigenvector gives the best approximate homography in the total least squares sense.
@@ -450,7 +450,7 @@ $$
 x_i =
 \begin{bmatrix}
 u_i \\ v_i \\ 1
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 We define two normalization transforms:
@@ -560,7 +560,7 @@ c_i =
 \begin{bmatrix}
 -v_i \\
 u_i
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 Stacking the four point correspondences gives
@@ -609,7 +609,7 @@ u_2 \\
 u_3 \\
 -v_4 \\
 u_4
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 This is now an $8 \times 8$ linear system, so if the four points are in general position we can solve it directly using Gaussian elimination, LU decomposition, or any other small dense linear solver. Once the eight unknowns have been recovered, we reconstruct the full homography as
@@ -620,7 +620,7 @@ H =
 h_1 & h_2 & h_3 \\
 h_4 & h_5 & h_6 \\
 h_7 & h_8 & 1
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 This is computationally attractive because it avoids building $A^TA$, avoids an eigenvalue or singular value decomposition, and reduces the problem to a single direct solve on a tiny $8 \times 8$ matrix. The current AprilTag reference detector uses this kind of specialized four-corner homography solve in its detection path, solving the fixed-scale system by Gaussian elimination with pivoting.

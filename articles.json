@@ -1,5 +1,16 @@
 [
   {
+    "slug": "mathematics",
+    "title": "Mathematics",
+    "category": "mathematics",
+    "subcategory": "",
+    "summary": "Motivation for programming articles.",
+    "date": "2025-12-13",
+    "nodeType": "topic",
+    "tags": ["topic"],
+    "links": ["Discrete Differential Geometry/DDG", "geometric_algebra/Geometric Algebra"]
+  },
+  {
     "slug": "programming/Programming",
     "title": "Programming",
     "category": "programming",
@@ -9,7 +20,6 @@
     "nodeType": "topic",
     "tags": ["topic"],
     "links": [""]
-
   },
   {
     "slug": "programming/graphics/Graphics",
@@ -208,7 +218,7 @@
     "date": "2026-03-09",
     "nodeType": "definition",
     "tags": [""],
-    "links": ["programming/Programming"]
+    "links": ["mathematics"]
   },
   {
     "slug": "programming/graphics/Textures/Textures",
@@ -263,7 +273,18 @@
     "date": "2026-03-07",
     "nodeType": "article",
     "tags": [""],
-    "links": ["programming/CV/ComputerVision"]
+    "links": ["programming/CV/ComputerVision", "programming/CV/Fiducial Markers/Fiducial_Markers"]
+  },
+  {
+    "slug": "programming/CV/Pose Estimation",
+    "title": "Pose Estimation",
+    "category": "programming",
+    "subcategory": "computer vision",
+    "summary": "Pose estimation from homography and IPPE.",
+    "date": "2026-03-14",
+    "nodeType": "article",
+    "tags": [""],
+    "links": ["programming/CV/Homography/Homography"]
   },
   {
     "slug": "ai/ML/MLE and MAP",
@@ -344,7 +365,7 @@
     "summary": "Brief description of products.",
     "date": "2025-12-13",
     "nodeType": "article",
-    "links": ["geometric_algebra/Geometric Algebra", "programming/Programming"]
+    "links": ["mathematics"]
   },
   {
     "slug": "hardware/micro memory/micro_memory",
@@ -455,7 +476,66 @@
     "date": "2026-2-24",
     "nodeType": "article",
     "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture10/Curves",
+    "title": "Lecture 10 Curves",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Curves in the context of discrete differential geometry.",
+    "date": "2026-3-17",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Network Science/Network Science",
+    "title": "Network Science",
+    "category": "Mathematics",
+    "subcategory": "network science",
+    "summary": "Introduction to network science.",
+    "date": "2026-3-18",
+    "nodeType": "subtopic",
+    "links": ["mathematics"]
+  },
+  {
+    "slug": "Network Science/Graph Theory/Graph Theory",
+    "title": "Graph Theory",
+    "category": "Mathematics",
+    "subcategory": "network science",
+    "summary": "Fundamentals of network science.",
+    "date": "2026-3-18",
+    "nodeType": "article",
+    "links": ["Network Science/Network Science"]
+  },
+  {
+    "slug": "misc_math/Imaginary Numbers/Imaginary Numbers",
+    "title": "Imaginary Numbers",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "imaginary numbers.",
+    "date": "2026-3-20",
+    "nodeType": "article",
+    "links": ["mathematics"]
+  },
+  {
+    "slug": "misc_math/e/e",
+    "title": "E (Euler's Number)",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "Euler's number and its properties.",
+    "date": "2026-3-25",
+    "nodeType": "article",
+    "links": ["mathematics"]
+  },
+  {
+    "slug": "misc_math/Euler's Formula/Euler's Formula",
+    "title": "Euler's Formula",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "Euler's formula derivation.",
+    "date": "2026-3-25",
+    "nodeType": "article",
+    "links": ["misc_math/e/e", "misc_math/Imaginary Numbers/Imaginary Numbers"]
   }
-
 
 ]
