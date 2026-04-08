@@ -2,8 +2,8 @@
   {
     "slug": "mathematics",
     "title": "Mathematics",
-    "category": "mathematics",
-    "subcategory": "",
+    "category": "Mathematics",
+    "subcategory": "Mathematics",
     "summary": "Motivation for programming articles.",
     "date": "2025-12-13",
     "nodeType": "topic",
@@ -504,6 +504,26 @@
     "subcategory": "network science",
     "summary": "Fundamentals of network science.",
     "date": "2026-3-18",
+    "nodeType": "article",
+    "links": ["Network Science/Network Science"]
+  },
+  {
+    "slug": "Network Science/Random Networks/Random Networks",
+    "title": "Random Networks",
+    "category": "Mathematics",
+    "subcategory": "network science",
+    "summary": "Random networks and their properties.",
+    "date": "2026-3-27",
+    "nodeType": "article",
+    "links": ["Network Science/Network Science"]
+  },
+  {
+    "slug": "Network Science/descriptive vs inferential clustering/descriptive vs inferential clustering",
+    "title": "Descriptive vs Inferential Clustering",
+    "category": "Mathematics",
+    "subcategory": "network science",
+    "summary": "Comparison of descriptive and inferential clustering methods.",
+    "date": "2026-4-1",
     "nodeType": "article",
     "links": ["Network Science/Network Science"]
   },
