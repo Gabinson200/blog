@@ -488,6 +488,26 @@
     "links": ["Discrete Differential Geometry/DDG"]
   },
   {
+    "slug": "Discrete Differential Geometry/Lecture12&13/SmoothSurfaces",
+    "title": "Lecture 12/13 Surfaces",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Smooth surfaces in the context of discrete differential geometry.",
+    "date": "2026-5-07",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
+    "slug": "Discrete Differential Geometry/Lecture14/DiscreteSurfaces",
+    "title": "Lecture 14 Discrete Surfaces",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Discrete surfaces in the context of discrete differential geometry.",
+    "date": "2026-5-13",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG"]
+  },
+  {
     "slug": "Network Science/Network Science",
     "title": "Network Science",
     "category": "Mathematics",
@@ -556,6 +576,16 @@
     "date": "2026-3-25",
     "nodeType": "article",
     "links": ["misc_math/e/e", "misc_math/Imaginary Numbers/Imaginary Numbers"]
+  },
+  {
+    "slug": "misc_math/Fourier/Fourier",
+    "title": "Fourier",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "Fourier series, transform and other fun stuff.",
+    "date": "2026-5-20",
+    "nodeType": "article",
+    "links": ["misc_math/Euler's Formula/Euler's Formula"]
   }
 
 ]
