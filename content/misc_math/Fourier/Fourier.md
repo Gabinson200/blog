@@ -1,10 +1,27 @@
-# Fourier $\mathfrak{F}$
+
+<style>
+  .formula-box {
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+    background: #121212;
+  }
+
+  .formula-box-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 12px;
+  }
+</style>
+
+# Fourier Series$\mathfrak{F}$
 
 ## Resources
 
 - [Video series from steve brunton](https://www.youtube.com/playlist?list=PLMrJAkhIeNNT_Xh3Oy0Y4LTj0Oxo8GqsC)
 - [3B1B related videos](https://www.youtube.com/watch?v=spUNpyF58BY&list=PL4VT47y1w7A1-T_VIcufa7mCM3XrSA5DD)
-
+- [Khan Academy](https://www.youtube.com/watch?v=UKHBWzoOKsY&list=PLM0izz3xa1_oZmWYKshc9Y2wmfBZqxMg1)
 
 
 
@@ -15,11 +32,13 @@ Hopefully, by the end we will be able to demonstrate how complex signals can be 
 The rough outline of the article is:
 - Historical background
 - Problem Statement
-- Functions as basis for functions (Pure mathy, linear algebra view)
-- Fourier Series (more calculus)
-- Fourier Transform 
-- Discrete Fourier Transform ()
-
+- Function Spaces
+- Inner Product of Functions
+- Periodic Functions
+- Function Basis
+- Fourier series
+  - etc.
+  - examples
 
 
 # Historical Background
@@ -30,32 +49,30 @@ Fourier’s ideas grew out of the study of heat flow, where he showed that tempe
 
 However, Fourier and Laplace were not isolated figures working in separate mathematical worlds. Fourier was part of the same French scientific circle as Laplace, Lagrange, and Monge, and as a younger mathematician he encountered them through the new institutions of revolutionary France, especially the École Normale and École Polytechnique. Their relationship seems to have been cordial but intellectually tense: Laplace later served on committees evaluating Fourier’s work on heat, and although he raised objections to Fourier’s use of trigonometric series, he also recognized Fourier’s priority in formulating the heat equation.
 
-I met these ideas in different contexts: the Fourier transform was introduced to me in signal processing as a way to measure frequency content, while the Laplace transform showed up in differential equations as a way to convert initial-value problems into algebra. But this division is somewhat artificial. For causal signals, the Laplace transform can be thought of as a more general Fourier transform. It replaces the purely oscillatory term $e^{-i\omega t}$ with $e^{-st}$ where $s = \sigma + i\omega$. The extra $\sigma$ term lets us add exponential damping, making the transform converge in cases where the Fourier transform may fail. If we then restrict back to the imaginary axis, $s = i\omega,$ we recover the Fourier viewpoint.
+I personally met these ideas in different contexts: the Fourier transform was introduced to me in signal processing as a way to measure frequency content, while the Laplace transform showed up in differential equations as a way to convert initial-value problems into algebra. But this division is somewhat artificial. For causal signals, the Laplace transform can be thought of as a more general Fourier transform. It replaces the purely oscillatory term $e^{-i\omega t}$ with $e^{-st}$ where $s = \sigma + i\omega$. The extra $\sigma$ term lets us add exponential damping, making the transform converge in cases where the Fourier transform may fail. If we then restrict back to the imaginary axis, $s = i\omega,$ we recover the Fourier viewpoint.
 
 
 # Problem Statement
 
-* (This part is a little pure mathy but I think its useful to work down from higher levels of abstraction to really derive Fourier transforms from the ground up)
+* (This part is a little pure mathy but I think its useful to work down from higher levels of abstraction to really derive Fourier transforms from the ground up and to also use linear algebra to gain insight into the Fourier series.)
 
-The overall broad question that we want to address is: are there ways to decompose a function or class of functions into simpler functions. Additionally, are there any limits on the complexity of functions we can break down into simpler "atomic" functions? How complex are the "atomic" functions? And how well can they be used to reconstruct our original function? Ok, that is all pretty vague so lets try to narrow our area of search.
+The overall broad question that we want to address is: **are there ways to decompose a function or class of functions into simpler functions**. Additionally, are there any limits on the complexity of functions we can break down into simpler "atomic" functions? How complex are the "atomic" functions? And how well can they be used to reconstruct our original function? Ok, that is all pretty vague so lets try to narrow our area of search.
 
-Lets imagine a "complex" function as a black box with some inputs and outputs, our goal is to find several "simple" function boxes that when connected together perform the same operation as the more complex function. For example if we have a "complex" function $y=2x$ we can approximate that as an addition of two other functions $y_1 = x$ and $y_2 = x$ where $y = y_1 + y_2$. Alternatively, we can use multiplication or any other combination of operations for as the connective glue used to combine our simpler functions. Ex, $y=2x$ then $y_1 = x$ and $y_2 = 2$ then $y = y_1 \times y_2$. More broadly, what we want to find are the simple mathematical objects (functions in this case) that when combined have a very large possible output space so they can be used to construct a wide variety of "complex" functions.
+Lets imagine a "complex" function as a black box with some inputs and outputs, our goal is to find several "simple" function boxes that when connected together perform the same operation as the more complex function. For example if we have a "complex" function $y=2x$ we can approximate that as an addition of two other functions $y_1 = x$ and $y_2 = x$ where $y = y_1 + y_2$. Alternatively, we can use multiplication or any other combination of operations as the connective glue used to combine our simpler functions. Ex, $y=2x$ then $y_1 = x$ and $y_2 = 2$ then $y = y_1 \times y_2$. More broadly, what we want to find are the simple mathematical objects (functions in this case) that when combined have a very large possible output space so they can be used to construct a wide variety of "complex" functions.
 
-# Functions as basis for functions
 
-## Function Spaces
+# Function Spaces
 
-Hmmm, all this talk of operations and spaces makes me think of linear algebra, where instead of functions we were working with vectors (which do have the duality of acting as functions in a sense). In linear algebra, the first structure we usually study is a vector space. A vector space is a set of objects where we are allowed to do two basic operations:
+Hmmm, all this talk of operations and spaces makes me think of **linear algebra**, where instead of functions we were working with vectors (which do have the duality of acting as functions in a sense). In linear algebra, the first structure we usually study is a vector space. A vector space is a set of objects where we are allowed to do two basic operations:
 
 1. add two objects together
 2. multiply an object by a scalar
 
 If these two operations behave nicely, then the objects in the set can be treated like vectors, even if they do not look like the usual arrows in space. More formally, a vector space over a field $\mathbb{F}$, usually reals $\mathbb{R}$ or complex $\mathbb{C}$, is a set $V$ together with two operations:
 
-$$ + : V \times V \to V $$ and $$\cdot : \mathbb{F} \times V \to V.$$
+$$ + : V \times V \to V $$ and $$\cdot : \mathbb{F} \times V \to V$$
 
 The first operation is called vector addition, and the second is called scalar multiplication. For $V$ to be a vector space, the following conditions must hold for all $u,v,w \in V$ and all scalars $ a,b \in \mathbb{F}$
-
 
 We can do something very similar with functions. A **function space** is a vector space whose elements are functions. Instead of vectors like
 
@@ -154,10 +171,37 @@ So if $\mathcal{F}$ is a set of functions from some domain $D$ into a field $\ma
   </tbody>
 </table>
 
-So, function spaces are not an entirely new idea. They are vector spaces where the vectors happen to be functions. This is the conceptual bridge that lets us use linear algebra to study functions.
+So, function spaces are not an entirely new idea. They are like vector spaces where our mathematical objects are not vectors but some funky functions. This abstraction of functions as mathematical objects which we can add and scale will allow us to explore the possible output space of a combination of functions. 
+
+# Periodic Functions
+
+Before continuing, let’s make a quick addendum to our problem. Instead of immediately trying to approximate any possible function, let’s first restrict our search space to **periodic functions**.
+
+A function is called periodic if it repeats itself after some fixed interval. More formally, a function $f(x)$ is periodic with period $T>0$ if
+$$f(x+T)=f(x)$$
+for every $x$ in its domain.
+
+For example, sine and cosine are periodic functions because
+$$\sin(x+2\pi)=\sin(x)$$
+and
+$$\cos(x+2\pi)=\cos(x)$$
+
+So both $\sin(x)$ and $\cos(x)$ have period $2\pi$. More generally, $\sin(kx)$ and $\cos(kx)$ are also periodic, but their frequencies change depending on $k$.
+
+This restriction to periodic functions may seem like a big limitation. After all, many functions we care about do not repeat and definitely not forever. However, there is a useful trick: if we only care about a function on some finite interval, we can pretend that this interval is one period of a repeating function.
+
+For example, suppose we have a function defined only on the interval
+$$[-L,L]$$
+
+We can create a periodic version of this function by copying the same interval over and over again to the left and right. This is called a periodic extension. The original function may not have been periodic, but the repeated version is said to be periodic with period
+$$T=2L$$
+Visually, this means we take one finite “window” of the function and tile the real line with copies of that window.
+
+There is also a deeper reason that focusing on periodic functions is not as restrictive as it first appears. A non-periodic function can be thought of as a periodic function whose period has become infinitely large. Imagine taking a function on a larger and larger interval:
+$[-L,L]$. As $L$ grows, the repeated copies of the function get farther and farther apart. At that point, the repeated copies are infinitely far away, so from the perspective of any finite region, the function no longer appears periodic. So the plan is not to permanently restrict ourselves to periodic functions. Instead, we first understand periodic functions because they are easier to decompose into repeating waves. Then, by letting the period become infinitely large, we can extend the same idea to non-periodic functions.
 
 
-## Inner product of functions
+# Inner Product of Functions
 
 Now that we defined some properties of function spaces a natural question that arises is: what is the analogous dot (inner) product in the function space? In ordinary finite-dimensional linear algebra, the dot product between two vectors is defined as
 
@@ -181,13 +225,13 @@ $$\langle \mathbf{u},\mathbf{v}\rangle=\mathbf{u}\cdot \mathbf{v}$$
 
 The reason we use the more general phrase “inner product” is that not every vector space is made of ordinary coordinate vectors. Once our “vectors” are functions, we need an analogous operation that still measures alignment.
 
-So lets derive the inner product for the function space.
-Lets say we have two regular functions $f(x)$ and $g(x)$ defined on the domain $[a,b]$ that we can sample from at a regular interval $\Delta x = \frac{b-a}{n-1}$ where $n$ is the number of samples. We can then take the sampled outputs from our two functions and store them in an n-dimensional data vector we'll call $\hat{f}$ and $\hat{g}$ respectively. We can now take the inner product between those two data vectors:
-$$ \langle \hat{f}, \hat{g} \rangle  =  \hat{g}^T \hat{f} = \sum_{i=1}^{n} f_i g_i$$
+So, lets derive the inner product for the function space.
+Lets say we have two regular functions $f(x)$ and $g(x)$ defined on the domain $[a,b]$ that we can sample from at a regular interval $\Delta x = \frac{b-a}{n-1}$ where $n$ is the number of samples. We can then take the sampled outputs from our two functions and store them in an n-dimensional data vector we'll call $\bar{f}$ and $\bar{g}$ respectively. We can now take the inner product between those two data vectors:
+$$ \langle \bar{f}, \bar{g} \rangle  =  \bar{g}^T \bar{f} = \sum_{i=1}^{n} \bar{f_i} \bar{g_i}$$
 
 We now have the inner product for the data vectors but this is different from the inner product of the function since we are only considering a finite number of sampled elements with the added complication that as the number of our samples increases we end up summing together more terms leading to an explosion in the size of the inner product. So what we can do is simply normalize the contribution of each sample by the sampling interval $\Delta x$:
 
-$$\langle \hat{f}, \hat{g} \rangle \Delta x  = \sum_{i=1}^{n} f_i g_i \Delta x$$
+$$\langle \bar{f}, \bar{g} \rangle \Delta x  = \sum_{i=1}^{n} \bar{f_i} \bar{g_i} \Delta x$$
 
 We can interpret each sample value $f_i g_i$ as measuring the local overlap between the two functions at one point in the domain. However, a single sample should not contribute by itself; it should contribute in proportion to the small interval of the domain that it represents. This is why we multiply each term by $\Delta x$.
 
@@ -212,7 +256,7 @@ $$
 \int_a^b f(x)g(x)\,dx.
 $$
 
-So the function inner product is the limiting case of the ordinary vector dot product applied to finer and finer sampled versions of the functions. Thus for functions, the standard inner product is defined by multiplying the two functions pointwise and integrating over the domain:
+So the **function inner product** is the limiting case of the ordinary vector dot product applied to finer and finer sampled versions of the functions. Thus for functions, the standard inner product is defined by multiplying the two functions pointwise and integrating over the domain:
 
 $$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
 
@@ -222,14 +266,9 @@ $$\sum_{i=1}^{n} u_i v_i$$
 The function inner product multiplies matching function values and “adds” them continuously using an integral:
 $$\int_a^b f(x)g(x)\,dx.$$
 
-So the analogy is:
-
-$$\text{finite sum over vector components} \quad \longrightarrow \quad \text{continuous sum over function values}.$$
-
 For complex-valued functions, we usually use the complex conjugate of the second function:
 
 $$\langle f,g\rangle = \int_a^b f(x)g^*(x)\,dx$$
-
 
 This ensures that the inner product of a function with itself gives a nonnegative quantity:
 $$\langle f,f\rangle = \int_a^b |f(x)|^2\,dx$$
@@ -246,214 +285,839 @@ $$\langle f,g\rangle = 0$$
 Using the integral definition, this means
 $$\int_a^b f(x)g(x)\,dx = 0$$
 
+$\star$ Geometrically, this means the two functions have no net alignment over the interval; their positive and negative overlaps cancel out perfectly.
 
-$\star$ Geometrically, this means the two functions have no net alignment over the interval. Their positive and negative overlaps cancel out perfectly. This is the key idea that will allow us to treat sine and cosine waves as basis directions in function space.
+# Function Basis
 
-## Periodic Functions
-
-Before continuing lets make a quick addendum to our problem, by restricting the space of our "complex" function that we wish to approximate to periodic functions
-
-
-## Function Basis
-
-> **Recap**: Our goal is to find simple function(s) whose combination can be used to express more "complex" functions. We have defined function spaces analogous to vector spaces using linear algebra to provide a framework for searching the function space. Furthermore, we have defined the inner product between two functions which will be useful in determining if two functions fit the orthogonality condition needed to use the functions as basis for a function space. 
-
-
-In ordinary linear algebra, a basis needs two properties:
-
-$$
-\text{basis} = \text{independent} + \text{spanning}.
-$$
-
-The basis vectors must point in independent directions, but they must also be able to build every vector in the space. The same idea holds for functions. A collection of functions
-
-$$
-\phi_1(x),\phi_2(x),\phi_3(x),\dots
-$$
-
+In ordinary linear algebra, a basis needs to be both **independent** and **spanning**. The basis vectors must point in independent directions, but they must also be able to build every vector in the space. The same idea holds for functions. A collection of functions
+$$\phi_1(x),\phi_2(x),\phi_3(x),\dots$$
 can act as a basis for a function space if functions in that space can be written, or at least approximated arbitrarily well, as linear combinations of the basis functions:
 
-$$
-f(x)
-=
-c_1\phi_1(x)
-+
-c_2\phi_2(x)
-+
-c_3\phi_3(x)
-+
-\cdots.
-$$
+$$f(x)=c_1\phi_1(x)+c_2\phi_2(x)+c_3\phi_3(x)+\cdots$$
 
 Because function spaces are usually infinite-dimensional, we often need infinitely many basis functions. So instead of asking for a finite linear combination, we usually ask whether the infinite series converges back to the original function in some meaningful sense.
 
 If our function space has an inner product, then the nicest kind of basis is an **orthonormal basis**. A family of functions $\{\phi_n\}$ is orthonormal if
-
-$$
-\langle \phi_m,\phi_n\rangle
-=
-\delta_{mn},
-$$
-
+$$\langle \phi_m,\phi_n\rangle=\delta_{mn}$$
 where
-
-$$
-\delta_{mn}
-=
-\begin{cases}
-1, & m=n, \\
-0, & m\neq n.
-\end{cases}
-$$
+$$\delta_{mn}=\begin{cases}1, & m=n, \\0, & m\neq n\end{cases}$$
 
 The condition $\langle \phi_m,\phi_n\rangle=0$ for $m\neq n$ means the functions point in independent directions. The condition $\langle \phi_n,\phi_n\rangle=1$ means each basis function has unit length.
 
-But again, orthonormality is only half the story. To be a basis, the family must also be **complete**. Completeness means there are no missing directions in the function space. In other words, every function in the space can be recovered, or approximated arbitrarily well, using these basis functions.
+But orthonormality is only half the story. To be a basis, the family must also be **complete**. Completeness means there are no missing directions in the function space. In other words, every function in the space can be recovered, or approximated arbitrarily well, using these basis functions.
 
-So the search for a Fourier basis has two parts:
+So the search for a Fourier basis has two objectives:
 
-1. Find simple functions that are orthogonal.
-2. Show that there are enough of them to reconstruct the class of functions we care about.
+**1. Find simple functions that are orthogonal.**
 
-Since Fourier series are designed for periodic functions, it makes sense to look for simple periodic basis functions. The simplest periodic waves are
+**2. Show that there are enough of them to reconstruct the class of functions we care about.**
 
-$$
-\cos(kx)
-$$
+Since we restricted our functions to periodic functions, it makes sense to look for simple periodic basis functions. The simplest periodic waves are of course: $\cos(kx)$ and $\sin(kx)$ where $k$ controls the frequency of oscillation.
+
+# Sines and Cosines as Basis
+
+Before moving further lets look at some properties of sines and cosines that make them attractive basis functions stemming from their properties under integration, namely that their overlaps cancel out over a full symmetric period, leading to the expressions: 
+
+<details>
+  <summary><strong>Longer calculation here! (Click to expand)</strong></summary>
+Lets look at the interval $[0,2\pi]$ and assume that $m, n$ are positive integers.
+
+First, we can show that individual sine waves integrate to zero over this interval for any non-zero integer $m$, with a little trick of dividing and multiplying the entire integral by $-m$:
+
+$$\int_{0}^{2\pi}\sin(mx)\,dx=\frac{-1}{m}\int_{0}^{2\pi}-m\sin(mx)\,dx$$
+Since
+$$\frac{d}{dx}\cos(mx)=-m\sin(mx),$$
+we get
+$$\int_{0}^{2\pi}\sin(mx)\,dx=\frac{-1}{m}\cos(mx)\Big|_0^{2\pi}$$
+
+$$=\frac{-1}{m}\left[\cos(2\pi m)-\cos(0)\right]$$
+
+Since $m$ is an integer, $\cos(2\pi m)=1$ and $\cos(0)=1$.
+
+Therefore,
+$$\int_{0}^{2\pi}\sin(mx)\,dx=\frac{-1}{m}(1-1)=0.$$
+
+Geometrically, this result says that over a full period, the positive and negative areas of the sine wave cancel out.
+
+Similarly, cosine waves also integrate to zero for any non-zero integer $n$:
+
+$$\int_{0}^{2\pi}\cos(nx)\,dx.$$
+This time we use the fact that
+$$\frac{d}{dx}\sin(nx)=n\cos(nx)$$
+
+So we can write
+$$\int_{0}^{2\pi}\cos(nx)\,dx=\frac{1}{n}\int_{0}^{2\pi}n\cos(nx)\,dx$$
+Therefore, 
+$$\int_{0}^{2\pi}\cos(nx)\,dx=\frac{1}{n}\sin(nx)\Big|_0^{2\pi}$$
+$$=\frac{1}{n}\left[\sin(2\pi n)-\sin(0)\right]$$
+
+Since $n$ is an integer, $\sin(2\pi n)=0$ and $\sin(0)=0.$
+Thus,
+$$\int_{0}^{2\pi}\cos(nx)\,dx=\frac{1}{n}(0-0)=0$$
+
+So individual sine and cosine waves have zero average over a full period.
+
+Now lets look at what happens when we square sine and cosine waves. Unlike the previous integrals, these will not evaluate to zero because squaring makes the functions nonnegative.
+
+For sine squared, we use the trigonometric identity
+
+$$\sin^2(mx)=\frac{1-\cos(2mx)}{2}$$
+Therefore,
+$$\int_{0}^{2\pi}\sin^2(mx)\,dx=\int_{0}^{2\pi}\frac{1-\cos(2mx)}{2}\,dx$$
+
+Splitting this into two integrals gives
+
+$$\int_{0}^{2\pi}\sin^2(mx)\,dx=\frac{1}{2}\int_{0}^{2\pi}1\,dx
+-
+\frac{1}{2}\int_{0}^{2\pi}\cos(2mx)\,dx$$
+The first term is
+$$\frac{1}{2}\int_{0}^{2\pi}1\,dx=\frac{1}{2}(2\pi)=\pi$$
+
+The second term is zero because $\cos(2mx)$ is still a cosine wave with integer frequency:
+$$\int_{0}^{2\pi}\cos(2mx)\,dx=0$$
+
+Therefore,
+$$\int_{0}^{2\pi}\sin^2(mx)\,dx=\pi.$$
+
+Similarly, for cosine squared we use the identity
+
+$$\cos^2(nx)=\frac{1+\cos(2nx)}{2}$$
+Then
+$$\int_{0}^{2\pi}\cos^2(nx)\,dx=\int_{0}^{2\pi}\frac{1+\cos(2nx)}{2}\,dx$$
+
+Splitting this apart,
+
+$$\int_{0}^{2\pi}\cos^2(nx)\,dx=\frac{1}{2}\int_{0}^{2\pi}1\,dx
++
+\frac{1}{2}\int_{0}^{2\pi}\cos(2nx)\,dx$$
+
+Again, the first term is
+$$\frac{1}{2}\int_{0}^{2\pi}1\,dx=\pi,$$
+and the second term is zero:
+$$\frac{1}{2}\int_{0}^{2\pi}\cos(2nx)\,dx=0$$
+So
+$$\int_{0}^{2\pi}\cos^2(nx)\,dx=\pi$$
+
+Thus, over the interval $[0,2\pi]$, we have:
+</details>
+
+
+$$\int_{0}^{2\pi}\sin(mx)\,dx=0, \int_{0}^{2\pi}\cos(nx)\,dx=0$$
+and
+$$\int_{0}^{2\pi}\sin^2(mx)\,dx=\pi, \int_{0}^{2\pi}\cos^2(nx)\,dx=\pi$$
+
+Geometrically, the first two equations say that sine and cosine waves have zero average over a full period. The last two equations say that when a sine or cosine wave is multiplied by itself, the entire expression becomes positive so the area under the curve is also positive and average out to $\frac{1}{2}$, this is why over a full period of $2\pi$ their integral comes out to $\pi$.
+
+[INSERT PICTURE HERE]
+
+Now we can look at what happens when we multiply different sine and cosine waves together. This is the key step for understanding orthogonality, because the inner product of two functions is defined by multiplying them pointwise and integrating.
+
+$$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
+
+First, consider two sine waves with frequencies $m$ and $n$:
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx$$
+To evaluate this, we use the product-to-sum identity
+
+$$\sin(mx)\sin(nx)=\frac{1}{2}\left[\cos((m-n)x)-\cos((m+n)x)\right].$$
+
+So
+
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=\frac{1}{2}\int_0^{2\pi}\left[\cos((m-n)x)-\cos((m+n)x)\right]dx$$
+
+Splitting the integral gives
+
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=
+\frac{1}{2}\int_0^{2\pi}\cos((m-n)x)\,dx
+-
+\frac{1}{2}\int_0^{2\pi}\cos((m+n)x)\,dx$$
+
+If $m\neq n$, then both $m-n$ and $m+n$ are nonzero integers, so both cosine terms integrate to zero over $[0,2\pi]$. Therefore,
+
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=0\quad \text{when } m\neq n.$$
+
+If $m=n$, then the first cosine term becomes
+
+$$\cos((m-n)x)=\cos(0)=1.$$
+
+So
+
+$$\int_0^{2\pi}\sin^2(mx)\,dx=
+\frac{1}{2}\int_0^{2\pi}1\,dx-\frac{1}{2}\int_0^{2\pi}\cos(2mx)\,dx.$$
+
+The first term is $\pi$, and the second term is zero, so
+$$\int_0^{2\pi}\sin^2(mx)\,dx=\pi$$
+Thus,
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=\begin{cases}0, & m\neq n, \\\pi, & m=n.\end{cases}$$
+The exact same pattern happens for two cosine waves. Start with
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx$$
+Using the identity
+$$\cos(mx)\cos(nx)=\frac{1}{2}\left[\cos((m-n)x)+\cos((m+n)x)\right].$$
+we get
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=\frac{1}{2}\int_0^{2\pi}\cos((m-n)x)\,dx+\frac{1}{2}\int_0^{2\pi}\cos((m+n)x)\,dx$$
+
+If $m\neq n$, both terms integrate to zero, so
+
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=0\quad \text{when } m\neq n$$
+
+If $m=n$, then again $\cos((m-n)x)=1$, so
+
+$$\int_0^{2\pi}\cos^2(mx)\,dx=\frac{1}{2}\int_0^{2\pi}1\,dx+\frac{1}{2}
+\int_0^{2\pi}\cos(2mx)\,dx$$
+
+The first term is $\pi$, and the second term is zero. Therefore,
+
+$$\int_0^{2\pi}\cos^2(mx)\,dx=\pi.$$
+
+Thus,
+
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=\begin{cases}0, & m\neq n, \\\pi, &m=n\end{cases}$$
+
+Finally, consider a sine wave multiplied by a cosine wave:
+$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx$$
+Using the product-to-sum identity
+$$\sin(mx)\cos(nx)=\frac{1}{2}\left[\sin((m+n)x)+\sin((m-n)x)\right].$$
+we get
+$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=\frac{1}{2}\int_0^{2\pi}\sin((m+n)x)\,dx+
+\frac{1}{2}\int_0^{2\pi}\sin((m-n)x)\,dx$$
+
+The first term integrates to zero because $m+n$ is a positive integer. If $m\neq n$, then $m-n$ is also a nonzero integer, so the second term also integrates to zero.
+
+If $m=n$, then the second sine term becomes
+$$\sin((m-n)x)=\sin(0)=0$$
+So this term is still zero. Therefore,
+$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0$$
+
+for all positive integers $m,n$.
+
+Putting these results together:
+
+$$\star \int_0^{2\pi}\sin(mx)\sin(nx)\,dx=\begin{cases}0, & m\neq n, \\\pi, & m=n.\end{cases}$$
+
+$$\star \int_0^{2\pi}\cos(mx)\cos(nx)\,dx=\begin{cases}0, & m\neq n, \\\pi, &m=n\end{cases}$$
 
 and
 
-$$
-\sin(kx),
-$$
+$$\star \int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0.$$
 
-where $k$ controls the frequency of oscillation.
+<iframe
+  src="./content/misc_math/Fourier/function_orthogonality.html"
+  style="width: 100%; height: 900px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Interactive visualization of sine and cosine orthogonality">
+</iframe>
 
-These functions are natural candidates because they are simple, smooth, periodic, and orthogonal on intervals like $[-\pi,\pi]$. For example,
 
-$$
-\int_{-\pi}^{\pi} \sin(mx)\sin(nx)\,dx = 0
-\quad \text{when } m\neq n,
-$$
+* (Phew! ok that was a lot of math but I think its useful to write it out because it will help us gather insight later when we will be summing up all the different sine and cosine terms) 
 
-$$
-\int_{-\pi}^{\pi} \cos(mx)\cos(nx)\,dx = 0
-\quad \text{when } m\neq n,
-$$
+# From Orthogonality to a Function Basis
 
+Now lets connect the calculus we just did back to the linear algebra language we developed earlier.
+
+We defined the inner product between two real-valued functions on an interval as
+
+$$\langle f,g\rangle=\int_0^{2\pi} f(x)g(x)\,dx.$$
+
+So when we computed integrals like
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx,$$
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx,$$
 and
+$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx,$$
+we were really computing inner products between different candidate basis functions.
 
+The results we found were
+$$\langle \sin(mx),\sin(nx)\rangle=\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=
+\begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
 $$
-\int_{-\pi}^{\pi} \sin(mx)\cos(nx)\,dx = 0.
+\langle \cos(mx),\cos(nx)\rangle=\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=
+\begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
+and
+$$\langle \sin(mx),\cos(nx)\rangle=\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0$$
+
+These equations say that different sine frequencies point in perpendicular directions, different cosine frequencies point in perpendicular directions, and every sine wave points in a perpendicular direction from every cosine wave.
+
+So the family
+
+$$1,\quad \cos(x),\quad \sin(x),\quad \cos(2x),\quad \sin(2x),\quad \cos(3x),\quad \sin(3x),\dots$$
+is an **orthogonal family** of functions on $[0,2\pi]$.
+There is one small normalization detail. The functions are orthogonal, but not orthonormal, because their lengths are not all equal to $1$. For example,
+$$\|\sin(nx)\|^2=\langle \sin(nx),\sin(nx)\rangle=\pi,$$
+and
+$$\|\cos(nx)\|^2=\langle \cos(nx),\cos(nx)\rangle=\pi$$
+Therefore,
+$$\|\sin(nx)\|=\sqrt{\pi}$$
+and
+$$\|\cos(nx)\|=\sqrt{\pi}$$
+So if we wanted unit-length basis functions, we could use
+$$\frac{1}{\sqrt{\pi}}\sin(nx)$$
+and
+$$\frac{1}{\sqrt{\pi}}\cos(nx)$$
+The constant function is slightly different. Since
+
+$$\langle 1,1\rangle=\int_0^{2\pi}1^2\,dx=2\pi,$$
+its norm is
+$$\|1\|=\sqrt{2\pi}$$
+So the normalized constant basis function would be
+$$\frac{1}{\sqrt{2\pi}}$$
+This means the normalized trigonometric family is
 $$
-
-This means sine and cosine waves behave like perpendicular directions in function space. A low-frequency wave points in a different direction than a high-frequency wave, and sine waves point in different directions than cosine waves.
-
-So a reasonable guess is that a periodic function can be built from a sum of these periodic waves:
-
-$$
-f(x)
-=
-\frac{a_0}{2}
-+
-\sum_{k=1}^{\infty}
-a_k\cos(kx)
-+
-b_k\sin(kx).
-$$
-
-This is the real Fourier series.
-
-Now we can introduce the complex exponential version. The function
-
-$$
-e^{ikx}
-$$
-
-should not be seen as a random new basis function. By Euler's formula,
-
-$$
-e^{ikx}
-=
-\cos(kx)+i\sin(kx).
-$$
-
-So $e^{ikx}$ is just a compact way to package a cosine wave and a sine wave of the same frequency into one complex-valued wave. Instead of separately tracking sine and cosine coefficients, we can write the Fourier series more compactly as
-
-$$
-f(x)
-=
-\sum_{k=-\infty}^{\infty}
-c_k e^{ikx}.
-$$
-
-In this form, the basis functions are
-
-$$
-\phi_k(x)=e^{ikx},
-\qquad k\in\mathbb{Z}.
-$$
-
-On $[-\pi,\pi]$, these complex exponentials are orthogonal because
-
-$$
-\langle e^{imx},e^{ikx}\rangle
-=
-\int_{-\pi}^{\pi} e^{imx}\left(e^{ikx}\right)^*\,dx
-=
-\int_{-\pi}^{\pi} e^{i(m-k)x}\,dx.
+\frac{1}{\sqrt{2\pi}},
+\quad
+\frac{1}{\sqrt{\pi}}\cos(x),
+\quad
+\frac{1}{\sqrt{\pi}}\sin(x),
+\quad
+\frac{1}{\sqrt{\pi}}\cos(2x),
+\quad
+\frac{1}{\sqrt{\pi}}\sin(2x),
+\quad \dots
 $$
 
-If $m\neq k$, the oscillations cancel over the interval, so
+This is now an **orthonormal family**.
+
+However, orthogonality only tells us that these functions point in independent directions. To call them a basis, we also need a spanning or completeness property. In finite-dimensional linear algebra, a basis must be independent and spanning. The same idea holds here:
+
+$$\text{function basis}=\text{orthogonal independent directions}+\text{enough directions to reconstruct the space}$$
+
+For Fourier analysis, the important completeness statement is:
+If $f$ is a square-integrable periodic function on $[0,2\pi]$, meaning
+$$\int_0^{2\pi}|f(x)|^2\,dx < \infty,$$
+then $f$ can be approximated arbitrarily well, in the $L^2$ or mean-square sense, by finite sums of sine and cosine functions.
+What the square-integrable periodic function really means is that we want our function to have some finite "energy" so that it does not just asymptotically increase to infinity over a period. 
+
+In the linear algebra sense completeness is satisfied when:
+
+A function $f$ is orthogonal to every sine and cosine basis function, meaning
+
+$$\langle f,\cos(nx)\rangle = 0$$
+and
+$$\langle f,\sin(nx)\rangle = 0$$
+for every positive integer $n$, and also
+$$\langle f,1\rangle = 0,$$
+then $f$ must be the zero function in the $L^2$ sense.
+
+That is the infinite-dimensional version of saying: if a vector has zero projection onto every basis direction, then it must be the zero vector.
+
+This completeness result is deeper than the orthogonality calculations above. Orthogonality follows from trigonometric identities and integration. Completeness requires a real theorem from analysis. For the purpose of this article, we can treat it as the theorem that justifies the Fourier series:
+
+$$\left\{1,\cos(x),\sin(x),\cos(2x),\sin(2x),\dots\right\}$$
+
+forms a complete orthogonal basis for square-integrable periodic functions on $[0,2\pi]$.
+
+So now we have both ingredients we wanted:
+
+$$\text{orthogonality}\quad \Rightarrow \quad
+\text{the coefficients can be found independently by projection},$$
+and
+$$\text{completeness}\quad \Rightarrow \quad
+\text{the full infinite series can reconstruct the function}.$$
+
+
+# Fourier Series
+
+> **Recap**: Our goal is to find simple function(s) whose combination can be used to express more "complex" functions. We have defined function spaces analogous to vector spaces using linear algebra to provide a framework for searching the function space. Furthermore, we have defined the inner product between two functions which was useful in determining if two functions fit the orthogonality condition needed to use the functions as basis for a function space. Finally, we identified sines as cosines as possible candidate functions as basis for periodic functions.
+
+Bringing all the linear algebra together we can posit that a periodic function with finite energy could be approximated as:
+
+$$f(x)=\sum_{k=1}^{\infty}a_k\cos(\omega_1 x)+b_k\sin(\omega_2 x)$$
+
+The formulation of periodic functions as a sum of sines and cosines, above, then introduces the following question(s): By what rule / reason do we assign the wave frequencies and magnitudes?
+
+$\star$ The answer is that the frequencies come from the **periodicity** of the function and the **completeness** requirement, while the magnitudes are determined from the **projection** onto our **orthonormal basis**.
+
+## Frequencies in the Fourier Series
+
+Suppose our function is periodic with period $T$. That means
+
+$$f(x+T)=f(x)$$
+
+If we want to build $f(x)$ out of sine and cosine waves, then the sine and cosine waves should also repeat after the same period $T$. The simplest wave that completes exactly one full cycle over an interval of length $T$ has angular frequency
+$$\omega_0 = \frac{2\pi}{T}$$
+This is called the **fundamental angular frequency**.
+A cosine wave with this frequency satisfies
+$$\cos(\omega_0(x+T))=\cos(\omega_0 x+\omega_0 T)$$
+Since
+$$\omega_0 T = \frac{2\pi}{T}T = 2\pi,$$
+we get
+$$\cos(\omega_0(x+T))=\cos(\omega_0 x+2\pi)=\cos(\omega_0 x)$$
+
+So $\cos(\omega_0 x)$ has period $T$. The same is true for $\sin(\omega_0 x)$.
+
+But we are not limited to waves that complete one cycle over the interval. We can also use waves that complete two cycles, three cycles, four cycles, and so on. These have frequencies
+
+$$2\omega_0,\quad 3\omega_0,\quad 4\omega_0,\quad \dots$$
+or more generally,
+$$k\omega_0,\qquad k\in \mathbb{Z}$$
+
+These are the **harmonics** of the fundamental frequency. They are special because each one completes an integer number of cycles over one period of the function.
+
+This gives us the natural Fourier basis candidates:
+$$\cos(k\omega_0 x)$$
+and$$\sin(k\omega_0 x)$$
+
+There is another important way to interpret these frequencies. The integer multiples of the fundamental frequency are not only chosen so that each wave fits neatly inside one period; they are also the directions that make the sine and cosine family complete.
+
+The lowest frequency, $\omega_0$, captures the broadest oscillation that fits inside one period. The higher harmonics,
+$$2\omega_0,\quad 3\omega_0,\quad 4\omega_0,\quad \dots$$
+capture increasingly fine details. So as $k$ increases, we are adding higher-frequency basis directions that let us represent sharper bends, faster changes, and more detailed structure in the original function.
+
+In this sense, the set of frequencies
+$$\omega_k = k\omega_0$$
+
+is doing two jobs at once. **Periodicity** tells us which frequencies are allowed, because each basis wave must repeat consistently over the period $T$. **Completeness** tells us why we need the whole infinite ladder of these frequencies, because only the full collection of harmonics gives us enough independent directions to reconstruct arbitrary square-integrable periodic functions.
+
+So the frequencies in the Fourier series are not arbitrary. They are integer multiples of the fundamental frequency: each one fits the period, remains orthogonal to the others, and contributes another independent direction to the function space.
+
+Therefore,
+$$\omega_k = k\omega_0 = \frac{2\pi k}{T}.$$
+This is why the Fourier series has the form
+$$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(k\omega_0 x)+
+b_k\sin(k\omega_0 x)\right].$$
+The term
+$$\frac{a_0}{2}$$
+
+is the constant or average part of the function. The remaining terms describe oscillating components at higher and higher frequencies. It will be more obvious where the $\frac{a_0}{2}$ term comes from when we explore where the magnitudes come from next.
+
+## Magnitudes in the Fourier Series
+
+Now we can answer the second question: where do the magnitudes $a_k$ and $b_k$ come from?
+
+### Oscillating Coefficients
+
+Our intuition tells us that the $k$th magnitudes should somehow weight the $k$th frequency sines and cosines such that their contribution to the overall sum best approximates our target function. We already posited that the target function is just a sum of sines and cosines of varying frequencies so lets imagine just one component wave of our target function defined by the sum of a sine and cosine at a particular frequency:
+
+$$f(x)_{\omega_k} \approx a_k\cos(\omega_k x)+b_k\sin(\omega_k x)$$
+
+Since sine and cos are orthogonal basis functions we should probably weight their contributions independently and proportionally to how much they align with the $k$th frequency component of our target function
+
+Geometrically, $a_k$ measures how much of the function points in the direction of the cosine wave
+$$\cos(k\omega_0 x),$$
+while $b_k$ measures how much of the function points in the direction of the sine wave
+$$\sin(k\omega_0 x)$$
+
+Since we already defined the inner product between functions, the natural way to measure this is by projection.
+For an ordinary vector, the coordinate of a vector $\mathbf{v}$ in the direction of an orthogonal basis vector $\mathbf{e}_k$ is
+
+$$c_k=\frac{\langle \mathbf{v},\mathbf{e}_k\rangle}
+{\langle \mathbf{e}_k,\mathbf{e}_k\rangle}$$
+
+The exact same idea works for functions. If our basis function is $\phi_k(x)$, then the coefficient of $f(x)$ in the direction of $\phi_k(x)$ is
+
+$$c_k=\frac{\langle f,\phi_k\rangle}
+{\langle \phi_k,\phi_k\rangle}$$
+
+For the cosine coefficient, the basis function is
+$$\phi_k(x)=\cos(k\omega_0 x).$$
+
+Therefore,
+$$a_k=\frac{\langle f,\cos(k\omega_0 x)\rangle}
+{\langle \cos(k\omega_0 x),\cos(k\omega_0 x)\rangle}$$
+
+Using the integral inner product, this becomes
 
 $$
-\int_{-\pi}^{\pi} e^{i(m-k)x}\,dx=0.
+a_k=
+\frac{\int_{x_0}^{x_0+T} f(x)\cos(k\omega_0 x)\,dx}
+{\int_{x_0}^{x_0+T} \cos^2(k\omega_0 x)\,dx}
 $$
 
-If $m=k$, then the integrand becomes $1$, so
+For $k\geq 1$, the denominator is
 
-$$
-\int_{-\pi}^{\pi} 1\,dx=2\pi.
-$$
+$$\int_{x_0}^{x_0+T} \cos^2(k\omega_0 x)\,dx=\frac{T}{2}$$
+
+
+<details>
+  <summary><strong>Longer calculation here! (Click to expand)</strong></summary>
+  
+For $k\geq 1$, the denominator is
+
+$$\int_{x_0}^{x_0+T} \cos^2(k\omega_0 x)\,dx.$$
+To evaluate this, we use the trigonometric identity
+$$\cos^2(\theta)=\frac{1+\cos(2\theta)}{2}$$
+so we get
+$$\cos^2(k\omega_0 x)=\frac{1+\cos(2k\omega_0 x)}{2}$$
 
 Therefore,
 
 $$
-\langle e^{imx},e^{ikx}\rangle
-=
-2\pi \delta_{mk}.
+\int_{x_0}^{x_0+T} \cos^2(k\omega_0 x)\,dx=
+\int_{x_0}^{x_0+T}\frac{1+\cos(2k\omega_0 x)}{2}\,dx=
+\frac{1}{2}\int_{x_0}^{x_0+T} 1\,dx+
+\frac{1}{2}\int_{x_0}^{x_0+T} \cos(2k\omega_0 x)\,dx.
 $$
 
-If we want the basis functions to have unit length, we normalize them:
+The first term is simple:
+$$\frac{1}{2}
+\int_{x_0}^{x_0+T} 1\,dx=
+\frac{1}{2}
+\left[x\right]_{x_0}^{x_0+T}=
+\frac{1}{2}
+\left((x_0+T)-x_0\right)=
+\frac{T}{2}$$
+
+For the second term, we integrate the cosine:
+
+$$\frac{1}{2}
+\int_{x_0}^{x_0+T} \cos(2k\omega_0 x)\,dx =
+\frac{1}{2}\left[\frac{\sin(2k\omega_0 x)}{2k\omega_0}\right]_{x_0}^{x_0+T}=
+\frac{1}{4k\omega_0}\left[\sin(2k\omega_0(x_0+T))-\sin(2k\omega_0 x_0)\right]
+$$
+
+Now remember that $\omega_0 = \frac{2\pi}{T}$ therefore, $2k\omega_0 T=2k\frac{2\pi}{T}T=4\pi k$
+
+So the first sine term becomes
+$$\sin(2k\omega_0(x_0+T))=\sin(2k\omega_0 x_0 + 4\pi k)$$
+
+Since $4\pi k$ is an integer multiple of $2\pi$, the sine function just repeats:
+$$\sin(2k\omega_0 x_0 + 4\pi k)=\sin(2k\omega_0 x_0).$$
+Therefore,
+$$\sin(2k\omega_0(x_0+T))-\sin(2k\omega_0 x_0)=0$$
+So the oscillating part contributes nothing over one full period:
+
+$$\frac{1}{2}\int_{x_0}^{x_0+T} \cos(2k\omega_0 x)\,dx=0$$
+
+Thus we are left with
+$$\int_{x_0}^{x_0+T} \cos^2(k\omega_0 x)\,dx=\frac{T}{2}$$
+
+So for $k\geq 1$,
+$$\langle \cos(k\omega_0 x),\cos(k\omega_0 x)\rangle=\frac{T}{2}$$
+
+Geometrically, this says that over one full period, the average value of $\cos^2(k\omega_0 x)$ is $\frac{1}{2}$. Since the interval has length $T$, the total area under $\cos^2(k\omega_0 x)$ over that interval is just half of $T$.
+
+(Hopefully the explicit calculations above make intuitive sense since they correspond to what we found in the Sines and Cosines section)
+</details>
+
+So
+$$a_k=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
+Similarly, the sine coefficient is
+$$b_k=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\sin(k\omega_0 x)\,dx$$
+
+
+
+### Constant coefficient
+
+The constant coefficient comes from projecting onto the $k = 0$ basis function which is simply $f_{\omega_0}(x) = cos(0) = 1$.
+
+Following our projection rule, the denominator is the inner product of this constant basis function with itself:
+$$\langle 1, 1 \rangle = \int_{x_0}^{x_0+T} 1dx = T$$
+
+$$a_0=\frac{\langle f, 1 \rangle}{\langle 1, 1 \rangle} = \frac{1}{T}\int_{x_0}^{x_0+T}f(x)\,dx$$
+
+Notice that this is $T$ not $T/2$ like we got fo the oscillating sine/cosine terms, the constant coefficient represents the integral (total area under the curve) for one period of our function and then dividing that area by $T$ giving us the average height of the function. 
+
+However, to keep the calculus formulas consistent for all $k$, mathematicians usually define $a_0$ using the exact same formula we derived for the other $a_k$ terms thus:
+
+$$a_0=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
+
+Because this formula calculates twice the true average of the function, the "2" is treated as an artifact of normalization. This is exactly why you will almost always see the final Fourier series equation written with the constant term divided by two:
+
+<div class="formula-box">
+
+<div class="formula-box-title">Fourier Series</div>
 
 $$
-\phi_k(x)
-=
-\frac{1}{\sqrt{2\pi}}e^{ikx}.
+f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(k\omega_0 x)+b_k\sin(k\omega_0 x)\right]
 $$
+where
+$$\omega_0=\frac{2\pi}{T}$$
+$$a_k=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
+and
+$$b_k=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\sin(k\omega_0 x)\,dx.$$
+
+</div>
+
+So the frequencies are chosen because they fit the period of the function while satisfying completeness, and the magnitudes are chosen because they are the projection coordinates of the function onto each sine and cosine direction.
+
+In the special case where the period is $T=2\pi$ we get $\omega_0=\frac{2\pi}{2\pi}=1$
+So the Fourier series simplifies to
+$$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(kx)+b_k\sin(kx)\right]$$
+
+This is why we often see the basis functions written as
+$\cos(kx)$ and $\sin(kx)$.
+
+### Recap
+
+Before moving on lets briefly summarize the path we took.
+
+The main idea was to treat functions like vectors. In ordinary linear algebra, a vector can be decomposed into a sum of basis vectors:
+
+$$\mathbf{v}=c_1\mathbf{e}_1 +c_2\mathbf{e}_2+c_3\mathbf{e}_3+\cdots$$
+
+Where the coefficients tell us how much of each basis direction is present in the original vector. Fourier series are the same idea, except now our “vectors” are functions and our “basis vectors” are basis functions.
+
+To make this analogy work, we first defined a function space, where functions can be added and scaled just like ordinary vectors. Then we defined an inner product between functions:
+
+$$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
+
+This gave us a way to talk about length, projection, and orthogonality in function space.
+
+Next, we restricted our attention to periodic functions, because if a function repeats over some period $T$, then it makes sense to try to build it out of simpler repeating waves. This led us naturally to sine and cosine functions.
+
+We then showed that sine and cosine waves of different frequencies are orthogonal:
+
+$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=0\quad \text{when } m\neq n,$$
+
+$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=0\quad \text{when } m\neq n,$$
+
+and
+
+$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0.$$
+
+These calculations showed that different sine and cosine waves behave like perpendicular directions in function space.
+
+Then we invoked the deeper completeness result: the full family
+
+$$1,\cos(x),\sin(x),\cos(2x),\sin(2x),\dots$$
+
+contains enough independent directions to reconstruct square-integrable periodic functions in the $L^2$ sense.
+
+Putting these ideas together, we arrived at the real Fourier series:
+
+$$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(k\omega_0 x)+
+b_k\sin(k\omega_0 x)\right].$$
+
+Where the frequencies
+$$k\omega_0$$
+
+come from the completeness of basis and periodicity of the function, while the magnitudes $a_k$ and $b_k$ come from projection onto each basis wave.
+
+Euler’s formulation will not change this idea. It will only give us a cleaner way to package the sine and cosine basis functions using complex exponentials.
+
+# Euler's Formulation of the Fourier Series
+
+Now that we have defined the real Fourier series,
+
+$$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(kx)+b_k\sin(kx)\right],$$
+
+we can introduce a more compact version using Euler's formula:
+
+$$e^{ikx}=\cos(kx)+i\sin(kx).$$
+
+[ADD LINK TO EULER'S FORMULA ARTICLE HERE]
+
+Euler's formula also lets us rewrite sine and cosine in terms of complex exponentials:
+
+$$\cos(kx)=\frac{e^{ikx}+e^{-ikx}}{2}, \qquad \sin(kx)=\frac{e^{ikx}-e^{-ikx}}{2i}.$$
+
+So instead of treating sine and cosine as separate basis functions, we can package them into complex exponentials with positive and negative frequencies.
+
+Starting with one frequency component,
+
+$$a_k\cos(kx)+b_k\sin(kx),$$
+
+we substitute the exponential formulas:
+
+$$a_k\cos(kx)+b_k\sin(kx)=a_k\left(\frac{e^{ikx}+e^{-ikx}}{2}\right)+b_k\left(\frac{e^{ikx}-e^{-ikx}}{2i}\right).$$
+
+Now group together the $e^{ikx}$ and $e^{-ikx}$ terms:
+
+$$a_k\cos(kx)+b_k\sin(kx)=\left(\frac{a_k}{2}+\frac{b_k}{2i}\right)e^{ikx}+\left(\frac{a_k}{2}-\frac{b_k}{2i}\right)e^{-ikx}.$$
+
+Since $\frac{1}{i}=-i$, this becomes
+
+$$a_k\cos(kx)+b_k\sin(kx)=\left(\frac{a_k-ib_k}{2}\right)e^{ikx}+\left(\frac{a_k+ib_k}{2}\right)e^{-ikx}.$$
+
+This shows us how the real Fourier coefficients $a_k$ and $b_k$ combine into complex Fourier coefficients:
+
+$$c_k=\frac{a_k-ib_k}{2}, \qquad c_{-k}=\frac{a_k+ib_k}{2}, \qquad k>0.$$
+
+The constant term also gets absorbed into the complex notation. Since the real Fourier series has constant term $\frac{a_0}{2}$, we define
+
+$$c_0=\frac{a_0}{2}.$$
+
+So the full Fourier series becomes
+
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}.$$
+
+This is the complex Fourier series. The basis functions are now
+
+$$\phi_k(x)=e^{ikx}, \qquad k\in\mathbb{Z}.$$
+
+The negative values of $k$ are not a mistake. They are what allow the complex exponential form to represent both sine and cosine information. Positive and negative complex exponentials work together to encode the real oscillations we previously described using separate sine and cosine terms.
+
+For completeness sake lets check that these complex exponential basis functions are also orthogonal. Using the complex inner product,
+
+$$\langle f,g\rangle=\int_{-\pi}^{\pi}f(x)g^*(x)\,dx,$$
+
+we get
+
+$$\langle e^{imx},e^{ikx}\rangle=\int_{-\pi}^{\pi}e^{imx}\left(e^{ikx}\right)^*\,dx.$$
+
+Since $\left(e^{ikx}\right)^*=e^{-ikx}$, this becomes
+
+$$\langle e^{imx},e^{ikx}\rangle=\int_{-\pi}^{\pi}e^{imx}e^{-ikx}\,dx=\int_{-\pi}^{\pi}e^{i(m-k)x}\,dx.$$
+
+If $m\neq k$, then $m-k$ is a nonzero integer. The complex exponential completes an integer number of oscillations over $[-\pi,\pi]$, so the positive and negative contributions cancel:
+
+$$
+\int_{-\pi}^{\pi}e^{i(m-k)x}\,dx=
+\left[\frac{e^{i(m-k)x}}{i(m-k)}\right]_{-\pi}^{\pi}=
+\frac{2i\sin((m-k)\pi)}{i(m-k)}=0,\qquad m\neq k.
+$$
+
+If $m=k$, then $e^{i(m-k)x}=e^0=1$, so
+
+$$\int_{-\pi}^{\pi}e^{i(m-k)x}\,dx=\int_{-\pi}^{\pi}1\,dx=2\pi.$$
+
+Therefore,
+
+$$\langle e^{imx},e^{ikx}\rangle=2\pi\delta_{mk},$$
+
+where
+
+$$\delta_{mk}=\begin{cases}1, & m=k, \\ 0, & m\neq k.\end{cases}$$
+
+So the complex exponentials are orthogonal, but not normalized. Their squared length is
+
+$$\langle e^{ikx},e^{ikx}\rangle=2\pi.$$
+
+If we want unit-length basis functions, we normalize them by defining
+
+$$\phi_k(x)=\frac{1}{\sqrt{2\pi}}e^{ikx}.$$
 
 Then
 
-$$
-\langle \phi_m,\phi_k\rangle
-=
-\delta_{mk}.
-$$
+$$\langle \phi_m,\phi_k\rangle=\delta_{mk}.$$
 
-This gives us an orthonormal basis for periodic square-integrable functions on $[-\pi,\pi]$. In that setting, a function can be represented by its projections onto these complex exponential directions:
+Now we can compute the complex coefficient $c_k$ using the same projection idea as before. If
 
-$$
-c_k
-=
-\langle f,\phi_k\rangle.
-$$
+$$f(x)=\sum_{j=-\infty}^{\infty}c_j e^{ijx},$$
 
-Equivalently, without the normalized basis, the coefficient formula is
+then taking the inner product with $e^{ikx}$ gives
 
-$$
-c_k
-=
-\frac{1}{2\pi}
-\int_{-\pi}^{\pi}
-f(x)e^{-ikx}\,dx.
-$$
+$$\langle f,e^{ikx}\rangle=\left\langle\sum_{j=-\infty}^{\infty}c_j e^{ijx},e^{ikx}\right\rangle.$$
+
+Using linearity,
+
+$$\langle f,e^{ikx}\rangle=\sum_{j=-\infty}^{\infty}c_j\langle e^{ijx},e^{ikx}\rangle.$$
+
+But orthogonality tells us that
+
+$$\langle e^{ijx},e^{ikx}\rangle=2\pi\delta_{jk}.$$
+
+So every term disappears except the one where $j=k$:
+
+$$\langle f,e^{ikx}\rangle=2\pi c_k.$$
+
+Therefore,
+
+$$c_k=\frac{1}{2\pi}\langle f,e^{ikx}\rangle.$$
+
+Using the integral form of the inner product,
+
+$$\langle f,e^{ikx}\rangle=\int_{-\pi}^{\pi}f(x)\left(e^{ikx}\right)^*\,dx=\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
+
+So the complex Fourier coefficient is
+
+$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
+
+This is the complex version of the Fourier projection formula. It does the same job as the real coefficients $a_k$ and $b_k$, but it packages the sine and cosine information into one coefficient $c_k$ for each integer frequency $k$.
+
+
+# Fourier Transform
+
+At this point we have the complex Fourier series:
+
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx},$$
+
+with coefficients
+
+$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
+
+This formula came directly from the same projection idea we used throughout the article: to find how much of a basis function is inside $f(x)$, take the inner product of $f(x)$ with that basis function.
+
+However, this version assumes that our function is periodic on an interval of length $2\pi$. More generally, if a function has period $T$, then its fundamental angular frequency is
+$$\omega_0=\frac{2\pi}{T}$$
+and the allowed frequencies are
+$$\omega_k=k\omega_0=\frac{2\pi k}{T}$$
+So the complex Fourier series can be written as
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x}$$
+where
+$$c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx$$
+
+This is the same coefficient formula as before, just adjusted for a period of length $T$ instead of $2\pi$.
+
+Now remember our earlier idea: a non-periodic function can be thought of as a periodic function whose period has become infinitely large. So let the period grow:
+$$T\to\infty.$$
+As $T$ gets larger, the fundamental frequency
+$$\omega_0=\frac{2\pi}{T}$$
+gets smaller. That means the spacing between neighboring frequency samples gets smaller and smaller:
+$$\Delta \omega=\omega_0=\frac{2\pi}{T}\to 0.$$
+
+So in the Fourier series, the frequencies are discrete:
+$$\dots,-2\omega_0,-\omega_0,0,\omega_0,2\omega_0,\dots$$
+but as $T\to\infty$, these discrete frequency points become dense and eventually behave like a continuous frequency axis.
+
+So the main distinguishing feature between the Fourier series and Fourier transform is 
+$$\text{Fourier series: discrete frequencies}
+\quad  \quad
+\text{Fourier transform: continuous frequencies}$$
+
+To see this algebraically, start from the complex Fourier coefficient:
+
+$$c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx.$$
+
+Define
+$$\widehat{f}(\omega_k)=\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx$$
+Then
+$$c_k=\frac{1}{T}\widehat{f}(\omega_k)$$
+
+But since
+$$\Delta \omega=\frac{2\pi}{T},$$
+we can rewrite
+$$\frac{1}{T}=\frac{\Delta \omega}{2\pi}$$
+Therefore,
+$$c_k=\frac{\Delta \omega}{2\pi}\widehat{f}(\omega_k)$$
+
+Now plug this back into the Fourier series:
+
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x}$$
+
+Substituting for $c_k$ gives
+
+$$f(x)=\sum_{k=-\infty}^{\infty}\frac{\Delta \omega}{2\pi}
+\widehat{f}(\omega_k)e^{i\omega_k x}$$
+
+Rearranging,
+
+$$f(x)=\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat{f}(\omega_k)e^{i\omega_k x}\Delta \omega$$
+
+This now looks like a Riemann sum over frequency. As $T\to\infty$, the frequency spacing $\Delta\omega\to 0$, so the sum becomes an integral:
+
+$$f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat{f}(\omega)e^{i\omega x}\,d\omega.$$
+
+This is the inverse Fourier transform.
+
+The corresponding forward Fourier transform is
+$$\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx.$$
+So the Fourier transform pair is
+$$\boxed{\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx}$$
+and
+$$\boxed{f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat{f}(\omega)e^{i\omega x}\,d\omega}$$
+
+This is the same projection idea as the Fourier series, but now instead of projecting onto a countable list of basis functions
+
+$$e^{ikx},\qquad k\in\mathbb{Z},$$
+we project onto a continuous family of basis functions
+$$e^{i\omega x},\qquad \omega\in\mathbb{R}$$
+
+So the Fourier transform asks:
+How much of the frequency $\omega$ is present in the function $f(x)$?
+The answer is given by
+
+$$\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx$$
+
+This is an inner product-like measurement between the function $f(x)$ and the complex exponential $e^{i\omega x}$. The negative sign appears because, just like in the complex Fourier series, we project using the complex conjugate:
+
+$$\left(e^{i\omega x}\right)^*=e^{-i\omega x}$$
+
+Geometrically, the Fourier transform measures how strongly $f(x)$ aligns with each possible complex wave. If $f(x)$ contains a strong oscillation at frequency $\omega$, then multiplying by $e^{-i\omega x}$ causes that frequency component to line up and accumulate. If $f(x)$ does not contain that frequency, the oscillations cancel out and the integral becomes small or zero.
+
+So the main difference between Fourier series and transoform is just that 
+$$\text{Fourier series}=\text{projection onto discrete frequency basis functions},$$
+while
+$$\text{Fourier transform}=\text{projection onto continuous frequency basis functions}$$
+
+In both cases, the core idea is unchanged:
+
+$$\text{decompose a function by measuring its alignment with simpler waves}.$$

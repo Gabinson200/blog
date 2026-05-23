@@ -1,0 +1,66 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Visualizing Orthogonality: Sines and Cosines</title>
+
+  <link rel="stylesheet" href="./function_orthogonality.css" />
+
+  <!-- Keep plotly-2.27.0.min.js in the same folder as this file -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
+  <script src="./function_orthogonality.js" defer></script>
+</head>
+
+<body>
+  <div class="fourier-widget">
+    <h3>Visualizing Orthogonality: Sines and Cosines</h3>
+
+    <div class="controls-grid">
+      <div class="control-group">
+        <strong>Wave 1</strong>
+
+        <div class="control-row">
+          <label for="type1">Type:</label>
+          <select id="type1">
+            <option value="sin">Sine</option>
+            <option value="cos">Cosine</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label for="freq1">Frequency m: <span id="freq1-val">1</span></label>
+          <input type="range" id="freq1" min="1" max="5" step="1" value="1" />
+        </div>
+      </div>
+
+      <div class="control-group">
+        <strong>Wave 2</strong>
+
+        <div class="control-row">
+          <label for="type2">Type:</label>
+          <select id="type2">
+            <option value="sin">Sine</option>
+            <option value="cos">Cosine</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label for="freq2">Frequency n: <span id="freq2-val">2</span></label>
+          <input type="range" id="freq2" min="1" max="5" step="1" value="2" />
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box">
+      Net Inner Product:
+      <span id="integral-result">0.000</span>
+    </div>
+
+    <div id="plot-waves" class="plot-area"></div>
+    <div id="plot-product" class="plot-area"></div>
+  </div>
+</body>
+</html>
