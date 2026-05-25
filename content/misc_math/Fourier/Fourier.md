@@ -518,12 +518,7 @@ We defined the inner product between two real-valued functions on an interval as
 
 $$\langle f,g\rangle=\int_0^{2\pi} f(x)g(x)\,dx.$$
 
-So when we computed integrals like
-$$\int_0^{2\pi}\sin(mx)\sin(nx)\,dx,$$
-$$\int_0^{2\pi}\cos(mx)\cos(nx)\,dx,$$
-and
-$$\int_0^{2\pi}\sin(mx)\cos(nx)\,dx,$$
-we were really computing inner products between different candidate basis functions.
+So when we computed the integrals of sines and cosines above we were really computing inner products between different candidate basis functions.
 
 The results we found were
 $$\langle \sin(mx),\sin(nx)\rangle=\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=
@@ -544,14 +539,10 @@ There is one small normalization detail. The functions are orthogonal, but not o
 $$\|\sin(nx)\|^2=\langle \sin(nx),\sin(nx)\rangle=\pi,$$
 and
 $$\|\cos(nx)\|^2=\langle \cos(nx),\cos(nx)\rangle=\pi$$
-Therefore,
-$$\|\sin(nx)\|=\sqrt{\pi}$$
-and
-$$\|\cos(nx)\|=\sqrt{\pi}$$
+Therefore, $\|\sin(nx)\|=\sqrt{\pi}$ and $\|\cos(nx)\|=\sqrt{\pi}$.
+
 So if we wanted unit-length basis functions, we could use
-$$\frac{1}{\sqrt{\pi}}\sin(nx)$$
-and
-$$\frac{1}{\sqrt{\pi}}\cos(nx)$$
+$\frac{1}{\sqrt{\pi}}\sin(nx)$ and $\frac{1}{\sqrt{\pi}}\cos(nx)$
 The constant function is slightly different. Since
 
 $$\langle 1,1\rangle=\int_0^{2\pi}1^2\,dx=2\pi,$$
@@ -612,6 +603,15 @@ and
 $$\text{completeness}\quad \Rightarrow \quad
 \text{the full infinite series can reconstruct the function}.$$
 
+<!--
+<iframe
+  src="./content/misc_math/Fourier/sampled_vector_fourier.html"
+  style="width: 100%; height: 1880px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="3D orthogonal basis of a 3-point DFT">
+</iframe>
+-->
 
 # Fourier Series
 
@@ -688,12 +688,8 @@ Our intuition tells us that the $k$th magnitudes should somehow weight the $k$th
 
 $$f(x)_{\omega_k} \approx a_k\cos(\omega_k x)+b_k\sin(\omega_k x)$$
 
-Since sine and cos are orthogonal basis functions we should probably weight their contributions independently and proportionally to how much they align with the $k$th frequency component of our target function
-
-Geometrically, $a_k$ measures how much of the function points in the direction of the cosine wave
-$$\cos(k\omega_0 x),$$
-while $b_k$ measures how much of the function points in the direction of the sine wave
-$$\sin(k\omega_0 x)$$
+Since sine and cosine are orthogonal basis functions we should probably weight their contributions independently and proportionally to how much they align with the $k$th frequency component of our target function i.e. geometrically, $a_k$ measures how much of the function points in the direction of the cosine wave $\cos(k\omega_0 x),$ while $b_k$ measures how much of the function points in the direction of the sine wave
+$\sin(k\omega_0 x)$.
 
 Since we already defined the inner product between functions, the natural way to measure this is by projection.
 For an ordinary vector, the coordinate of a vector $\mathbf{v}$ in the direction of an orthogonal basis vector $\mathbf{e}_k$ is
@@ -835,6 +831,145 @@ $$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(kx)+b_k\sin(kx)\right]$$
 This is why we often see the basis functions written as
 $\cos(kx)$ and $\sin(kx)$.
 
+### Canceling Terms
+
+A very noteworthy behavior of the approximation from the Fourier series is that when we take the inner product of our function with cosine or sine of a particular frequency the coefficients $a_k$ and $b_k$ in the series for that particular $k$th frequency will become just a single term in the sum. In other words the alignment of our function with different frequency sines and cosines will simply be represented by a single period weighted coefficient in the series. 
+
+To see this explicitly, start with the Fourier series
+
+$$f(x)=\frac{a_0}{2}+\sum_{j=1}^{\infty}\left[a_j\cos(j\omega_0 x)+b_j\sin(j\omega_0 x)\right]$$
+
+Here I am using $j$ as the summation index, so that we can reserve $k$ for the specific frequency we want to measure.
+
+Now suppose we want to measure how much of the frequency-$k$ cosine wave is present in $f(x)$. We do that by taking the inner product of $f(x)$ with $\cos(k\omega_0 x)$:
+
+$$\langle f,\cos(k\omega_0 x)\rangle=\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
+
+Substituting the Fourier series for $f(x)$ gives
+
+$$\langle f,\cos(k\omega_0 x)\rangle=$$
+$$
+\int_{x_0}^{x_0+T}
+\left[
+\frac{a_0}{2}
++
+a_1\cos(\omega_0 x)+b_1\sin(\omega_0 x)
++
+a_2\cos(2\omega_0 x)+b_2\sin(2\omega_0 x)
++
+\cdots
++
+a_k\cos(k\omega_0 x)+b_k\sin(k\omega_0 x)
++
+\cdots
+\right]
+$$
+$$\cos(k\omega_0 x)\,dx.$$
+
+Now distribute $\cos(k\omega_0 x)$ across every term in the Fourier series. This gives one integral for every basis component:
+
+<table class="vector-function-table">
+  <thead>
+    <tr>
+      <th>Fourier term in $f(x)$</th>
+      <th>After multiplying by $\cos(k\omega_0 x)$</th>
+      <th>Integral over one period</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Constant term $\frac{a_0}{2}$</td>
+      <td>$\frac{a_0}{2}\cos(k\omega_0 x)$</td>
+      <td>$\frac{a_0}{2}\int_{x_0}^{x_0+T}\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$</td>
+    </tr>
+    <tr>
+      <td>Cosine term $a_1\cos(\omega_0 x)$</td>
+      <td>$a_1\cos(\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$a_1\int_{x_0}^{x_0+T}\cos(\omega_0 x)\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$ if $k\neq 1$</td>
+    </tr>
+    <tr>
+      <td>Sine term $b_1\sin(\omega_0 x)$</td>
+      <td>$b_1\sin(\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$b_1\int_{x_0}^{x_0+T}\sin(\omega_0 x)\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$</td>
+    </tr>
+    <tr>
+      <td>Cosine term $a_2\cos(2\omega_0 x)$</td>
+      <td>$a_2\cos(2\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$a_2\int_{x_0}^{x_0+T}\cos(2\omega_0 x)\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$ if $k\neq 2$</td>
+    </tr>
+    <tr>
+      <td>Sine term $b_2\sin(2\omega_0 x)$</td>
+      <td>$b_2\sin(2\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$b_2\int_{x_0}^{x_0+T}\sin(2\omega_0 x)\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$</td>
+    </tr>
+    <tr>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+    </tr>
+    <tr>
+      <td>Matching cosine term $a_k\cos(k\omega_0 x)$</td>
+      <td>$a_k\cos(k\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$a_k\int_{x_0}^{x_0+T}\cos^2(k\omega_0 x)\,dx$</td>
+      <td>$a_k\frac{T}{2}$</td>
+    </tr>
+    <tr>
+      <td>Matching sine term $b_k\sin(k\omega_0 x)$</td>
+      <td>$b_k\sin(k\omega_0 x)\cos(k\omega_0 x)$</td>
+      <td>$b_k\int_{x_0}^{x_0+T}\sin(k\omega_0 x)\cos(k\omega_0 x)\,dx$</td>
+      <td>$0$</td>
+    </tr>
+    <tr>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+      <td>$\vdots$</td>
+    </tr>
+  </tbody>
+</table>
+
+So visually, almost every term disappears. The constant term has zero overlap with $\cos(k\omega_0 x)$, every sine term has zero overlap with $\cos(k\omega_0 x)$, and every cosine term with the wrong frequency has zero overlap with $\cos(k\omega_0 x)$.
+
+The only surviving term is the cosine term with the matching frequency:
+$$a_k\cos(k\omega_0 x)$$
+Therefore,
+$$\langle f,\cos(k\omega_0 x)\rangle=a_k\int_{x_0}^{x_0+T}\cos^2(k\omega_0 x)\,dx=a_k\frac{T}{2}$$
+
+Solving for $a_k$ gives
+
+$$a_k=\frac{2}{T}\langle f,\cos(k\omega_0 x)\rangle=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
+
+This is exactly the coefficient formula we derived earlier, but now we can see why it works: taking the inner product with $\cos(k\omega_0 x)$ filters out every other basis direction and leaves only the $a_k$ contribution.
+
+The same cancellation happens when we project onto $\sin(k\omega_0 x)$. This time all constant terms, all cosine terms, and all sine terms with the wrong frequency disappear. The only surviving term is
+
+$$b_k\sin(k\omega_0 x)$$
+So
+$$\langle f,\sin(k\omega_0 x)\rangle=b_k\int_{x_0}^{x_0+T}\sin^2(k\omega_0 x)\,d=b_k\frac{T}{2}$$
+
+Therefore,
+
+$$b_k=\frac{2}{T}\langle f,\sin(k\omega_0 x)\rangle=
+\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\sin(k\omega_0 x)\,dx$$
+
+So all that work we did with the linear algebra pays off, the Fourier coefficient formulas are exactly the result of projecting the function onto one basis direction at a time. Orthogonality makes all the “wrong” frequencies in the sum cancel, leaving only the matching sine or cosine coefficient.
+
+<iframe
+  src="./content/misc_math/Fourier/fourier_approximator.html"
+  style="width: 100%; height: 1000px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Fourier Series Approximator">
+</iframe>
+
+
 ### Recap
 
 Before moving on lets briefly summarize the path we took.
@@ -893,11 +1028,17 @@ we can introduce a more compact version using Euler's formula:
 
 $$e^{ikx}=\cos(kx)+i\sin(kx).$$
 
-[ADD LINK TO EULER'S FORMULA ARTICLE HERE]
-
-Euler's formula also lets us rewrite sine and cosine in terms of complex exponentials:
+[Euler's formula](article.html?slug=misc_math\Euler's%20Formula\Euler's%20Formula) also lets us rewrite sine and cosine in terms of complex exponentials:
 
 $$\cos(kx)=\frac{e^{ikx}+e^{-ikx}}{2}, \qquad \sin(kx)=\frac{e^{ikx}-e^{-ikx}}{2i}.$$
+
+<iframe
+  src="./content/misc_math/Euler's%20Formula/euler_visualizer.html"
+  style="width: 100%; height: 1040px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Complex rotation generating sine and cosine waves">
+</iframe>
 
 So instead of treating sine and cosine as separate basis functions, we can package them into complex exponentials with positive and negative frequencies.
 
@@ -1011,7 +1152,67 @@ So the complex Fourier coefficient is
 
 $$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
 
-This is the complex version of the Fourier projection formula. It does the same job as the real coefficients $a_k$ and $b_k$, but it packages the sine and cosine information into one coefficient $c_k$ for each integer frequency $k$.
+<div class="formula-box">
+
+<div class="formula-box-title">Complex Fourier Series</div>
+
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}.$$
+where
+$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
+
+</div>
+
+This is the complex version of the Fourier projection formula. It does the same job as the real coefficients $a_k$ and $b_k$, but it packages the sine and cosine information into one complex coefficient $c_k$ for each integer frequency $k$.
+
+The important point is that this is still the same linear algebra story as before. In a vector space, a coefficient measures how much a vector points in the direction of a basis vector. Here, the “vector” is the function $f(x)$, the basis direction is $e^{ikx}$, and the coefficient is found by projection:
+
+$$c_k=\frac{\langle f,e^{ikx}\rangle}{\langle e^{ikx},e^{ikx}\rangle}$$
+Since
+$$\langle e^{ikx},e^{ikx}\rangle=2\pi,$$
+we get
+$$c_k=\frac{1}{2\pi}\langle f,e^{ikx}\rangle$$
+Now use the complex inner product:
+
+$$
+\langle f,e^{ikx}\rangle=
+\int_{-\pi}^{\pi}f(x)\left(e^{ikx}\right)^*\,dx=
+\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx
+$$
+
+Therefore,
+$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx$$
+
+We can also look at it from a geometric perspective where the term
+$$e^{-ikx}$$
+is a rotating unit vector in the complex plane. So the integrand
+$$f(x)e^{-ikx}$$
+
+can be viewed as the function $f(x)$ being wound around the origin at a rate determined by $k$. The magnitude of $k$ determines the speed at which we "wind" our function around the average value (DC offset). If $f(x)$ is positive, it stretches the rotating vector outward; if $f(x)$ is negative, it flips the point to the opposite side. So $f(x)$ acts like a signed radial scale factor.
+
+Thus, the same expression has two interpretations:
+
+$$c_k=\frac{1}{2\pi}\langle f,e^{ikx}\rangle$$
+is the **linear algebra interpretation**: $c_k$ is the projection of $f$ onto the basis direction $e^{ikx}$.
+And
+$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx$$
+is the **geometric winding interpretation**: $c_k$ is the average position, or center of mass, of the wound curve
+
+$$z_k(x)=f(x)e^{-ikx}$$
+
+**The winding picture is just the complex-plane visualization of the inner product projection.**
+
+If the winding frequency $k$ does not match a frequency strongly present in $f(x)$, the wound curve tends to balance around the origin, so the average position is close to zero. But if $k$ matches a frequency inside $f(x)$, the wound curve becomes lopsided, and its average position moves away from the origin. That displacement is the complex coefficient $c_k$. The magnitude $|c_k|$ tells us how strongly frequency $k$ is present, while the angle $\arg(c_k)$ stores the phase of that frequency component.
+
+So changing $k$ is like tuning a frequency detector. In the linear algebra view, we are projecting onto different basis directions. In the winding view, we are winding the signal at different speeds and watching when the center of mass moves away from the origin.
+
+<iframe
+  src="./content/misc_math/Fourier/fourier_winding.html"
+  style="width: 100%; height: 700px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Complex rotation generating sine and cosine waves">
+</iframe>
+
 
 
 # Fourier Transform

@@ -22,6 +22,13 @@ $$cos(x) + isin(x)$$
 Thus: 
 $$\bigstar e^{ix} = cos(x) + isin(x) \bigstar$$
 
+<iframe
+  src="./content/misc_math/Euler's%20Formula/euler_visualizer.html"
+  style="width: 100%; height: 1040px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Complex rotation generating sine and cosine waves">
+</iframe>
 
 
 

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Euler's Formula Visualizer</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <link rel="stylesheet" href="./euler_visualizer.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" defer></script>
+  <script src="./euler_visualizer.js" defer></script>
+</head>
+
+<body>
+  <div class="euler-visualizer">
+    <h3>Euler's Formula & Wave Construction</h3>
+
+    <p class="description">
+      Explore how rotating vectors in the complex plane generate sine and cosine waves, and how combining two counter-rotating vectors can isolate a purely real or purely imaginary wave.
+    </p>
+
+    <div class="controls">
+      <label class="control">
+        Visualization Mode
+        <select id="mode-select">
+          <option value="euler">Euler's Formula (1 Vector &rarr; 2 Waves)</option>
+          <option value="cosine">Cosine Construction (2 Vectors &rarr; Cosine)</option>
+          <option value="sine">Sine Construction (2 Vectors &rarr; Sine)</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Frequency (&omega;):
+        <span id="freq-display">1.0</span>
+        <input id="freq-slider" type="range" min="0.5" max="3.0" step="0.1" value="1.0" />
+      </label>
+
+      <div class="btn-container">
+        <button id="btn-play" class="btn">Pause</button>
+      </div>
+    </div>
+
+    <div class="visualization-grid">
+      <canvas id="canvas-circle"></canvas>
+      <canvas id="canvas-sine"></canvas>
+      <canvas id="canvas-cosine"></canvas>
+      
+      <div class="formula-box">
+        <div class="formula-title">Current Equation</div>
+        <div id="equation-display" class="formula"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

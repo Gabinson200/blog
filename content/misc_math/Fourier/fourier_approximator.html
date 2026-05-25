@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Fourier Series Approximator</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <link rel="stylesheet" href="./fourier_approximator.css" />
+
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" defer></script>
+  <script src="./fourier_approximator.js" defer></script>
+</head>
+
+<body>
+  <div class="fourier-approximator">
+    <h3>Fourier Series Approximator</h3>
+
+    <p class="description">
+      Choose a periodic function and increase the number of Fourier terms. The dashed curve is the ideal target function, and the solid curve is the finite Fourier approximation.
+    </p>
+
+    <div class="controls">
+      <label class="control">
+        Function type
+        <select id="wave-type">
+          <option value="complex">Complex mixed sine/cosine</option>
+          <option value="square">Square</option>
+          <option value="sawtooth">Sawtooth</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Number of terms:
+        <span id="k-display">1</span>
+        <input id="k-slider" type="range" min="1" max="12" step="1" value="1" />
+      </label>
+    </div>
+
+    <div id="plot" class="plot"></div>
+
+    <div class="formula-box">
+      <div class="formula-title">Target Function</div>
+      <div id="target-equation" class="formula"></div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-title">Current Fourier Approximation</div>
+      <div id="formula" class="formula"></div>
+    </div>
+  </div>
+</body>
+</html>
