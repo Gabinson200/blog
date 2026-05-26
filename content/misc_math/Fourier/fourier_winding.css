@@ -2,9 +2,11 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -39,9 +41,9 @@ body {
 
 .controls {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .control {
@@ -54,9 +56,11 @@ body {
   background: #1b1b1b;
   font-size: 0.95rem;
   font-weight: 600;
+  min-width: 0;
 }
 
-select, input[type="range"] {
+select,
+input[type="range"] {
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid #555;
@@ -64,35 +68,47 @@ select, input[type="range"] {
   color: #f5f5f5;
   cursor: pointer;
   width: 100%;
+  min-width: 0;
 }
 
-/* Grid Layout dynamically sizing canvases */
 .visualization-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  grid-template-rows: minmax(400px, 50vh);
-  gap: 16px;
+  grid-template-columns: minmax(230px, 0.9fr) minmax(260px, 1.1fr);
+  gap: 14px;
   align-items: stretch;
+  min-width: 0;
+}
+
+.left-panel,
+.wrap-panel {
+  min-width: 0;
+  min-height: 0;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  height: 100%;
+  gap: 14px;
+  height: clamp(430px, 52vw, 540px);
+}
+
+.wrap-panel {
+  height: clamp(430px, 52vw, 540px);
 }
 
 .plot-canvas {
+  display: block;
+  width: 100%;
+  min-width: 0;
   background: #101010;
   border: 1px solid #333;
   border-radius: 8px;
-  width: 100%;
-  display: block;
 }
 
 #canvas-time {
-  height: 50%;
-  flex-shrink: 0;
+  height: 58%;
+  min-height: 220px;
+  flex: 0 0 auto;
 }
 
 #canvas-wrap {
@@ -102,22 +118,25 @@ select, input[type="range"] {
 .formula-box {
   border: 1px solid #333;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   background: #1b1b1b;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-height: 130px;
+  min-width: 0;
 }
 
 .formula-title {
   font-weight: 700;
   margin-bottom: 8px;
-  color: #888;
+  color: #aaa;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.85rem;
+  letter-spacing: 0.7px;
+  font-size: 0.78rem;
+  text-align: center;
 }
 
 .formula {
@@ -131,25 +150,49 @@ select, input[type="range"] {
 }
 
 .val-text {
-  margin-top: 10px;
-  font-size: 1.2rem;
+  margin-top: 8px;
+  font-size: 1.05rem;
   font-weight: bold;
-  color: #ef5350; /* Matches the Center of Mass vector */
+  color: #ef5350;
+  text-align: center;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
+/*
+  Important:
+  Do NOT stack at 768px. That was the cause of the half-screen cutoff.
+  Only stack when the iframe/content column is truly narrow.
+*/
+@media (max-width: 560px) {
+  .fourier-winding {
+    padding: 12px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
   .controls {
     grid-template-columns: 1fr;
   }
+
   .visualization-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
   }
+
+  .left-panel {
+    height: 410px;
+  }
+
+  .wrap-panel {
+    height: 390px;
+  }
+
   #canvas-time {
     height: 250px;
   }
-  #canvas-wrap {
-    height: 400px;
+
+  .formula-box {
+    min-height: 130px;
+    padding: 10px;
   }
 }

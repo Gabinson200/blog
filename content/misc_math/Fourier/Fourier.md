@@ -19,9 +19,9 @@
 
 ## Resources
 
-- [Video series from steve brunton](https://www.youtube.com/playlist?list=PLMrJAkhIeNNT_Xh3Oy0Y4LTj0Oxo8GqsC)
+- [Video series from Steve Brunton](https://www.youtube.com/playlist?list=PLMrJAkhIeNNT_Xh3Oy0Y4LTj0Oxo8GqsC)
 - [3B1B related videos](https://www.youtube.com/watch?v=spUNpyF58BY&list=PL4VT47y1w7A1-T_VIcufa7mCM3XrSA5DD)
-- [Khan Academy](https://www.youtube.com/watch?v=UKHBWzoOKsY&list=PLM0izz3xa1_oZmWYKshc9Y2wmfBZqxMg1)
+- [Khan Academy videos](https://www.youtube.com/watch?v=UKHBWzoOKsY&list=PLM0izz3xa1_oZmWYKshc9Y2wmfBZqxMg1)
 
 
 
@@ -33,12 +33,14 @@ The rough outline of the article is:
 - Historical background
 - Problem Statement
 - Function Spaces
-- Inner Product of Functions
 - Periodic Functions
+- Inner Product of Functions
 - Function Basis
+- Sines and Cosines as Basis
 - Fourier series
-  - etc.
-  - examples
+- Euler's Formula
+- Fourier Transform
+
 
 
 # Historical Background
@@ -408,8 +410,6 @@ $$\int_{0}^{2\pi}\sin^2(mx)\,dx=\pi, \int_{0}^{2\pi}\cos^2(nx)\,dx=\pi$$
 
 Geometrically, the first two equations say that sine and cosine waves have zero average over a full period. The last two equations say that when a sine or cosine wave is multiplied by itself, the entire expression becomes positive so the area under the curve is also positive and average out to $\frac{1}{2}$, this is why over a full period of $2\pi$ their integral comes out to $\pi$.
 
-[INSERT PICTURE HERE]
-
 Now we can look at what happens when we multiply different sine and cosine waves together. This is the key step for understanding orthogonality, because the inner product of two functions is defined by multiplying them pointwise and integrating.
 
 $$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
@@ -500,8 +500,9 @@ and
 $$\star \int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0.$$
 
 <iframe
+  id="function-orthogonality-frame"
   src="./content/misc_math/Fourier/function_orthogonality.html"
-  style="width: 100%; height: 900px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 820px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
   title="Interactive visualization of sine and cosine orthogonality">
@@ -946,7 +947,7 @@ Solving for $a_k$ gives
 
 $$a_k=\frac{2}{T}\langle f,\cos(k\omega_0 x)\rangle=\frac{2}{T}\int_{x_0}^{x_0+T}f(x)\cos(k\omega_0 x)\,dx$$
 
-This is exactly the coefficient formula we derived earlier, but now we can see why it works: taking the inner product with $\cos(k\omega_0 x)$ filters out every other basis direction and leaves only the $a_k$ contribution.
+This is exactly the coefficient formula we derived earlier, but now we can see what it is doing algebraically: taking the inner product with $\cos(k\omega_0 x)$ filters out every other basis direction and leaves only the $a_k$ contribution.
 
 The same cancellation happens when we project onto $\sin(k\omega_0 x)$. This time all constant terms, all cosine terms, and all sine terms with the wrong frequency disappear. The only surviving term is
 
@@ -1034,10 +1035,10 @@ $$\cos(kx)=\frac{e^{ikx}+e^{-ikx}}{2}, \qquad \sin(kx)=\frac{e^{ikx}-e^{-ikx}}{2
 
 <iframe
   src="./content/misc_math/Euler's%20Formula/euler_visualizer.html"
-  style="width: 100%; height: 1040px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 820px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
-  title="Complex rotation generating sine and cosine waves">
+  title="Euler formula visualization">
 </iframe>
 
 So instead of treating sine and cosine as separate basis functions, we can package them into complex exponentials with positive and negative frequencies.
@@ -1207,118 +1208,163 @@ So changing $k$ is like tuning a frequency detector. In the linear algebra view,
 
 <iframe
   src="./content/misc_math/Fourier/fourier_winding.html"
-  style="width: 100%; height: 700px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 735px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
-  title="Complex rotation generating sine and cosine waves">
+  title="Fourier coefficient winding visualization">
 </iframe>
 
+Now that we have defined the complex Fourier series and its coefficients, we can visualize the series as a chain of rotating vectors in the complex plane. Each term
 
+$$c_k e^{ikx}$$
+
+contributes one rotating vector: the magnitude $|c_k|$ sets the vector’s length, the integer $k$ sets its angular speed and direction, and the phase $\arg(c_k)$ sets its initial angle. Adding these vectors tip-to-tail gives the partial sum of the Fourier series, and as $x$ changes, the endpoint of the chain traces the reconstructed function.
+
+<iframe
+  src="./content/misc_math/Fourier/epicycle_visualization.html"
+  style="width: 100%; height: 860px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Epicycle Visualization">
+</iframe>
 
 # Fourier Transform
 
-At this point we have the complex Fourier series:
+Up to this point, we have been working with the complex Fourier series. For a $2\pi$-periodic function, we wrote
 
-$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx},$$
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx},\qquad c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
 
-with coefficients
+More generally, if the function has period $T$, then the fundamental angular frequency is
 
-$$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx.$$
+$$\omega_0=\frac{2\pi}{T},\qquad \omega_k=k\omega_0=\frac{2\pi k}{T},$$
 
-This formula came directly from the same projection idea we used throughout the article: to find how much of a basis function is inside $f(x)$, take the inner product of $f(x)$ with that basis function.
+so the Fourier series becomes
 
-However, this version assumes that our function is periodic on an interval of length $2\pi$. More generally, if a function has period $T$, then its fundamental angular frequency is
-$$\omega_0=\frac{2\pi}{T}$$
-and the allowed frequencies are
-$$\omega_k=k\omega_0=\frac{2\pi k}{T}$$
-So the complex Fourier series can be written as
-$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x}$$
-where
-$$c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx$$
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x},\qquad c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx.$$
 
-This is the same coefficient formula as before, just adjusted for a period of length $T$ instead of $2\pi$.
+This is still the same projection idea as before. Each coefficient $c_k$ measures how much the function aligns with one allowed frequency $\omega_k$. The important word here is **allowed**. Because the function is periodic with period $T$, only frequencies that fit evenly into that period are allowed. That is why the Fourier series uses discrete frequencies:
 
-Now remember our earlier idea: a non-periodic function can be thought of as a periodic function whose period has become infinitely large. So let the period grow:
-$$T\to\infty.$$
-As $T$ gets larger, the fundamental frequency
-$$\omega_0=\frac{2\pi}{T}$$
-gets smaller. That means the spacing between neighboring frequency samples gets smaller and smaller:
-$$\Delta \omega=\omega_0=\frac{2\pi}{T}\to 0.$$
-
-So in the Fourier series, the frequencies are discrete:
 $$\dots,-2\omega_0,-\omega_0,0,\omega_0,2\omega_0,\dots$$
-but as $T\to\infty$, these discrete frequency points become dense and eventually behave like a continuous frequency axis.
 
-So the main distinguishing feature between the Fourier series and Fourier transform is 
-$$\text{Fourier series: discrete frequencies}
-\quad  \quad
-\text{Fourier transform: continuous frequencies}$$
+Now suppose we want to study a function that is not naturally periodic. One way to connect it back to Fourier series is to imagine placing the function inside a very large interval of length $T$, periodically repeating that interval, and then letting the period grow without bound:
 
-To see this algebraically, start from the complex Fourier coefficient:
+$$T\to\infty.$$
+
+As the period grows, the fundamental frequency shrinks:
+
+$$\omega_0=\frac{2\pi}{T}\to 0.$$
+
+So the spacing between neighboring frequency samples also shrinks:
+
+$$\Delta\omega=\omega_0=\frac{2\pi}{T}.$$
+
+So in the Fourier series, the frequency domain is a discrete set of points indexed by integers $k$. But as $T\to\infty$, the frequency spacing $\Delta\omega$ goes to zero, and those discrete frequency samples become a continuous frequency axis. The Fourier transform is the operation that takes our original function $f(x)$ and produces a new function $\widehat f(\omega)$, whose input is frequency and whose value tells us how strongly that frequency appears in $f$.
+
+So the domain changes in an important way:
+
+$$\text{Fourier series: } k\in\mathbb{Z},\qquad \omega_k=k\omega_0.$$
+
+$$\text{Fourier transform: } \omega\in\mathbb{R}.$$
+
+In other words, the Fourier series maps a periodic function to a sequence of coefficients,
+
+$$f(x)\quad\longrightarrow\quad \{c_k\}_{k\in\mathbb{Z}},$$
+
+while the Fourier transform maps a non-periodic function to a new function of frequency,
+
+$$f(x)\quad\longrightarrow\quad \widehat f(\omega).$$
+
+**The output of the Fourier transform is not a list of coefficients anymore it is a continuous frequency-domain function.**
+
+To see this algebraically, start with the period-$T$ coefficient formula:
 
 $$c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx.$$
 
-Define
-$$\widehat{f}(\omega_k)=\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx$$
+Define the frequency-domain quantity
+
+$$\widehat f_T(\omega_k)=\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx.$$
+
 Then
-$$c_k=\frac{1}{T}\widehat{f}(\omega_k)$$
+
+$$c_k=\frac{1}{T}\widehat f_T(\omega_k).$$
 
 But since
-$$\Delta \omega=\frac{2\pi}{T},$$
-we can rewrite
-$$\frac{1}{T}=\frac{\Delta \omega}{2\pi}$$
-Therefore,
-$$c_k=\frac{\Delta \omega}{2\pi}\widehat{f}(\omega_k)$$
 
-Now plug this back into the Fourier series:
+$$\Delta\omega=\frac{2\pi}{T},\qquad \frac{1}{T}=\frac{\Delta\omega}{2\pi},$$
 
-$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x}$$
+we can rewrite the coefficient as
 
-Substituting for $c_k$ gives
+$$c_k=\frac{\Delta\omega}{2\pi}\widehat f_T(\omega_k).$$
 
-$$f(x)=\sum_{k=-\infty}^{\infty}\frac{\Delta \omega}{2\pi}
-\widehat{f}(\omega_k)e^{i\omega_k x}$$
+Substitute this back into the Fourier series:
+
+$$f(x)=\sum_{k=-\infty}^{\infty}\frac{\Delta\omega}{2\pi}\widehat f_T(\omega_k)e^{i\omega_k x}.$$
 
 Rearranging,
 
-$$f(x)=\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat{f}(\omega_k)e^{i\omega_k x}\Delta \omega$$
+$$f(x)=\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat f_T(\omega_k)e^{i\omega_k x}\Delta\omega.$$
 
-This now looks like a Riemann sum over frequency. As $T\to\infty$, the frequency spacing $\Delta\omega\to 0$, so the sum becomes an integral:
+This is a Riemann sum over frequency. As $T\to\infty$, the frequency spacing $\Delta\omega\to 0$, the discrete samples $\omega_k$ become a continuous variable $\omega$, and the sum becomes an integral:
 
-$$f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat{f}(\omega)e^{i\omega x}\,d\omega.$$
+$$f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x}\,d\omega.$$
 
-This is the inverse Fourier transform.
+This is the **inverse Fourier transform**. It reconstructs the original function by continuously adding complex waves of every possible frequency.
 
-The corresponding forward Fourier transform is
-$$\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx.$$
+The corresponding **forward Fourier transform** is
+
+$$\widehat f(\omega)=\int_{-\infty}^{\infty}f(u)e^{-i\omega u}\,du.$$
+
+I am using $u$ inside the integral here just to emphasize that it is a dummy variable. The transform takes in a function of position/time and returns a function of angular frequency:
+
+$$
+f(x)\quad\xrightarrow{\mathfrak{F}}\quad \widehat f(\omega)
+$$
+
+The inverse transform goes the other direction:
+
+$$
+\widehat f(\omega)\quad\xrightarrow{\mathfrak{F}^{-1}}\quad f(x)
+$$
+
 So the Fourier transform pair is
-$$\boxed{\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx}$$
-and
-$$\boxed{f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat{f}(\omega)e^{i\omega x}\,d\omega}$$
 
-This is the same projection idea as the Fourier series, but now instead of projecting onto a countable list of basis functions
+$$\boxed{\widehat f(\omega)=\int_{-\infty}^{\infty}f(u)e^{-i\omega u}\,du}$$
 
-$$e^{ikx},\qquad k\in\mathbb{Z},$$
-we project onto a continuous family of basis functions
-$$e^{i\omega x},\qquad \omega\in\mathbb{R}$$
+$$\boxed{f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x}\,d\omega}$$
 
-So the Fourier transform asks:
-How much of the frequency $\omega$ is present in the function $f(x)$?
-The answer is given by
+The first formula is the **analysis equation**. It breaks down our function into continuous frequency components. In the Fourier series, this frequency information was stored in the discrete coefficients $c_k$, where $k\in\mathbb{Z}$. In the Fourier transform, those discrete coefficients are replaced by a continuous frequency-domain function $\widehat f(\omega)$, where $\omega\in\mathbb{R}$.
 
-$$\widehat{f}(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx$$
+The connection is
 
-This is an inner product-like measurement between the function $f(x)$ and the complex exponential $e^{i\omega x}$. The negative sign appears because, just like in the complex Fourier series, we project using the complex conjugate:
+$$c_k=\frac{\Delta\omega}{2\pi}\widehat f(\omega_k),$$
 
-$$\left(e^{i\omega x}\right)^*=e^{-i\omega x}$$
+so $\widehat f(\omega)$ can be thought of as the continuous, rescaled version of the Fourier series coefficients as the period grows to infinity.
 
-Geometrically, the Fourier transform measures how strongly $f(x)$ aligns with each possible complex wave. If $f(x)$ contains a strong oscillation at frequency $\omega$, then multiplying by $e^{-i\omega x}$ causes that frequency component to line up and accumulate. If $f(x)$ does not contain that frequency, the oscillations cancel out and the integral becomes small or zero.
+The second formula is the **synthesis equation**. It rebuild $f$ by adding all of those frequency contributions back together.
 
-So the main difference between Fourier series and transoform is just that 
-$$\text{Fourier series}=\text{projection onto discrete frequency basis functions},$$
-while
-$$\text{Fourier transform}=\text{projection onto continuous frequency basis functions}$$
+If we substitute the forward transform directly into the inverse transform, we get
 
-In both cases, the core idea is unchanged:
+$$f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\left[\int_{-\infty}^{\infty}f(u)e^{-i\omega u}\,du\right]e^{i\omega x}\,d\omega.$$
 
-$$\text{decompose a function by measuring its alignment with simpler waves}.$$
+Combining the exponentials gives
+
+$$f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}f(u)e^{i\omega(x-u)}\,du\,d\omega.$$
+
+This double-integral form makes the analysis/synthesis structure explicit. The inner integral measures how much of each frequency is present in the original function. The outer integral adds those frequencies back together to reconstruct the function.
+
+So the Fourier transform is just a reformualtion of the Fourier series when the period of the Fourier series is stretched to infinity. The discrete harmonic frequencies become a continuous frequency axis, the coefficient sequence $c_k$ becomes the frequency-domain function $\widehat f(\omega)$, and the Fourier series sum becomes an integral over all frequencies.
+
+<iframe
+  src="./content/misc_math/Fourier/fourier_spectrum_widget.html"
+  style="width: 100%; height: 1200px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  scrolling="no"
+  loading="lazy"
+  title="Fourier spectrum and reconstruction widget">
+</iframe>
+
+
+# Conclusion
+
+There is a lot more we can talk about regarding the use of Fourier transforms in various domains, from simplifying complex equations to signal processing, to image processing. I will likely write more about the implementation of the Fourier transform namely the discrete and fast Fourier transform but I think this article is already a bit too long as it is, so I will leave those topics to another day.
+
+In a nutshell, Fourier analysis is the idea that complicated functions can be understood by decomposing them into simpler wave-like building blocks. In this article, we approached that idea from the perspective of linear algebra: functions can be treated like vectors, sine and cosine waves can act like orthogonal basis directions, and Fourier coefficients are projection coordinates that measure how much of each frequency is present. From there, Euler’s formula allowed us to package sine and cosine into complex exponentials, giving both an algebraic shorthand and a geometric interpretation through winding, centers of mass, and rotating epicycles. Hopefully, this explanation helps connect the linear algebra view with the algebraic derivations and geometric visualizations of Fourier series and Fourier transforms that are commonly, but independently, shown online.

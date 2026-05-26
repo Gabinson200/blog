@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Epicycle Visualization</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <link rel="stylesheet" href="./epicycle_visualization.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" defer></script>
+  <script src="./epicycle_visualization.js" defer></script>
+</head>
+
+<body>
+  <div class="epicycle-widget">
+    <h3>Epicycle Visualization</h3>
+
+    <p class="description">
+      Select a function and watch it reconstructed as a chain of rotating complex Fourier terms. Hover over a circle to highlight its corresponding coefficient.
+    </p>
+
+    <div class="controls">
+      <label class="control">
+        Function
+        <select id="function-select">
+          <option value="complex">Complex mixed wave</option>
+          <option value="square">Square wave</option>
+          <option value="sawtooth">Sawtooth wave</option>
+          <option value="triangle">Triangle wave</option>
+          <option value="pulse">Narrow pulse</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Harmonic pairs:
+        <span id="circle-count-display">K = 4, circles = 9</span>
+        <input id="circle-slider" type="range" min="0" max="14" step="1" value="4" />
+      </label>
+
+      <label class="control">
+        Speed:
+        <span id="speed-display">1.0×</span>
+        <input id="speed-slider" type="range" min="0.2" max="3" step="0.1" value="1" />
+      </label>
+
+      <div class="button-row">
+        <button id="play-button" type="button">Pause</button>
+        <button id="reset-button" type="button">Reset</button>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-title">Current partial sum</div>
+      <div id="formula-display" class="formula"></div>
+    </div>
+
+    <div class="visualization-grid">
+      <div class="canvas-card epicycle-card">
+        <div class="card-title">Rotating Fourier Terms</div>
+        <div class="canvas-wrap">
+          <canvas id="epicycle-canvas"></canvas>
+          <div id="circle-tooltip" class="circle-tooltip hidden"></div>
+        </div>
+      </div>
+
+      <div class="canvas-card wave-card">
+        <div class="card-title">Reconstructed Function</div>
+        <canvas id="wave-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

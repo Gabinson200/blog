@@ -6,6 +6,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -16,7 +17,7 @@ body {
 
 .euler-visualizer {
   width: 100%;
-  max-width: 1000px; /* Slightly wider to accommodate dynamic scaling */
+  max-width: 1000px;
   margin: 0 auto;
   border: 1px solid #444;
   border-radius: 12px;
@@ -40,9 +41,9 @@ body {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) minmax(200px, 1fr) 100px;
+  grid-template-columns: minmax(190px, 1fr) minmax(190px, 1fr) minmax(86px, 0.32fr);
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .control {
@@ -55,16 +56,18 @@ body {
   background: #1b1b1b;
   font-size: 0.95rem;
   font-weight: 600;
+  min-width: 0;
 }
 
 .btn-container {
   display: flex;
   align-items: stretch;
+  min-width: 0;
 }
 
 .btn {
   width: 100%;
-  padding: 10px 16px;
+  padding: 10px 14px;
   background: #42a5f5;
   color: #fff;
   border: none;
@@ -85,6 +88,8 @@ select {
   background: #222;
   color: #f5f5f5;
   cursor: pointer;
+  width: 100%;
+  min-width: 0;
 }
 
 input[type="range"] {
@@ -92,76 +97,139 @@ input[type="range"] {
   cursor: pointer;
 }
 
-/* Responsive Grid layout */
 .visualization-grid {
   display: grid;
-  grid-template-columns: 1fr 1.5fr; /* e.g. 40% left, 60% right */
-  grid-template-rows: minmax(250px, 35vh) minmax(250px, 35vh);
+  grid-template-columns: minmax(230px, 0.9fr) minmax(260px, 1.25fr);
+  grid-template-rows: clamp(240px, 30vw, 330px) clamp(210px, 25vw, 300px);
   gap: 12px;
+  align-items: stretch;
+  min-width: 0;
 }
 
-canvas {
+.canvas-panel,
+.formula-box {
+  min-width: 0;
+  min-height: 0;
+}
+
+.canvas-panel {
+  width: 100%;
+  height: 100%;
+}
+
+#canvas-circle,
+#canvas-sine,
+#canvas-cosine {
   background: #101010;
   border: 1px solid #333;
   border-radius: 8px;
   width: 100%;
   height: 100%;
   display: block;
+  min-width: 0;
 }
 
-/* Formula box is now assigned to the bottom-right grid cell */
+.circle-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sine-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.cosine-panel {
+  grid-column: 1;
+  grid-row: 2;
+}
+
 .formula-box {
   grid-column: 2;
   grid-row: 2;
   border: 1px solid #333;
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px;
   background: #1b1b1b;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  min-width: 0;
 }
 
 .formula-title {
   font-weight: 700;
-  margin-bottom: 12px;
-  color: #888;
+  margin-bottom: 10px;
+  color: #aaa;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.85rem;
+  letter-spacing: 0.7px;
+  font-size: 0.8rem;
+  text-align: center;
 }
 
 .formula {
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   background: #101010;
   white-space: nowrap;
   text-align: center;
-  font-size: 1.3rem;
+  font-size: clamp(0.9rem, 1.8vw, 1.25rem);
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 80px;
 }
 
-/* Mobile Layout */
-@media (max-width: 768px) {
-  .controls { grid-template-columns: 1fr; }
-  .btn-container { height: 45px; }
-  
+/*
+  Important:
+  Do not stack at 768px. That causes half-screen iframe cutoff.
+  Only stack when the article column is genuinely narrow.
+*/
+@media (max-width: 560px) {
+  .euler-visualizer {
+    padding: 12px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-container {
+    height: 44px;
+  }
+
   .visualization-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, auto);
+    grid-template-rows: 300px 270px 260px auto;
   }
-  
-  /* Stack vertically on mobile */
-  #canvas-circle { grid-column: 1; grid-row: 1; height: 300px; }
-  #canvas-sine   { grid-column: 1; grid-row: 2; height: 300px; }
-  #canvas-cosine { grid-column: 1; grid-row: 3; height: 300px; }
-  .formula-box   { grid-column: 1; grid-row: 4; height: auto; min-height: 120px; }
+
+  .circle-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .sine-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cosine-panel {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .formula-box {
+    grid-column: 1;
+    grid-row: 4;
+    min-height: 120px;
+    padding: 12px;
+  }
 }

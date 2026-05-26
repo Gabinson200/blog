@@ -18,7 +18,7 @@
     <h3>Fourier Coefficients as the Center of Mass</h3>
 
     <p class="description">
-      Wind a signal around the complex plane at a specific frequency. The red vector represents the <strong>Center of Mass</strong> of the resulting shape. When the winding frequency matches a frequency present in the signal, the center of mass spikes outward, revealing the Fourier coefficient for that integer frequency.
+      Wind a signal around the complex plane at a specific frequency. The red vector represents the <strong>center of mass</strong> of the wound curve. When the winding frequency matches a frequency present in the signal, the center of mass moves away from the origin, revealing the Fourier coefficient for that integer frequency.
     </p>
 
     <div class="controls">
@@ -27,7 +27,7 @@
         <select id="wave-select">
           <option value="offset-cos">Offset Cosine: 1 + cos(2t)</option>
           <option value="pure-cos">Pure Cosine: cos(3t)</option>
-          <option value="combo">Combo Wave: cos(2t) + sin(3t)</option> <option value="pulse">Narrow Pulse</option>
+          <option value="combo">Combo Wave: cos(2t) + sin(3t)</option>
           <option value="pulse">Narrow Pulse</option>
         </select>
       </label>
@@ -42,14 +42,17 @@
     <div class="visualization-grid">
       <div class="left-panel">
         <canvas id="canvas-time" class="plot-canvas"></canvas>
+
         <div class="formula-box">
-          <div class="formula-title">Center of Mass (Fourier Coefficient)</div>
+          <div class="formula-title">Center of Mass / Fourier Coefficient</div>
           <div id="equation-display" class="formula"></div>
           <div id="value-display" class="val-text"></div>
         </div>
       </div>
-      
-      <canvas id="canvas-wrap" class="plot-canvas"></canvas>
+
+      <div class="wrap-panel">
+        <canvas id="canvas-wrap" class="plot-canvas"></canvas>
+      </div>
     </div>
   </div>
 </body>

@@ -25,14 +25,14 @@
       <label class="control">
         Visualization Mode
         <select id="mode-select">
-          <option value="euler">Euler's Formula (1 Vector &rarr; 2 Waves)</option>
-          <option value="cosine">Cosine Construction (2 Vectors &rarr; Cosine)</option>
-          <option value="sine">Sine Construction (2 Vectors &rarr; Sine)</option>
+          <option value="euler">Euler's Formula (1 Vector → 2 Waves)</option>
+          <option value="cosine">Cosine Construction (2 Vectors → Cosine)</option>
+          <option value="sine">Sine Construction (2 Vectors → Sine)</option>
         </select>
       </label>
 
       <label class="control">
-        Frequency (&omega;):
+        Frequency (ω):
         <span id="freq-display">1.0</span>
         <input id="freq-slider" type="range" min="0.5" max="3.0" step="0.1" value="1.0" />
       </label>
@@ -43,10 +43,18 @@
     </div>
 
     <div class="visualization-grid">
-      <canvas id="canvas-circle"></canvas>
-      <canvas id="canvas-sine"></canvas>
-      <canvas id="canvas-cosine"></canvas>
-      
+      <div class="canvas-panel circle-panel">
+        <canvas id="canvas-circle"></canvas>
+      </div>
+
+      <div class="canvas-panel sine-panel">
+        <canvas id="canvas-sine"></canvas>
+      </div>
+
+      <div class="canvas-panel cosine-panel">
+        <canvas id="canvas-cosine"></canvas>
+      </div>
+
       <div class="formula-box">
         <div class="formula-title">Current Equation</div>
         <div id="equation-display" class="formula"></div>

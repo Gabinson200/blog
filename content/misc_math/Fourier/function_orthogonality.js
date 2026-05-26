@@ -6,6 +6,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const freq1Val = document.getElementById("freq1-val");
   const freq2Val = document.getElementById("freq2-val");
   const resultDisplay = document.getElementById("integral-result");
+  const widget = document.querySelector(".fourier-widget");
+  let resizeRaf = null;
 
   const numPoints = 1200;
   const minX = -Math.PI;
@@ -28,11 +30,30 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function resizePlots() {
     if (!window.Plotly) {
-      return;
+        return;
     }
 
-    Plotly.Plots.resize("plot-waves");
-    Plotly.Plots.resize("plot-product");
+    const waves = document.getElementById("plot-waves");
+    const product = document.getElementById("plot-product");
+
+    if (waves) {
+        Plotly.Plots.resize(waves);
+    }
+
+    if (product) {
+        Plotly.Plots.resize(product);
+    }
+  }
+
+  function scheduleResize() {
+    if (resizeRaf !== null) {
+        cancelAnimationFrame(resizeRaf);
+    }
+
+    resizeRaf = requestAnimationFrame(() => {
+        resizePlots();
+        resizeRaf = null;
+    });
   }
 
   function updatePlots() {
@@ -191,7 +212,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     );
 
-    setTimeout(resizePlots, 50);
+    scheduleResize();
   }
 
   type1Select.addEventListener("change", updatePlots);
@@ -199,7 +220,13 @@ window.addEventListener("DOMContentLoaded", () => {
   freq1Slider.addEventListener("input", updatePlots);
   freq2Slider.addEventListener("input", updatePlots);
 
-  window.addEventListener("resize", resizePlots);
+  window.addEventListener("resize", scheduleResize);
+
+  if (window.ResizeObserver && widget) {
+    const resizeObserver = new ResizeObserver(scheduleResize);
+    resizeObserver.observe(widget);
+  }
 
   updatePlots();
+  scheduleResize();
 });

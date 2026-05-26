@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Fourier Spectrum and Reconstruction</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <link rel="stylesheet" href="./fourier_spectrum_widget.css" />
+
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" defer></script>
+  <script src="./fourier_spectrum_widget.js" defer></script>
+</head>
+
+<body>
+  <div class="fourier-spectrum-widget">
+    <h3>Fourier Spectrum and Reconstruction</h3>
+
+    <p class="description">
+      Choose a periodic function, then expand the frequency window outward from the center. The top plot shows the magnitude of each complex Fourier coefficient, and the bottom plot reconstructs the signal using only the included frequencies.
+    </p>
+
+    <div class="controls">
+      <label class="control">
+        Function
+        <select id="function-select">
+          <option value="complex">Complex mixed wave</option>
+          <option value="square">Square wave</option>
+          <option value="sawtooth">Sawtooth wave</option>
+          <option value="pulse">Narrow pulse</option>
+          <option value="triangle">Triangle wave</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Include frequencies from
+        <span id="k-range-display">-0 to 0</span>
+        <input id="k-slider" type="range" min="0" max="16" step="1" value="0" />
+      </label>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-title">Current partial reconstruction</div>
+      <div id="formula-display" class="formula"></div>
+    </div>
+
+    <div class="plot-card">
+      <div class="plot-title">Frequency magnitude spectrum</div>
+      <div id="spectrum-plot" class="plot spectrum-plot"></div>
+    </div>
+
+    <div class="plot-card">
+      <div class="plot-title">Reconstructed wave from selected frequencies</div>
+      <div id="reconstruction-plot" class="plot reconstruction-plot"></div>
+    </div>
+  </div>
+</body>
+</html>
