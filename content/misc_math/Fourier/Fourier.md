@@ -15,7 +15,7 @@
   }
 </style>
 
-# Fourier Series$\mathfrak{F}$
+# Fourier Series $\mathfrak{F}$
 
 ## Resources
 
@@ -964,12 +964,11 @@ So all that work we did with the linear algebra pays off, the Fourier coefficien
 
 <iframe
   src="./content/misc_math/Fourier/fourier_approximator.html"
-  style="width: 100%; height: 1000px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 960px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
   title="Fourier Series Approximator">
 </iframe>
-
 
 ### Recap
 
@@ -1035,7 +1034,7 @@ $$\cos(kx)=\frac{e^{ikx}+e^{-ikx}}{2}, \qquad \sin(kx)=\frac{e^{ikx}-e^{-ikx}}{2
 
 <iframe
   src="./content/misc_math/Euler's%20Formula/euler_visualizer.html"
-  style="width: 100%; height: 820px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 720px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
   title="Euler formula visualization">
@@ -1356,12 +1355,11 @@ So the Fourier transform is just a reformualtion of the Fourier series when the 
 
 <iframe
   src="./content/misc_math/Fourier/fourier_spectrum_widget.html"
-  style="width: 100%; height: 1200px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
+  style="width: 100%; height: 1100px; border: 0; border-radius: 12px; overflow: hidden; display: block;"
   scrolling="no"
   loading="lazy"
   title="Fourier spectrum and reconstruction widget">
 </iframe>
-
 
 # Conclusion
 
