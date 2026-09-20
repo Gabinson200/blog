@@ -685,15 +685,15 @@ Now we can answer the second question: where do the magnitudes $a_k$ and $b_k$ c
 
 ### Oscillating Coefficients
 
-Our intuition tells us that the $k$th magnitudes should somehow weight the $k$th frequency sines and cosines such that their contribution to the overall sum best approximates our target function. We already posited that the target function is just a sum of sines and cosines of varying frequencies so lets imagine just one component wave of our target function defined by the sum of a sine and cosine at a particular frequency:
+Our intuition tells us that the $k$ th magnitudes should somehow weight the $k$ th frequency sines and cosines such that their contribution to the overall sum best approximates our target function. We already posited that the target function is just a sum of sines and cosines of varying frequencies so lets imagine just one component wave of our target function defined by the sum of a sine and cosine at a particular frequency:
 
 $$f(x)_{\omega_k} \approx a_k\cos(\omega_k x)+b_k\sin(\omega_k x)$$
 
-Since sine and cosine are orthogonal basis functions we should probably weight their contributions independently and proportionally to how much they align with the $k$th frequency component of our target function i.e. geometrically, $a_k$ measures how much of the function points in the direction of the cosine wave $\cos(k\omega_0 x),$ while $b_k$ measures how much of the function points in the direction of the sine wave
+Since sine and cosine are orthogonal basis functions we should probably weight their contributions independently and proportionally to how much they align with the $k$ th frequency component of our target function i.e. geometrically, $a_k$ measures how much of the function points in the direction of the cosine wave $\cos(k\omega_0 x),$ while $b_k$ measures how much of the function points in the direction of the sine wave
 $\sin(k\omega_0 x)$.
 
 Since we already defined the inner product between functions, the natural way to measure this is by projection.
-For an ordinary vector, the coordinate of a vector $\mathbf{v}$ in the direction of an orthogonal basis vector $\mathbf{e}_k$ is
+For an ordinary vector, the length of a vector $\mathbf{v}$ in the direction of an orthogonal basis vector $\mathbf{e}_k$ is
 
 $$c_k=\frac{\langle \mathbf{v},\mathbf{e}_k\rangle}
 {\langle \mathbf{e}_k,\mathbf{e}_k\rangle}$$
@@ -834,7 +834,7 @@ $\cos(kx)$ and $\sin(kx)$.
 
 ### Canceling Terms
 
-A very noteworthy behavior of the approximation from the Fourier series is that when we take the inner product of our function with cosine or sine of a particular frequency the coefficients $a_k$ and $b_k$ in the series for that particular $k$th frequency will become just a single term in the sum. In other words the alignment of our function with different frequency sines and cosines will simply be represented by a single period weighted coefficient in the series. 
+A very noteworthy behavior of the approximation from the Fourier series is that when we take the inner product of our function with cosine or sine of a particular frequency the coefficients $a_k$ and $b_k$ in the series for that particular $k$ th (>0) frequency will become just a single sin/cos pair in the sum. In other words the alignment of our function with different frequency sines and cosines will simply be represented by a single period weighted coefficient in the series. 
 
 To see this explicitly, start with the Fourier series
 
@@ -1054,7 +1054,7 @@ Now group together the $e^{ikx}$ and $e^{-ikx}$ terms:
 
 $$a_k\cos(kx)+b_k\sin(kx)=\left(\frac{a_k}{2}+\frac{b_k}{2i}\right)e^{ikx}+\left(\frac{a_k}{2}-\frac{b_k}{2i}\right)e^{-ikx}.$$
 
-Since $\frac{1}{i}=-i$, this becomes
+Since $\frac{1}{i}= \frac{1}{\sqrt{-1}} = \frac{\sqrt{-1}}{\sqrt{-1}^2} = -i$, this becomes
 
 $$a_k\cos(kx)+b_k\sin(kx)=\left(\frac{a_k-ib_k}{2}\right)e^{ikx}+\left(\frac{a_k+ib_k}{2}\right)e^{-ikx}.$$
 
@@ -1066,13 +1066,22 @@ The constant term also gets absorbed into the complex notation. Since the real F
 
 $$c_0=\frac{a_0}{2}.$$
 
-So the full Fourier series becomes
+So the full Fourier series:
+$$f(x)=\frac{a_0}{2}+\sum_{k=1}^{\infty}\left[a_k\cos(kx)+b_k\sin(kx)\right],$$
+
+ becomes
 
 $$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}.$$
 
+where
+
+$$c_k=\frac{a_k-ib_k}{2}, \qquad c_{-k}=\frac{a_k+ib_k}{2}, \qquad c_0=\frac{a_0}{2}$$
+
 This is the complex Fourier series. The basis functions are now
 
-$$\phi_k(x)=e^{ikx}, \qquad k\in\mathbb{Z}.$$
+$$\phi_k(x)=e^{ikx}$$
+
+with associated weights $$c_k \qquad k\in\mathbb{Z}$$
 
 The negative values of $k$ are not a mistake. They are what allow the complex exponential form to represent both sine and cosine information. Positive and negative complex exponentials work together to encode the real oscillations we previously described using separate sine and cosine terms.
 
@@ -1195,13 +1204,15 @@ $$c_k=\frac{1}{2\pi}\langle f,e^{ikx}\rangle$$
 is the **linear algebra interpretation**: $c_k$ is the projection of $f$ onto the basis direction $e^{ikx}$.
 And
 $$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}\,dx$$
-is the **geometric winding interpretation**: $c_k$ is the average position, or center of mass, of the wound curve
+is the **geometric winding interpretation**: $c_k$ is the average center of mass, of the wound curve
 
 $$z_k(x)=f(x)e^{-ikx}$$
 
 **The winding picture is just the complex-plane visualization of the inner product projection.**
 
-If the winding frequency $k$ does not match a frequency strongly present in $f(x)$, the wound curve tends to balance around the origin, so the average position is close to zero. But if $k$ matches a frequency inside $f(x)$, the wound curve becomes lopsided, and its average position moves away from the origin. That displacement is the complex coefficient $c_k$. The magnitude $|c_k|$ tells us how strongly frequency $k$ is present, while the angle $\arg(c_k)$ stores the phase of that frequency component.
+(This is late place to bring this to the readers attention but all our previous derivations have been for functions in the domain $[-\pi, \pi]$, we will see how this can be generalized for all lengths of time shortly)
+
+If the winding frequency $k$ does not match a frequency strongly present in $f(x)$, the wound curve tends to balance around the origin and the average the average position is zero. But if $k$ matches a frequency inside $f(x)$, the wound curve becomes lopsided, and its average position moves away from the origin. That displacement is the complex coefficient $c_k$. The magnitude $|c_k|$ tells us how strongly frequency $k$ is present, while the angle $\arg(c_k)$ stores the phase of that frequency component.
 
 So changing $k$ is like tuning a frequency detector. In the linear algebra view, we are projecting onto different basis directions. In the winding view, we are winding the signal at different speeds and watching when the center of mass moves away from the origin.
 
@@ -1226,6 +1237,8 @@ contributes one rotating vector: the magnitude $|c_k|$ sets the vector’s lengt
   loading="lazy"
   title="Epicycle Visualization">
 </iframe>
+
+Notice that for every increase in $k$ we add two circles which represent the addition of two complex terms $e^{+-ikx}$ because of the (+- k) terms in the sum. Each these complex terms encapsulates its corresponding sin and cosine terms. The cosine term is responsible for tracing out the real component of the  circular path of the first "rod" in the arm (shoulder to elbow) and the sin part is responsible for the imaginary component of that circle. The other complex term is responsible for the other part of the arm (elbow to hand) which will always have a corresponding circular path of the same radius and speed but in the reverse direction.
 
 # Fourier Transform
 
