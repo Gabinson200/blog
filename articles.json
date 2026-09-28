@@ -508,6 +508,16 @@
     "links": ["Discrete Differential Geometry/DDG"]
   },
   {
+    "slug": "Discrete Differential Geometry/DDG Programming/DDG Programming",
+    "title": "Applied DDG",
+    "category": "Mathematics",
+    "subcategory": "discrete differential geometry",
+    "summary": "Discrete surfaces in the context of discrete differential geometry.",
+    "date": "2026-6-1",
+    "nodeType": "article",
+    "links": ["Discrete Differential Geometry/DDG", "programming/graphics/Graphics"]
+  },
+  {
     "slug": "Network Science/Network Science",
     "title": "Network Science",
     "category": "Mathematics",
@@ -586,6 +596,26 @@
     "date": "2026-5-20",
     "nodeType": "article",
     "links": ["misc_math/Euler's Formula/Euler's Formula"]
+  },
+  {
+    "slug": "misc_math/DFT/DFT",
+    "title": "DFT",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "Discrete Fourier transform and its applications.",
+    "date": "2026-7-22",
+    "nodeType": "article",
+    "links": ["misc_math/Fourier/Fourier"]
+  },
+  {
+    "slug": "misc_math/FFT/FFT",
+    "title": "FFT",
+    "category": "Mathematics",
+    "subcategory": "miscellaneous",
+    "summary": "Fast Fourier transform and its applications.",
+    "date": "2026-9-19",
+    "nodeType": "article",
+    "links": ["misc_math/Fourier/Fourier"]
   }
 
 ]
