@@ -1,17 +1,36 @@
 
-The goal of this article is to further explore the Fourier Transform and understand its application after discretization into the Discrete Fourier Transform (DFT).
+The goal of this article is to further explore the Fourier Transform, and understand its application after discretization into the Discrete Fourier Transform (DFT).
+
+
+# ok this is the plan talk 
+
+
+talk about how to interpret the fourier transfrom as a function and how to interpreted its related inputs and outputs
+- input: querry frequency
+- output: complex number
+- interpretation of the complex number as encoding the phase and magnitude of the frequency in the signal.
+
+then talk aboout the descretization of the function (DFT)
+    - talk about the computational steps ypu dneed to do to build it
+    - we can write some pseudocode
+    - show that is runs in O(n^2) time
+
+finally talk about the FFT ie how sampling at specific fequencies allows for more efficicient computation. 
+
 
 The main sections will be:
 - [Fourier Series to the Fourier transform](#Fourier-Series-to-the-Fourier-transform)
     - [Functions of any period](#Functions-of-any-period)
     - [Functions of infinite period](#Functions-of-infinite-period)
-    - [Analysis equation outputs](#Analysis-equation-outputs)
-- [Discretization](#Discretization)
+    - [Analysis equation and Synthesis Equations](#Analysis-and-Synthesis-Equations)
 - [Functional Interpretation](#Functional-Interpretation)
+- [Discretization](#Discretization)
 - [DFT output interpretation](#DFT-output-interpretation)
 - [Use cases](#Use-cases)
 - [Pseudocode](#Pseudocode)
 
+
+test ok what about if i write it like htis
 
 # Fourier Series to the Fourier transform
 

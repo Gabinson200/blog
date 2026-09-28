@@ -3,5 +3,16 @@
         "infitasenally",
         "microcontroller",
         "miscalenious"
+    ],
+
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 75,
+
+    "liveServer.settings.ignoreFiles": [
+        ".vscode/**",
+        "**/*.scss",
+        "**/*.sass",
+        "**/*.ts",
+        "content/**/*.md"
     ]
 }
