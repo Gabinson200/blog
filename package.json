@@ -1,0 +1,16 @@
+{
+  "name": "thefirstman-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build scripts for TheFirstMan's Blog (Atom feed and semantic article index).",
+  "scripts": {
+    "build:rss": "node scripts/generate-rss.js",
+    "build:embeddings": "node scripts/build-embeddings.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "4.3.0"
+  }
+}

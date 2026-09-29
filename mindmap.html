@@ -39,6 +39,69 @@
         stroke: var(--accent-color);
         stroke-opacity: 0.6;
       }
+      .orbit {
+        fill: none;
+        stroke: var(--text-color);
+        stroke-opacity: 0.16;
+        stroke-width: 1;
+        pointer-events: none;
+      }
+      #mindmap svg { display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+      #mindmap svg.is-3d { cursor: grab; }
+      #mindmap svg.is-3d:active { cursor: grabbing; }
+
+      /* 2D / 3D switch, top right of the graph */
+      .view-toggle {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+        display: inline-grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 3px;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+      }
+      .view-toggle::before {
+        content: '';
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc(50% - 3px);
+        border-radius: 999px;
+        background: var(--accent-color);
+        transition: transform 0.35s ease;
+      }
+      .view-toggle.is-3d::before { transform: translateX(100%); }
+      .view-toggle span {
+        position: relative;
+        padding: 0.3rem 0.85rem;
+        transition: color 0.35s;
+      }
+      .view-toggle:not(.is-3d) span:first-child,
+      .view-toggle.is-3d span:last-child { color: #fff; }
+      .view-toggle:disabled { cursor: progress; }
+      .view-toggle:focus-visible { outline: 2px solid var(--link-color); outline-offset: 2px; }
+      .mindmap-hint {
+        position: absolute;
+        left: 12px;
+        bottom: 10px;
+        margin: 0;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .view-toggle::before, .view-toggle span { transition: none; }
+      }
     </style>
   </head>
   <body>
@@ -54,9 +117,15 @@
         This mindmap visualises the relationships between different articles.
         Each node represents an article and edges represent explicit
         connections defined in the article metadata. Click on any node to
-        open the corresponding article.
+        open the corresponding article. Switch to the 3D view in the top-right
+        corner to see each article orbiting the topic it belongs to.
       </p>
-      <div id="mindmap"></div>
+      <div id="mindmap">
+        <button type="button" id="view-toggle" class="view-toggle" aria-pressed="false" aria-label="3D view">
+          <span aria-hidden="true">2D</span><span aria-hidden="true">3D</span>
+        </button>
+        <p class="mindmap-hint" hidden>Drag to rotate · scroll to zoom</p>
+      </div>
     </main>
     <footer class="site-footer">
       <p>
