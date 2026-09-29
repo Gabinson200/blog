@@ -99,7 +99,15 @@ function buildNavigation(categories) {
   mindLi.appendChild(mindA);
   navList.appendChild(mindLi);
 
-  // 4. Webring Link
+  // 4. Semantic Graph Link
+  const semLi = document.createElement('li');
+  const semA = document.createElement('a');
+  semA.href = 'semantic.html';
+  semA.textContent = 'Semantic Graph';
+  semLi.appendChild(semA);
+  navList.appendChild(semLi);
+
+  // 5. Webring Link
   const ringLi = document.createElement('li');
   const ringA = document.createElement('a');
   ringA.href = 'webring.html';

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Semantic Graph</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Chart tokens: categorical slots, ink and hairlines for light & dark */
+      .semantic {
+        --series-1: #2a78d6;
+        --series-2: #eb6834;
+        --series-3: #1baf7a;
+        --chart-surface: var(--bg-color);
+        --ink-secondary: #52514e;
+        --ink-muted: #6f6d68;
+        --grid: #e1e0d9;
+        --axis: #c3c2b7;
+        --control-bg: #f4f4f2;
+      }
+      @media (prefers-color-scheme: dark) {
+        .semantic {
+          --series-1: #3987e5;
+          --series-2: #d95926;
+          --series-3: #199e70;
+          --ink-secondary: #c3c2b7;
+          --ink-muted: #a3a29b;
+          --grid: #2c2c2a;
+          --axis: #45453f;
+          --control-bg: #262626;
+        }
+      }
+
+      /* Break out of the 800px column like the mindmap does, keeping a 16px gutter */
+      .semantic-wide {
+        width: min(1100px, calc(100vw - 2rem));
+        margin-left: calc(50% - min(550px, 50vw - 1rem));
+      }
+
+      .semantic-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        align-items: flex-end;
+        margin: 1rem 0 0.5rem;
+      }
+      .control-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+      .control-label {
+        font-size: 0.8rem;
+        color: var(--ink-secondary);
+        font-weight: 600;
+      }
+
+      .segmented {
+        display: inline-flex;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 2px;
+        background: var(--control-bg);
+      }
+      .segmented input { position: absolute; opacity: 0; pointer-events: none; }
+      .segmented label {
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        transition: background-color 0.2s, color 0.2s;
+      }
+      .segmented input:checked + label { background: var(--accent-color); color: #fff; }
+      .segmented input:focus-visible + label { outline: 2px solid var(--link-color); outline-offset: 1px; }
+
+      .concept-row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; }
+      .concept-axis { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+      .concept-axis .axis-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ink-secondary);
+        min-width: 1.2rem;
+      }
+      .concept-axis .between { color: var(--ink-muted); }
+      .concept-input {
+        font: inherit;
+        font-size: 0.95rem;
+        width: 9.5rem;
+        max-width: 42vw;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-bg);
+        color: var(--text-color);
+      }
+      .concept-input:focus { outline: 2px solid var(--accent-color); outline-offset: 0; border-color: transparent; }
+      .plot-button {
+        font: inherit;
+        font-size: 0.95rem;
+        padding: 0.4rem 1rem;
+        border: 0;
+        border-radius: 6px;
+        background: var(--accent-color);
+        color: #fff;
+        cursor: pointer;
+      }
+      .plot-button:disabled { opacity: 0.6; cursor: progress; }
+
+      .presets { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.85rem; }
+      .presets .control-label { margin-right: 0.2rem; }
+      .preset-chip {
+        font: inherit;
+        font-size: 0.85rem;
+        padding: 0.15rem 0.65rem;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--text-color);
+        cursor: pointer;
+      }
+      .preset-chip:hover { border-color: var(--accent-color); }
+
+      .k-control { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+      .k-control input[type="range"] { width: min(260px, 60vw); accent-color: var(--accent-color); }
+      .k-value { font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+      .semantic-status {
+        min-height: 1.4rem;
+        font-size: 0.85rem;
+        color: var(--ink-secondary);
+        margin: 0.25rem 0;
+      }
+      .semantic-status.error { color: #d03b3b; }
+
+      .chart-card {
+        position: relative;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--chart-surface);
+        padding: 0.5rem 0.5rem 0.25rem;
+      }
+      .chart-card.is-busy svg { opacity: 0.45; transition: opacity 0.2s; }
+      .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        font-size: 0.85rem;
+        color: var(--ink-secondary);
+        padding: 0.25rem 0.5rem 0;
+        align-items: center;
+      }
+      .legend-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+      .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+      .legend-spacer { flex: 1; }
+      .legend-toggle { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; }
+
+      #semantic-chart { display: block; width: 100%; touch-action: manipulation; }
+      #semantic-chart .grid line { stroke: var(--grid); stroke-width: 1; }
+      #semantic-chart .grid .domain { display: none; }
+      #semantic-chart .axis .domain, #semantic-chart .axis line { stroke: var(--axis); }
+      #semantic-chart .axis text {
+        fill: var(--ink-muted);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+      #semantic-chart .zero-line { stroke: var(--axis); stroke-width: 1; }
+      #semantic-chart .axis-title { fill: var(--ink-secondary); font-size: 12.5px; font-weight: 600; }
+      #semantic-chart .node circle {
+        stroke: var(--chart-surface);
+        stroke-width: 2;
+        transition: r 0.15s;
+      }
+      #semantic-chart .node:focus { outline: none; }
+      #semantic-chart .node.is-active circle,
+      #semantic-chart .node:focus-visible circle { stroke: var(--text-color); stroke-width: 2; }
+      #semantic-chart .leader { stroke: var(--axis); stroke-width: 1; }
+      #semantic-chart .node-label {
+        fill: var(--text-color);
+        font-size: 11.5px;
+        pointer-events: none;
+        paint-order: stroke;
+        stroke: var(--chart-surface);
+        stroke-width: 3px;
+        stroke-linejoin: round;
+      }
+
+      .chart-tooltip {
+        position: absolute;
+        pointer-events: none;
+        z-index: 5;
+        max-width: 300px;
+        padding: 0.55rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        font-size: 0.82rem;
+        line-height: 1.4;
+        opacity: 0;
+        transition: opacity 0.12s;
+      }
+      .chart-tooltip.is-visible { opacity: 1; }
+      .chart-tooltip .tt-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.15rem; }
+      .chart-tooltip .tt-cat { color: var(--ink-muted); font-size: 0.78rem; margin-bottom: 0.35rem; }
+      .chart-tooltip .tt-row { display: flex; gap: 0.5rem; align-items: baseline; }
+      .chart-tooltip .tt-value { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 3.4rem; }
+      .chart-tooltip .tt-axis { color: var(--ink-secondary); }
+      .chart-tooltip .tt-section { color: var(--ink-muted); font-size: 0.78rem; margin: 0 0 0.25rem 3.9rem; }
+      .chart-tooltip .tt-excerpt {
+        margin-top: 0.4rem;
+        padding-top: 0.4rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--ink-secondary);
+        font-style: italic;
+      }
+      .chart-tooltip .tt-hint { margin-top: 0.35rem; color: var(--ink-muted); font-size: 0.75rem; }
+
+      .semantic-notes { font-size: 0.92rem; margin-top: 1rem; }
+      .semantic-notes summary { cursor: pointer; font-weight: 600; }
+      .table-wrap { overflow-x: auto; }
+      .score-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; margin-top: 0.5rem; }
+      .score-table th, .score-table td {
+        text-align: left;
+        padding: 0.3rem 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: top;
+      }
+      .score-table td.num, .score-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+      .score-table .cat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.35rem; }
+
+      @media (max-width: 600px) {
+        .concept-input { width: 7.5rem; }
+        .segmented label { padding: 0.3rem 0.6rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title"><a href="./">TheFirstMan's Blog</a></h1>
+      <nav class="site-nav">
+        <ul id="category-list" class="nav-list"></ul>
+      </nav>
+    </header>
+    <main class="site-main semantic">
+      <h2>Semantic Article Graph</h2>
+      <p>
+        Every article is split into chunks of related sentences and embedded with a small
+        language model. Type one, two, or four concepts and the articles are placed by how
+        close their text is to those concepts in meaning. Hover a dot for details, and click it
+        to open the article.
+      </p>
+
+      <div class="semantic-wide">
+        <form id="semantic-form" class="semantic-controls" autocomplete="off">
+          <div class="control-group">
+            <span class="control-label" id="mode-label">Concepts</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="mode-label">
+              <input type="radio" name="mode" id="mode-1" value="1" />
+              <label for="mode-1">1</label>
+              <input type="radio" name="mode" id="mode-2" value="2" checked />
+              <label for="mode-2">2</label>
+              <input type="radio" name="mode" id="mode-4" value="4" />
+              <label for="mode-4">4 (opposites)</label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label" id="concepts-label">Enter concepts</span>
+            <div class="concept-row" id="concept-row" aria-labelledby="concepts-label">
+              <div class="concept-axis" data-axis="x">
+                <span class="axis-name">X</span>
+                <input class="concept-input" data-slot="0" aria-label="X axis concept" />
+                <span class="between" data-pair>↔</span>
+                <input class="concept-input" data-slot="1" data-pair aria-label="X axis right-hand concept" />
+              </div>
+              <div class="concept-axis" data-axis="y">
+                <span class="axis-name">Y</span>
+                <input class="concept-input" data-slot="2" aria-label="Y axis concept" />
+                <span class="between" data-pair>↔</span>
+                <input class="concept-input" data-slot="3" data-pair aria-label="Y axis upper concept" />
+              </div>
+              <button type="submit" class="plot-button" id="plot-button">Plot</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="k-slider">Top-K chunks averaged per article</label>
+            <div class="k-control">
+              <input type="range" id="k-slider" min="1" max="1" value="1" step="1" />
+              <span class="k-value" id="k-value" aria-live="polite"></span>
+            </div>
+          </div>
+        </form>
+
+        <div class="presets" id="presets"></div>
+        <div class="semantic-status" id="semantic-status" role="status" aria-live="polite"></div>
+
+        <div class="chart-card" id="chart-card">
+          <div class="chart-legend" id="chart-legend"></div>
+          <svg id="semantic-chart" role="img" aria-label="Scatter plot of articles by semantic similarity"></svg>
+          <div class="chart-tooltip" id="chart-tooltip" aria-hidden="true"></div>
+        </div>
+
+        <details class="semantic-notes">
+          <summary>Table view</summary>
+          <div class="table-wrap"><table class="score-table" id="score-table"></table></div>
+        </details>
+
+        <details class="semantic-notes">
+          <summary>How positions are computed</summary>
+          <ul>
+            <li>
+              At build time every article is split into semantic chunks: headings always start a
+              new chunk, and long sections are cut where neighbouring sentences drift apart in
+              meaning. Each chunk is embedded with <code>all-MiniLM-L6-v2</code> (384 dimensions),
+              and the vectors are stored in <code>semantic-index.json</code>.
+            </li>
+            <li>
+              The concepts you type are embedded in your browser with the same model, which
+              downloads once (about 23&nbsp;MB) and is then cached. The example concepts are
+              precomputed, so they plot without the download.
+            </li>
+            <li>
+              <strong>1 or 2 concepts:</strong> each chunk gets its cosine similarity to the
+              concept. <strong>4 concepts:</strong> each axis is the direction between its two
+              concepts (<em>right − left</em>, <em>top − bottom</em>) and each chunk is projected onto it.
+            </li>
+            <li>
+              <strong>Top-K:</strong> for each axis the chunks are sorted by relevance (highest
+              similarity, or largest projection in either direction) and the top K values are
+              averaged. When K is at its maximum, every article uses all of its chunks. Lower K
+              moves each article toward its most relevant sections. The axes are scaled to cover
+              every K, so articles visibly move as you drag the slider.
+            </li>
+          </ul>
+        </details>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <p>
+        <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+      </p>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/semantic.js"></script>
+  </body>
+</html>

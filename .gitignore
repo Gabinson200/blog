@@ -1,0 +1,3 @@
+node_modules/
+# transformers.js model cache used by scripts/build-embeddings.mjs
+.cache/
