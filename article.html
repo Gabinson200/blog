@@ -4,28 +4,67 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Article</title>
+
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+
     <script>
       window.MathJax = {
+        startup: { typeset: false },
         tex: {
           inlineMath: [['$', '$']],
           displayMath: [['$$', '$$']],
-          packages: {'[+]': ['ams']}
+          packages: { '[+]': ['ams'] }
         },
-        loader: {load: ['[tex]/ams']},
-        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']} // don't typeset inside code blocks
+        loader: { load: ['[tex]/ams'] },
+        options: {
+          skipHtmlTags: [
+            'script',
+            'noscript',
+            'style',
+            'textarea',
+            'pre',
+            'code'
+          ]
+        }
       };
     </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <script
+      id="MathJax-script"
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/marked@17.0.0/lib/marked.umd.js"
+    ></script>
+    <script defer src="scripts/main.js"></script>
+    <script defer src="scripts/article.js"></script>
   </head>
+
   <body>
     <header class="site-header">
-      <h1 class="site-title"><a href="./">TheFirstMan's Blog</a></h1>
+      <h1 class="site-title">
+        <a href="./">TheFirstMan's Blog</a>
+      </h1>
+
       <nav class="site-nav">
         <ul id="category-list" class="nav-list"></ul>
       </nav>
     </header>
+
     <main class="site-main">
       <article id="article">
         <h2 id="article-title"></h2>
@@ -33,16 +72,15 @@
         <div id="article-content" class="article-content"></div>
       </article>
     </main>
+
     <footer class="site-footer">
       <p>
-        <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+        <a
+          href="https://pages.github.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >GitHub Pages</a>.
       </p>
     </footer>
-    <!-- Marked library for markdown parsing -->
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="scripts/main.js"></script>
-    <script src="scripts/article.js"></script>
   </body>
 </html>

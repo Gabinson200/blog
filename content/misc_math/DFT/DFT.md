@@ -406,6 +406,8 @@ $$
 
 ## Discretization
 
+the issue is once it saves it will automatically jumpt ot the top
+
 In real life, we might not know the underlying continuous function which produces a signal or function $f(t)$ over some time period, so directly integrating it to produce $\widehat f(\omega)$ may not be possible.
 
 Instead, we usually have a finite number of measurements sampled from the signal at regular time intervals:
@@ -420,6 +422,6 @@ $$\boxed{\text{frequency bin}\quad\longrightarrow\quad\text{complex coefficient 
 
 Before looking at how the FFT computes these coefficients more efficiently, we first need to understand the mathematical structure of the DFT itself.
 
-Polynomial Duality
-Symmetry
+Polynomial Duality  
+Symmetry  
 FFT

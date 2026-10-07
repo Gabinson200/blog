@@ -1,470 +1,598 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  const content = document.getElementById('article-content');
+  const title = document.getElementById('article-title');
+  const meta = document.getElementById('article-meta');
+  const rawSlug = new URLSearchParams(location.search).get('slug') || '';
+  const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+
+  let blocks = [];
+  let stopWatchingImages = () => {};
+
   try {
-    const params = new URLSearchParams(location.search);
-    const raw = params.get('slug') || '';
+    if (!rawSlug) throw new Error('Missing ?slug=');
+    if (!content) throw new Error('Missing #article-content');
 
-    if (!raw) {
-      throw new Error('Missing ?slug=');
+    const slug = normalizeSlug(rawSlug);
+    const mdURL = new URL('./content/' + slug + '.md', location.href);
+    const mdDir = new URL('./', mdURL);
+
+    const response = await fetch(mdURL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error('Could not load ' + mdURL.pathname);
     }
 
-    // ----------------------------------------------------------
-    // ARTICLE PATH
-    // ----------------------------------------------------------
-
-    const slug = normalizeSlug(raw);
-
-    const mdPath = `./content/${slug}.md`;
-
-    console.log('[article] Fetching markdown from:', mdPath);
-
-    // Absolute URL for the Markdown file.
-    // Used to resolve relative images, links, etc.
-    const mdUrlAbs = new URL(mdPath, window.location.href);
-    const mdDirUrl = new URL('./', mdUrlAbs);
-
-    // ----------------------------------------------------------
-    // FETCH MARKDOWN
-    // ----------------------------------------------------------
-
-    const resp = await fetch(mdPath, {
-      cache: 'no-store'
-    });
-
-    if (!resp.ok) {
-      throw new Error(
-        `Failed to load markdown from ${mdPath}`
-      );
-    }
-
-    let markdownSource = await resp.text();
-
-    // Keep the original source so the live-preview loop can detect
-    // whether the Markdown file has actually changed.
-    let lastMarkdownSource = markdownSource;
-
-    // ----------------------------------------------------------
-    // LOAD ARTICLE METADATA MANIFEST
-    // ----------------------------------------------------------
-
-    let metaFromManifest = {};
+    let lastSource = await response.text();
+    let manifest = {};
 
     try {
-      const metaResp = await fetch('./articles.json', {
+      const response = await fetch('./articles.json', {
         cache: 'no-store'
       });
 
-      if (metaResp.ok) {
-        const all = await metaResp.json();
+      if (response.ok) {
+        const articles = await response.json();
 
-        metaFromManifest = Array.isArray(all)
-          ? (
-              all.find(
-                (article) =>
-                  normalizeSlug(article.slug || '') === slug
-              ) || {}
-            )
-          : {};
+        manifest = articles.find(
+          a => normalizeSlug(a.slug || '') === slug
+        ) || {};
       }
     } catch (error) {
-      console.debug(
-        '[article] Could not load articles.json:',
-        error
-      );
+      console.debug('[article] Metadata unavailable:', error);
     }
 
-    // ----------------------------------------------------------
-    // PARSE FRONT MATTER
-    // ----------------------------------------------------------
+    configureMarked();
+    await window.MathJax?.startup?.promise;
 
-    let {
-      frontMatter,
-      body: markdown
-    } = extractFrontMatter(markdownSource);
+    async function update(source, preserveScroll) {
+      const { frontMatter, body } = extractFrontMatter(source);
+      const template = document.createElement('template');
 
-    // ----------------------------------------------------------
-    // IMAGE BASE DIRECTORY
-    // ----------------------------------------------------------
-
-    let imagesBaseDirUrl =
-      getImagesBaseDirUrl(frontMatter);
-
-    // ----------------------------------------------------------
-    // ARTICLE ELEMENTS
-    // ----------------------------------------------------------
-
-    const titleEl =
-      document.getElementById('article-title');
-
-    const metaEl =
-      document.getElementById('article-meta');
-
-    const contentEl =
-      document.getElementById('article-content');
-
-    if (!contentEl) {
-      throw new Error(
-        'Missing #article-content container'
+      template.innerHTML = marked.parse(
+        body.replace(
+          /\[\[#([^\]]+)\]\]/g,
+          (_, text) => '[' + text + '](#' + slugify(text) + ')'
+        )
       );
-    }
 
-    // ----------------------------------------------------------
-    // ARTICLE TITLE / DATE / TAGS
-    // ----------------------------------------------------------
+      rewriteLinksAndMedia(
+        template.content,
+        mdDir,
+        getImagesBase(frontMatter)
+      );
 
-    updateArticleMetadata(
-      metaFromManifest,
-      frontMatter,
-      titleEl,
-      metaEl
-    );
+      // Compare BEFORE highlighting or MathJax changes the generated HTML.
+      const available = new Map();
 
-    // ----------------------------------------------------------
-    // MARKED RENDERER
-    // ----------------------------------------------------------
+      for (const block of blocks) {
+        if (!available.has(block.key)) {
+          available.set(block.key, []);
+        }
 
-    /*
-     * Custom heading renderer.
-     *
-     * This gives every heading an ID so Markdown links such as:
-     *
-     * [DFT Output](#dft-output)
-     *
-     * work correctly.
-     *
-     * Supports both newer and older versions of Marked.
-     */
+        available.get(block.key).push(block);
+      }
 
-    const renderer = {
-      heading(arg1, arg2) {
-        // New Marked versions:
-        // arg1 is a token object.
-        if (
-          typeof arg1 === 'object' &&
-          arg1 !== null
-        ) {
-          const token = arg1;
+      const next = [];
+      const changed = [];
 
-          const level =
-            token.depth || 1;
+      for (let node of Array.from(template.content.childNodes)) {
+        if (node.nodeType === Node.COMMENT_NODE) continue;
 
-          const plainText =
-            token.text || '';
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (!node.textContent.trim()) continue;
 
-          const innerHtml =
-            this.parser &&
-            this.parser.parseInline
-              ? this.parser.parseInline(
-                  token.tokens || []
-                )
-              : plainText;
+          const wrapper = document.createElement('div');
+          wrapper.append(node);
+          node = wrapper;
+        }
 
-          const id =
-            slugify(plainText);
+        const key = node.outerHTML;
+        const existing = available.get(key)?.shift();
+        const block = existing || { key, node };
 
-          return (
-            `<h${level} id="${id}">` +
-            `${innerHtml}` +
-            `</h${level}>`
+        next.push(block);
+
+        if (!existing) {
+          changed.push(block);
+        }
+      }
+
+      // Prepare changed blocks at the article's width while the existing
+      // article remains visible and fully usable.
+      const stage = document.createElement('div');
+      stage.className = content.className;
+      stage.setAttribute('aria-hidden', 'true');
+      stage.inert = true;
+
+      stage.style.cssText =
+        'position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;' +
+        'box-sizing:border-box;margin:0;z-index:-1;';
+
+      stage.style.width =
+        content.getBoundingClientRect().width + 'px';
+
+      content.after(stage);
+
+      let committed = false;
+
+      try {
+        for (const block of changed) {
+          stage.append(block.node);
+        }
+
+        stage.querySelectorAll('pre code').forEach(node => {
+          if (window.hljs) {
+            hljs.highlightElement(node);
+          }
+        });
+
+        stage.querySelectorAll('img').forEach(img => {
+          // Hidden staging content must load without waiting to enter
+          // the viewport.
+          img.loading = 'eager';
+          img.decoding = 'async';
+        });
+
+        if (changed.length && window.MathJax?.typesetPromise) {
+          await MathJax.typesetPromise(
+            changed.map(block => block.node)
           );
         }
 
-        // Old Marked versions.
-        const text =
-          arg1 || '';
+        // Start layout/font loading while the old article remains visible.
+        stage.getBoundingClientRect();
 
-        const level =
-          arg2 || 1;
-
-        const id =
-          slugify(text);
-
-        return (
-          `<h${level} id="${id}">` +
-          `${text}` +
-          `</h${level}>`
+        await settleWithin(
+          Promise.all([
+            document.fonts?.ready,
+            ...Array.from(
+              stage.querySelectorAll('img'),
+              waitForImage
+            )
+          ]),
+          2000
         );
-      }
-    };
 
-    // ----------------------------------------------------------
-    // CONFIGURE MARKED
-    // ----------------------------------------------------------
+        await new Promise(resolve => requestAnimationFrame(() => {
+          stopWatchingImages();
 
-    if (window.marked?.use) {
-      marked.use({
-        renderer,
+          // Capture NOW, so scrolling during preparation is respected.
+          const anchor = preserveScroll
+            ? captureAnchor(blocks, next)
+            : null;
 
-        extensions: [
-          {
-            name: 'mathBlock',
+          const root = document.documentElement;
+          const oldAnchorStyle = root.style.overflowAnchor;
+          const oldMinHeight = content.style.minHeight;
 
-            level: 'block',
+          root.style.overflowAnchor = 'none';
 
-            start(src) {
-              const index =
-                src.indexOf('$$');
+          // Prevent a temporary height reduction while nodes are moved.
+          content.style.minHeight =
+            content.getBoundingClientRect().height + 'px';
 
-              return index < 0
-                ? undefined
-                : index;
-            },
+          const retained = new Set(next);
+          const removed = blocks.filter(
+            block => !retained.has(block)
+          );
 
-            tokenizer(src) {
-              const match =
-                src.match(
-                  /^\$\$([\s\S]*?)\$\$/
-                );
+          if (removed.length) {
+            window.MathJax?.typesetClear?.(
+              removed.map(block => block.node)
+            );
+          }
 
-              if (!match) {
-                return;
-              }
+          updateMetadata(
+            manifest,
+            frontMatter,
+            title,
+            meta
+          );
 
-              return {
-                type: 'mathBlock',
-                raw: match[0],
-                text: match[1].trim()
-              };
-            },
+          // Keep unchanged nodes connected, including images and
+          // rendered math.
+          let cursor = content.firstChild;
 
-            renderer(token) {
-              return (
-                `$$\n` +
-                `${token.text}\n` +
-                `$$`
-              );
+          for (const block of next) {
+            if (block.node === cursor) {
+              cursor = cursor.nextSibling;
+            } else {
+              content.insertBefore(block.node, cursor);
             }
           }
-        ]
-      });
-    }
 
-    if (window.marked?.setOptions) {
-      marked.setOptions({
-        gfm: true,
-        breaks: false,
-        mangle: false,
-        headerIds: false
-      });
-    }
+          while (cursor) {
+            const following = cursor.nextSibling;
+            cursor.remove();
+            cursor = following;
+          }
 
-    // ----------------------------------------------------------
-    // INITIAL ARTICLE RENDER
-    // ----------------------------------------------------------
+          blocks = next;
+          content.style.minHeight = oldMinHeight;
 
-    await renderMarkdown(
-      markdown,
-      contentEl,
-      mdDirUrl,
-      imagesBaseDirUrl
-    );
+          restoreAnchor(anchor);
 
-    // ----------------------------------------------------------
-    // RESTORE SCROLL POSITION AFTER MANUAL PAGE RELOAD
-    // ----------------------------------------------------------
+          committed = true;
+          stage.remove();
 
-    const navEntry =
-      performance.getEntriesByType(
-        'navigation'
-      )[0];
-
-    if (
-      navEntry &&
-      navEntry.type === 'reload'
-    ) {
-      try {
-        const savedState =
-          JSON.parse(
-            sessionStorage.getItem(
-              'scrollState'
-            )
+          requestAnimationFrame(() => {
+            root.style.overflowAnchor = oldAnchorStyle;
+            stopWatchingImages = watchLateImages(content, blocks);
+            resolve();
+          });
+        }));
+      } finally {
+        if (!committed && changed.length) {
+          window.MathJax?.typesetClear?.(
+            changed.map(block => block.node)
           );
-
-        if (
-          savedState &&
-          savedState.slug === raw
-        ) {
-          setTimeout(() => {
-            window.scrollTo(
-              0,
-              savedState.scrollY
-            );
-          }, 10);
         }
-      } catch (error) {
-        console.debug(
-          '[article] Could not restore scroll state:',
-          error
-        );
+
+        stage.remove();
       }
     }
 
-    // ----------------------------------------------------------
-    // SCROLL TO HEADING IF URL CONTAINS A HASH
-    // ----------------------------------------------------------
+    await update(lastSource, false);
 
-    if (window.location.hash) {
-      const hashId =
-        window.location.hash.substring(1);
+    stopWatchingImages();
+    restoreInitialPosition(rawSlug);
+    stopWatchingImages = watchLateImages(content, blocks);
 
-      setTimeout(() => {
-        const target =
-          document.getElementById(hashId);
+    if (isLocal) {
+      console.log('[article] Live Markdown preview enabled');
 
-        if (target) {
-          target.scrollIntoView();
-        }
-      }, 0);
-    }
-
-    // ==========================================================
-    // LOCAL LIVE MARKDOWN PREVIEW
-    // ==========================================================
-    //
-    // This section only runs when viewing the website locally.
-    //
-    // Example:
-    //
-    // http://127.0.0.1:5500/article.html?slug=...
-    //
-    // It DOES NOT run on GitHub Pages.
-    //
-    // Every 400ms:
-    //
-    // 1. Fetch the Markdown file.
-    // 2. Compare it to the previous version.
-    // 3. If unchanged -> do nothing.
-    // 4. If changed -> rerender #article-content only.
-    //
-    // The browser page itself is never reloaded.
-    // ==========================================================
-
-    const isLocalDevelopment =
-      location.hostname === '127.0.0.1' ||
-      location.hostname === 'localhost' ||
-      location.hostname === '[::1]';
-
-    if (isLocalDevelopment) {
-      console.log(
-        '[article] Live Markdown preview enabled'
-      );
-
-      let liveUpdateInProgress = false;
-
-      setInterval(async () => {
-        // Don't waste requests while this browser tab
-        // isn't visible.
-        if (document.hidden) {
-          return;
-        }
-
-        // Prevent overlapping updates if MathJax or
-        // Markdown rendering takes longer than the
-        // polling interval.
-        if (liveUpdateInProgress) {
-          return;
-        }
-
+      // Schedule the NEXT request only after fetch + render have finished.
+      // There can never be two requests/renders in flight from this loop.
+      async function poll() {
         try {
-          /*
-           * Date.now() is added to the URL to prevent
-           * the browser or local server from returning
-           * a cached copy of the Markdown file.
-           */
-          const liveUrl =
-            `${mdPath}?live=${Date.now()}`;
+          if (!document.hidden) {
+            const url = new URL(mdURL);
+            url.searchParams.set('live', Date.now());
 
-          const response =
-            await fetch(liveUrl, {
+            const response = await fetch(url, {
               cache: 'no-store'
             });
 
-          if (!response.ok) {
-            return;
+            if (response.ok) {
+              const source = await response.text();
+
+              if (source !== lastSource) {
+                await update(source, true);
+
+                // Only mark a successful render as applied.
+                lastSource = source;
+              }
+            }
           }
-
-          const newSource =
-            await response.text();
-
-          // File did not change.
-          if (
-            newSource ===
-            lastMarkdownSource
-          ) {
-            return;
-          }
-
-          liveUpdateInProgress = true;
-
-          console.log(
-            '[article] Markdown changed — updating preview'
-          );
-
-          // Store the newest version.
-          lastMarkdownSource =
-            newSource;
-
-          // Parse front matter again because the user
-          // may also be editing article metadata.
-          const parsed =
-            extractFrontMatter(
-              newSource
-            );
-
-          const newFrontMatter =
-            parsed.frontMatter;
-
-          const newMarkdown =
-            parsed.body;
-
-          // Update the image base in case imagesBase:
-          // changed in the front matter.
-          imagesBaseDirUrl =
-            getImagesBaseDirUrl(
-              newFrontMatter
-            );
-
-          // Update title/date/tags live as well.
-          updateArticleMetadata(
-            metaFromManifest,
-            newFrontMatter,
-            titleEl,
-            metaEl
-          );
-
-          // Replace ONLY the article contents.
-          await renderMarkdown(
-            newMarkdown,
-            contentEl,
-            mdDirUrl,
-            imagesBaseDirUrl
-          );
         } catch (error) {
           console.debug(
-            '[article] Live preview check failed:',
+            '[article] Live preview update failed:',
             error
           );
         } finally {
-          liveUpdateInProgress = false;
+          setTimeout(poll, 75);
         }
-      }, 75);
-    }
-  } catch (err) {
-    console.error(err);
+      }
 
-    renderError(
-      `<span style="color:red;">Error:</span> ` +
-      `${escapeHtml(err.message)}`
-    );
+      setTimeout(poll, 75);
+    }
+  } catch (error) {
+    console.error(error);
+
+    if (content) {
+      content.textContent = 'Error: ' + error.message;
+    }
   }
 });
 
 
-// ============================================================
-// FRONT MATTER / METADATA
-// ============================================================
+function configureMarked() {
+  marked.use({
+    renderer: {
+      heading(arg, oldLevel) {
+        const modern = typeof arg === 'object' && arg !== null;
 
-function normalizeSlug(raw) {
-  return decodeURIComponent(raw)
+        const level = modern ? arg.depth : oldLevel;
+        const text = modern ? arg.text : arg;
+        const html = modern
+          ? this.parser.parseInline(arg.tokens || [])
+          : arg;
+
+        return (
+          '<h' + level + ' id="' + slugify(text) + '">' +
+          html +
+          '</h' + level + '>'
+        );
+      }
+    },
+
+    extensions: [{
+      name: 'mathBlock',
+      level: 'block',
+
+      start(source) {
+        const index = source.indexOf('$$');
+        return index < 0 ? undefined : index;
+      },
+
+      tokenizer(source) {
+        const match = /^\$\$([\s\S]*?)\$\$/.exec(source);
+
+        if (match) {
+          return {
+            type: 'mathBlock',
+            raw: match[0],
+            text: match[1].trim()
+          };
+        }
+      },
+
+      renderer(token) {
+        // Give display math a stable block to reuse on subsequent updates.
+        return (
+          '<div class="math-block">$$\n' +
+          escapeHtml(token.text) +
+          '\n$$</div>\n'
+        );
+      }
+    }]
+  });
+
+  marked.setOptions({
+    gfm: true,
+    breaks: false
+  });
+}
+
+
+function captureAnchor(previous, next) {
+  const fallback = {
+    node: null,
+    top: 0,
+    y: window.scrollY,
+    x: window.scrollX
+  };
+
+  // At the top, keep the beginning of the article visible.
+  if (window.scrollY < 1) {
+    return fallback;
+  }
+
+  const index = previous.findIndex(
+    block => block.node.getBoundingClientRect().bottom > 0
+  );
+
+  if (index < 0) {
+    return fallback;
+  }
+
+  const old = previous[index];
+  const top = old.node.getBoundingClientRect().top;
+
+  if (next.includes(old)) {
+    return {
+      ...fallback,
+      node: old.node,
+      top
+    };
+  }
+
+  // The visible block changed. Locate its replacement between
+  // surviving neighbours.
+  let before = index - 1;
+
+  while (before >= 0 && !next.includes(previous[before])) {
+    before--;
+  }
+
+  let after = index + 1;
+
+  while (
+    after < previous.length &&
+    !next.includes(previous[after])
+  ) {
+    after++;
+  }
+
+  const start = before >= 0
+    ? next.indexOf(previous[before]) + 1
+    : 0;
+
+  const end = after < previous.length
+    ? next.indexOf(previous[after])
+    : next.length;
+
+  if (start < end) {
+    const replacement = next[
+      Math.min(start + index - before - 1, end - 1)
+    ];
+
+    return {
+      ...fallback,
+      node: replacement.node,
+      top
+    };
+  }
+
+  // A deletion has no replacement: hold the nearest surviving neighbour.
+  const neighbour = previous[after] || previous[before];
+
+  return neighbour
+    ? {
+        ...fallback,
+        node: neighbour.node,
+        top: neighbour.node.getBoundingClientRect().top
+      }
+    : fallback;
+}
+
+
+function restoreAnchor(anchor) {
+  if (!anchor) return;
+
+  const top = anchor.node?.isConnected
+    ? (
+        window.scrollY +
+        anchor.node.getBoundingClientRect().top -
+        anchor.top
+      )
+    : anchor.y;
+
+  window.scrollTo({
+    left: anchor.x,
+    top,
+    behavior: 'instant'
+  });
+}
+
+
+function waitForImage(img) {
+  if (img.complete) {
+    return (
+      img.decode?.().catch(() => {}) ||
+      Promise.resolve()
+    );
+  }
+
+  return new Promise(resolve => {
+    const done = () => {
+      img.removeEventListener('load', done);
+      img.removeEventListener('error', done);
+      resolve();
+    };
+
+    img.addEventListener('load', done);
+    img.addEventListener('error', done);
+  });
+}
+
+
+function settleWithin(promise, milliseconds) {
+  let timer;
+
+  return Promise.race([
+    promise,
+    new Promise(resolve => {
+      timer = setTimeout(resolve, milliseconds);
+    })
+  ]).finally(() => clearTimeout(timer));
+}
+
+
+function watchLateImages(content, blocks) {
+  const pending = Array.from(
+    content.querySelectorAll('img')
+  ).filter(img => !img.complete);
+
+  if (!pending.length || !window.ResizeObserver) {
+    return () => {};
+  }
+
+  const anchor = captureAnchor(blocks, blocks);
+
+  const observer = new ResizeObserver(() => {
+    restoreAnchor(anchor);
+  });
+
+  const events = [
+    'wheel',
+    'touchstart',
+    'pointerdown',
+    'keydown'
+  ];
+
+  let timer;
+
+  function stop() {
+    observer.disconnect();
+    clearTimeout(timer);
+
+    events.forEach(event => {
+      window.removeEventListener(event, stop, true);
+    });
+  }
+
+  observer.observe(content);
+
+  // Stop compensating as soon as the user interacts with the page.
+  events.forEach(event => {
+    window.addEventListener(event, stop, {
+      capture: true,
+      passive: true
+    });
+  });
+
+  timer = setTimeout(stop, 10000);
+
+  Promise.all(pending.map(waitForImage)).then(() => {
+    requestAnimationFrame(() => {
+      // Allow the observer to handle the final size change.
+      requestAnimationFrame(stop);
+    });
+  });
+
+  return stop;
+}
+
+
+function restoreInitialPosition(slug) {
+  const reload =
+    performance.getEntriesByType('navigation')[0]?.type === 'reload';
+
+  if (reload) {
+    try {
+      const saved = JSON.parse(
+        sessionStorage.getItem('scrollState')
+      );
+
+      if (
+        saved?.slug === slug &&
+        Number.isFinite(saved.scrollY)
+      ) {
+        window.scrollTo({
+          left: 0,
+          top: saved.scrollY,
+          behavior: 'instant'
+        });
+
+        return;
+      }
+    } catch {}
+  }
+
+  if (location.hash) {
+    let id = location.hash.slice(1);
+
+    try {
+      id = decodeURIComponent(id);
+    } catch {}
+
+    (
+      document.getElementById(id) ||
+      document.getElementById(slugify(id))
+    )?.scrollIntoView();
+  }
+}
+
+
+window.addEventListener('beforeunload', () => {
+  const slug = new URLSearchParams(location.search).get('slug');
+
+  if (!slug) return;
+
+  try {
+    sessionStorage.setItem(
+      'scrollState',
+      JSON.stringify({
+        slug,
+        scrollY: window.scrollY
+      })
+    );
+  } catch {}
+});
+
+
+function normalizeSlug(value) {
+  return decodeURIComponent(value)
     .replace(/\\/g, '/')
     .replace(/^(\.\/)+/, '')
     .replace(/^\/+/, '')
@@ -472,735 +600,219 @@ function normalizeSlug(raw) {
 }
 
 
-function extractFrontMatter(markdown) {
-  if (!markdown.startsWith('---')) {
+function extractFrontMatter(source) {
+  const match =
+    /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(source);
+
+  if (!match) {
     return {
       frontMatter: {},
-      body: markdown
+      body: source
     };
   }
 
-  const endIdx =
-    markdown.indexOf(
-      '\n---',
-      3
-    );
+  const frontMatter = {};
 
-  if (endIdx === -1) {
-    return {
-      frontMatter: {},
-      body: markdown
-    };
-  }
+  for (const line of match[1].split(/\r?\n/)) {
+    const colon = line.indexOf(':');
 
-  const fmText =
-    markdown
-      .slice(3, endIdx)
-      .trim();
+    if (colon < 0) continue;
 
-  const frontMatter =
-    parseFrontMatter(fmText);
+    const key = line.slice(0, colon).trim();
+    let value = line.slice(colon + 1).trim();
 
-  const body =
-    markdown.slice(
-      endIdx + 4
-    );
-
-  return {
-    frontMatter,
-    body
-  };
-}
-
-
-function parseFrontMatter(text) {
-  const lines =
-    text.split(/\r?\n/);
-
-  const result = {};
-
-  lines.forEach((line) => {
-    const idx =
-      line.indexOf(':');
-
-    if (idx === -1) {
-      return;
+    if (/^(['"])[\s\S]*\1$/.test(value)) {
+      value = value.slice(1, -1);
     }
 
-    const key =
-      line
-        .slice(0, idx)
-        .trim();
-
-    let value =
-      line
-        .slice(idx + 1)
-        .trim();
-
-    // Remove matching quotes.
-    if (
-      (
-        value.startsWith('"') &&
-        value.endsWith('"')
-      ) ||
-      (
-        value.startsWith("'") &&
-        value.endsWith("'")
-      )
-    ) {
-      value =
-        value.slice(1, -1);
-    }
-
-    // Parse simple array syntax:
-    //
-    // tags: [math, fourier, dft]
-    //
     if (
       value.startsWith('[') &&
       value.endsWith(']')
     ) {
-      const arrStr =
-        value
-          .slice(1, -1)
-          .trim();
+      const inner = value.slice(1, -1).trim();
 
-      result[key] =
-        arrStr.length
-          ? arrStr
-              .split(',')
-              .map((item) =>
-                item
-                  .trim()
-                  .replace(
-                    /^['"]|['"]$/g,
-                    ''
-                  )
-              )
-          : [];
+      frontMatter[key] = inner
+        ? inner.split(',').map(item =>
+            item.trim().replace(/^['"]|['"]$/g, '')
+          )
+        : [];
     } else {
-      result[key] =
-        value;
+      frontMatter[key] = value;
     }
-  });
-
-  return result;
-}
-
-
-function getImagesBaseDirUrl(frontMatter) {
-  if (!frontMatter?.imagesBase) {
-    return null;
   }
 
-  const cleaned =
-    String(frontMatter.imagesBase)
-      .replace(/\\/g, '/')
-      .replace(/^\/+/, '');
-
-  const baseCandidate =
-    `./content/${cleaned}` +
-    `${cleaned.endsWith('/') ? '' : '/'}`;
-
-  return new URL(
-    baseCandidate,
-    window.location.href
-  );
+  return {
+    frontMatter,
+    body: source.slice(match[0].length)
+  };
 }
 
 
-function updateArticleMetadata(
-  metaFromManifest,
+function updateMetadata(
+  manifest,
   frontMatter,
   titleEl,
   metaEl
 ) {
-  const merged = {
-    ...metaFromManifest,
+  const data = {
+    ...manifest,
     ...frontMatter
   };
 
   const title =
-    merged.title ||
-    metaFromManifest.title ||
+    data.title ||
+    manifest.title ||
     'Untitled';
 
-  const dateStr =
-    merged.date ||
-    metaFromManifest.date ||
-    '';
+  document.title = title + ' - Science & Programming Blog';
 
-  const date =
-    dateStr
-      ? new Date(dateStr)
-      : null;
-
-  document.title =
-    `${title} - Science & Programming Blog`;
-
-  if (titleEl) {
-    titleEl.textContent =
-      title;
-  }
-
-  if (!metaEl) {
-    return;
+  if (titleEl && titleEl.textContent !== title) {
+    titleEl.textContent = title;
   }
 
   const pieces = [];
+  const date = data.date ? new Date(data.date) : null;
 
-  if (
-    date &&
-    !isNaN(date)
-  ) {
+  if (date && !isNaN(date)) {
     pieces.push(
-      date.toLocaleDateString(
-        undefined,
-        {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }
-      )
-    );
-  }
-
-  const tags =
-    merged.tags ||
-    merged.keywords ||
-    [];
-
-  if (
-    Array.isArray(tags) &&
-    tags.length
-  ) {
-    pieces.push(
-      'Tags: ' +
-      tags.join(', ')
-    );
-  }
-
-  metaEl.textContent =
-    pieces.join(' • ');
-}
-
-
-// ============================================================
-// MARKDOWN RENDERING
-// ============================================================
-
-async function renderMarkdown(
-  markdown,
-  contentEl,
-  mdDirUrl,
-  imagesBaseDirUrl
-) {
-  /*
-   * Convert Obsidian-style heading links:
-   *
-   * [[#Heading]]
-   *
-   * into:
-   *
-   * [Heading](#heading)
-   */
-
-  markdown =
-    markdown.replace(
-      /\[\[#([^\]]+)\]\]/g,
-      (
-        match,
-        captureGroup
-      ) => {
-        const linkText =
-          captureGroup;
-
-        const linkId =
-          slugify(linkText);
-
-        return (
-          `[${linkText}]` +
-          `(#${linkId})`
-        );
-      }
-    );
-
-  /*
-   * Tell MathJax that its existing rendered elements
-   * are about to be removed.
-   *
-   * This is particularly important during live updates.
-   */
-
-  if (
-    window.MathJax?.typesetClear
-  ) {
-    try {
-      MathJax.typesetClear(
-        [contentEl]
-      );
-    } catch (error) {
-      console.debug(
-        '[article] MathJax clear failed:',
-        error
-      );
-    }
-  }
-
-  // ----------------------------------------------------------
-  // MARKDOWN -> HTML
-  // ----------------------------------------------------------
-
-  const html =
-    typeof marked?.parse ===
-    'function'
-      ? marked.parse(markdown)
-      : marked(markdown);
-
-  contentEl.innerHTML =
-    html;
-
-  // ----------------------------------------------------------
-  // FIX RELATIVE LINKS / IMAGES
-  // ----------------------------------------------------------
-
-  rewriteLinksAndMedia(
-    contentEl,
-    mdDirUrl,
-    imagesBaseDirUrl
-  );
-
-  // ----------------------------------------------------------
-  // IMAGE SETTINGS
-  // ----------------------------------------------------------
-
-  contentEl
-    .querySelectorAll('img')
-    .forEach((img) => {
-      if (
-        !img.hasAttribute(
-          'loading'
-        )
-      ) {
-        img.setAttribute(
-          'loading',
-          'lazy'
-        );
-      }
-
-      img.decoding =
-        'async';
-    });
-
-  // ----------------------------------------------------------
-  // SYNTAX HIGHLIGHTING
-  // ----------------------------------------------------------
-
-  if (window.hljs) {
-    contentEl
-      .querySelectorAll(
-        'pre code'
-      )
-      .forEach((block) => {
-        try {
-          hljs.highlightElement(
-            block
-          );
-        } catch (error) {
-          console.debug(
-            '[article] Highlighting failed:',
-            error
-          );
-        }
-      });
-  }
-
-  // ----------------------------------------------------------
-  // MATHJAX
-  // ----------------------------------------------------------
-
-  await typesetMath(
-    contentEl
-  );
-}
-
-
-// ============================================================
-// MATHJAX
-// ============================================================
-
-async function typesetMath(el) {
-  if (!window.MathJax) {
-    return;
-  }
-
-  /*
-   * article.html loads MathJax asynchronously.
-   *
-   * If it has not finished loading yet, wait for
-   * the script's load event.
-   */
-
-  if (!MathJax.startup) {
-    const mjScript =
-      document.getElementById(
-        'MathJax-script'
-      );
-
-    if (
-      mjScript &&
-      !mjScript.dataset._bound
-    ) {
-      mjScript.dataset._bound =
-        '1';
-
-      await new Promise(
-        (resolve) => {
-          mjScript.addEventListener(
-            'load',
-            resolve,
-            {
-              once: true
-            }
-          );
-        }
-      );
-    }
-  }
-
-  if (
-    MathJax.typesetPromise
-  ) {
-    try {
-      await MathJax.typesetPromise(
-        [el]
-      );
-    } catch (error) {
-      console.error(
-        'MathJax typeset failed:',
-        error
-      );
-    }
-  }
-}
-
-
-// ============================================================
-// URL / MEDIA HELPERS
-// ============================================================
-
-function isAbsoluteUrl(url) {
-  return (
-    /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(
-      url
-    ) ||
-    /^[a-z]+:/i.test(
-      url
-    )
-  );
-}
-
-
-function resolveRelativeUrl(
-  raw,
-  mdDirUrl,
-  imagesBaseDirUrl
-) {
-  if (!raw) {
-    return raw;
-  }
-
-  let url =
-    raw
-      .replace(/\\/g, '/')
-      .trim();
-
-  // In-page heading links.
-  if (
-    url.startsWith('#')
-  ) {
-    return url;
-  }
-
-  // Links to another article.
-  if (
-    url.startsWith(
-      'article.html?slug='
-    )
-  ) {
-    return url;
-  }
-
-  // Absolute external URLs.
-  if (
-    isAbsoluteUrl(url)
-  ) {
-    return url;
-  }
-
-  // Absolute site paths.
-  if (
-    url.startsWith('/')
-  ) {
-    return url;
-  }
-
-  // Already starts at content/
-  if (
-    url.startsWith(
-      'content/'
-    )
-  ) {
-    const abs =
-      new URL(
-        `./${url}`,
-        window.location.href
-      );
-
-    return (
-      abs.pathname +
-      abs.search +
-      abs.hash
-    );
-  }
-
-  /*
-   * Optional alias:
-   *
-   * @img/image.png
-   *
-   * resolves using the article's imagesBase
-   * front-matter setting.
-   */
-
-  if (
-    imagesBaseDirUrl &&
-    url.startsWith('@img/')
-  ) {
-    const abs =
-      new URL(
-        url.slice(5),
-        imagesBaseDirUrl
-      );
-
-    return (
-      abs.pathname +
-      abs.search +
-      abs.hash
-    );
-  }
-
-  // Otherwise resolve relative to the
-  // directory containing the Markdown file.
-  const abs =
-    new URL(
-      url,
-      mdDirUrl
-    );
-
-  return (
-    abs.pathname +
-    abs.search +
-    abs.hash
-  );
-}
-
-
-function rewriteSrcset(
-  el,
-  attr,
-  mdDirUrl,
-  imagesBaseDirUrl
-) {
-  const srcset =
-    el.getAttribute(attr);
-
-  if (!srcset) {
-    return;
-  }
-
-  const parts =
-    srcset
-      .split(',')
-      .map((item) =>
-        item.trim()
-      )
-      .filter(Boolean);
-
-  const rewritten =
-    parts
-      .map((part) => {
-        const match =
-          part.match(
-            /^(\S+)(\s+.+)?$/
-          );
-
-        if (!match) {
-          return part;
-        }
-
-        const url =
-          resolveRelativeUrl(
-            match[1],
-            mdDirUrl,
-            imagesBaseDirUrl
-          );
-
-        const descriptor =
-          match[2] || '';
-
-        return (
-          `${url}${descriptor}`
-        );
+      date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       })
-      .join(', ');
+    );
+  }
 
-  el.setAttribute(
-    attr,
-    rewritten
+  const tags = data.tags || data.keywords || [];
+
+  if (Array.isArray(tags) && tags.length) {
+    pieces.push('Tags: ' + tags.join(', '));
+  }
+
+  const text = pieces.join(' • ');
+
+  if (metaEl && metaEl.textContent !== text) {
+    metaEl.textContent = text;
+  }
+}
+
+
+function getImagesBase(frontMatter) {
+  if (!frontMatter.imagesBase) {
+    return null;
+  }
+
+  const path = String(frontMatter.imagesBase)
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '');
+
+  return new URL(
+    './content/' +
+    path +
+    (path.endsWith('/') ? '' : '/'),
+    location.href
+  );
+}
+
+
+function resolveRelativeUrl(raw, mdDir, imagesBase) {
+  if (!raw) return raw;
+
+  const url = raw.replace(/\\/g, '/').trim();
+
+  if (
+    /^(?:#|\/|[a-z][a-z0-9+.-]*:)/i.test(url) ||
+    url.startsWith('article.html?slug=')
+  ) {
+    return url;
+  }
+
+  const absolute = url.startsWith('content/')
+    ? new URL('./' + url, location.href)
+    : imagesBase && url.startsWith('@img/')
+      ? new URL(url.slice(5), imagesBase)
+      : new URL(url, mdDir);
+
+  return (
+    absolute.pathname +
+    absolute.search +
+    absolute.hash
   );
 }
 
 
 function rewriteLinksAndMedia(
   container,
-  mdDirUrl,
-  imagesBaseDirUrl
+  mdDir,
+  imagesBase
 ) {
-  container
-    .querySelectorAll(
-      'img, a, video, audio, source'
-    )
-    .forEach((el) => {
-      const attr =
-        el.tagName === 'A'
-          ? 'href'
-          : 'src';
+  container.querySelectorAll(
+    'img, a, video, audio, source'
+  ).forEach(node => {
+    const attr = node.tagName === 'A' ? 'href' : 'src';
 
-      const value =
-        el.getAttribute(attr);
-
-      if (value) {
-        el.setAttribute(
-          attr,
-          resolveRelativeUrl(
-            value,
-            mdDirUrl,
-            imagesBaseDirUrl
-          )
-        );
-      }
-
-      if (
-        el.hasAttribute(
-          'srcset'
+    if (node.hasAttribute(attr)) {
+      node.setAttribute(
+        attr,
+        resolveRelativeUrl(
+          node.getAttribute(attr),
+          mdDir,
+          imagesBase
         )
-      ) {
-        rewriteSrcset(
-          el,
-          'srcset',
-          mdDirUrl,
-          imagesBaseDirUrl
-        );
-      }
-    });
-}
-
-
-// ============================================================
-// SCROLL STATE
-// ============================================================
-
-window.addEventListener(
-  'beforeunload',
-  () => {
-    const params =
-      new URLSearchParams(
-        window.location.search
       );
-
-    const slug =
-      params.get('slug');
-
-    if (!slug) {
-      return;
     }
 
-    const state = {
-      slug,
-      scrollY:
-        window.scrollY
-    };
+    if (node.hasAttribute('srcset')) {
+      const srcset = node.getAttribute('srcset')
+        .split(',')
+        .map(part => {
+          const match = /^(\S+)(\s+.*)?$/.exec(part.trim());
 
-    sessionStorage.setItem(
-      'scrollState',
-      JSON.stringify(state)
-    );
-  }
-);
+          return match
+            ? (
+                resolveRelativeUrl(
+                  match[1],
+                  mdDir,
+                  imagesBase
+                ) +
+                (match[2] || '')
+              )
+            : part;
+        })
+        .join(', ');
 
+      node.setAttribute('srcset', srcset);
+    }
 
-// ============================================================
-// ERROR HANDLING
-// ============================================================
-
-function renderError(message) {
-  const article =
-    document.getElementById(
-      'article'
-    );
-
-  if (article) {
-    article.innerHTML =
-      `<p>${message}</p>`;
-  }
+    if (node.hasAttribute('poster')) {
+      node.setAttribute(
+        'poster',
+        resolveRelativeUrl(
+          node.getAttribute('poster'),
+          mdDir,
+          imagesBase
+        )
+      );
+    }
+  });
 }
 
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll(
-      '&',
-      '&amp;'
-    )
-    .replaceAll(
-      '<',
-      '&lt;'
-    )
-    .replaceAll(
-      '>',
-      '&gt;'
-    )
-    .replaceAll(
-      '"',
-      '&quot;'
-    )
-    .replaceAll(
-      "'",
-      '&#39;'
-    );
-}
-
-
-// ============================================================
-// HEADING SLUG HELPER
-// ============================================================
 
 function slugify(text) {
-  return text
-    .toString()
+  return String(text)
     .toLowerCase()
     .trim()
-    .replace(
-      /\s+/g,
-      '-'
-    )
-    .replace(
-      /[^\w\-]+/g,
-      ''
-    )
-    .replace(
-      /\-\-+/g,
-      '-'
-    );
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
+}
+
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
