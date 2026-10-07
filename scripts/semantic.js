@@ -122,7 +122,7 @@ function createSemanticGraph() {
     state.maxChunks = d3.max(state.articles, (a) => a.chunks.length) || 1;
 
     els.slider.max = String(state.maxChunks);
-    els.slider.value = String(state.maxChunks);
+    els.slider.value = String(Math.min(3, state.maxChunks));
 
     for (const mode of [1, 2, 4]) {
       state.conceptsByMode[mode] = (index.presets?.[mode]?.[0] || []).slice();
@@ -136,7 +136,7 @@ function createSemanticGraph() {
       state.conceptsByMode[state.mode] = fromUrl;
     }
     const kParam = parseInt(params.get('k'), 10);
-    if (kParam >= 1 && kParam < state.maxChunks) els.slider.value = String(kParam);
+    if (kParam >= 1 && kParam <= state.maxChunks) els.slider.value = String(kParam);
     state.K = sliderK();
 
     buildLegend();
@@ -299,7 +299,7 @@ function createSemanticGraph() {
     if (!state.plotted) return;
     const params = new URLSearchParams();
     params.set('c', state.plotted.terms.join('|'));
-    if (state.K !== Infinity) params.set('k', String(state.K));
+    if (state.K !== Infinity) params.set('k', String(state.K === Infinity ? state.maxChunks : state.K));
     history.replaceState(null, '', `${location.pathname}?${params}`);
   }
 
