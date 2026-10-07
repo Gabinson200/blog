@@ -1,49 +1,31 @@
 
 The goal of this article is to further explore the Fourier Transform, and understand its application after discretization into the Discrete Fourier Transform (DFT).
 
-
-# ok this is the plan talk 
-
-
-talk about how to interpret the fourier transfrom as a function and how to interpreted its related inputs and outputs
-- input: querry frequency
-- output: complex number
-- interpretation of the complex number as encoding the phase and magnitude of the frequency in the signal.
-
-then talk aboout the descretization of the function (DFT)
-    - talk about the computational steps ypu dneed to do to build it
-    - we can write some pseudocode
-    - show that is runs in O(n^2) time
-
-finally talk about the FFT ie how sampling at specific fequencies allows for more efficicient computation. 
-
-
 The main sections will be:
-- [Fourier Series to the Fourier transform](#Fourier-Series-to-the-Fourier-transform)
+- [Fourier Transform](#Fourier-Transform)
     - [Functions of any period](#Functions-of-any-period)
     - [Functions of infinite period](#Functions-of-infinite-period)
     - [Analysis equation and Synthesis Equations](#Analysis-and-Synthesis-Equations)
-- [Functional Interpretation](#Functional-Interpretation)
-- [Discretization](#Discretization)
-- [DFT output interpretation](#DFT-output-interpretation)
-- [Use cases](#Use-cases)
-- [Pseudocode](#Pseudocode)
+    - [Analysis Equation Outputs](#Analysis-equation-outputs)
+- [DFT](#DFT)
+    - [Discretization](#Discretization)
+    - [DFT output interpretation](#DFT-output-interpretation)
+    - [Use cases](#Use-cases)
+    - [Pseudocode](#Pseudocode)
 
 
-test ok what about if i write it like htis
+# Fourier Transform
 
-# Fourier Series to the Fourier transform
-
-From the previous article on [Fourier series / transform](article.html?slug=\misc_math\Fourier\Fourier), we determined that functions / signals can be decomposed into a sum of exponential terms that really just encode rotations (see [Euler's formula](article.html?slug=\misc_math\Euler's%20Formula\Euler's%20Formula)), scaled by how much our signal "resonates" or aligns with each complex exponential in function space.
+From the previous article on [Fourier series / transform](article.html?slug=\misc_math\Fourier\Fourier), we determined that functions / signals can be decomposed into a sum of exponential terms that really just encode rotations (see [Euler's formula](article.html?slug=\misc_math\Euler's%20Formula\Euler's%20Formula)), scaled by how much our signal "resonates" or aligns with each complex exponential in function space. This is not a very rigorous description but if it does not ring any bells then I would briefly review the previous article. But fret not the entire beginning of this article is about going from the Fourier Series to the Fourier Transform.
 
 ## Functions of any period
 
+
 <div class="formula-box">
 
-For a function $f(x)$ with period $T = 2\pi$
-$$
-f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}\tag*{$k \in \mathbb{Z}$} 
-$$ 
+The Fourier Series statest that a periodic function $f(x)$ with period $T = 2\pi$ can be reconstructed as an infinite sum of weighted exponentials:
+
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}\tag*{$k \in \mathbb{Z}$}$$ 
 
 where
 
@@ -52,13 +34,13 @@ $$c_k=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-ikx}dx$$
 </div>
 
 
-Since the basic functions $\sin x$, $\cos x$, and $e^{ix}$ complete one full cycle over $2\pi$ radians, we must scale their angular frequency so that the fundamental basis function completes exactly one cycle over an interval of length $T$.
+Since the functions $\sin x$, $\cos x$, and $e^{ix}$ complete one full cycle over $2\pi$ radians, we must scale their angular frequency so that the fundamental basis function completes exactly one cycle over an interval of length $T$.
 $$\omega_0 T = 2\pi$$
 
 This gives us the fundamental angular frequency
 $$\boxed{\omega_0 = \frac{2\pi}{T}}$$
 
-The higher-frequency basis functions are then integer multiples of this fundamental frequency:
+The higher-frequency basis functions are integer multiples of this fundamental frequency:
 $$\frac{2\pi k}{T},\qquad k\in\mathbb Z$$
 
 When $T = 2\pi$:
@@ -89,7 +71,7 @@ $$\omega_k=k\frac{2\pi}{T}, \qquad \omega_{(k+1)}=(k+1)\frac{2\pi}{T}$$
 
 The difference: $\omega_{(k+1)} - \omega_k$ is $\Delta\omega = \frac{2\pi}{T} = \omega_0$
 
-we can rewrite
+so we can say that the fundamental frequency is equal to the change in frequency between consequtive k samples:
 $$\omega_0 = \Delta\omega = \frac{2\pi}{T}$$
 
 Which can then be rearranged as:
@@ -108,7 +90,7 @@ $$\omega_k=k\frac{2\pi}{T}.$$
 
 As $T$ increases, these discrete frequencies become more and more densely packed. For example, if you compare two periodic functions with periods $2\pi$ and $6\pi$ you would still need infinitelly many  samples ($k$) to reconstruct them, the difference is the spacing between frequency samples ($\omega_k$); for a period of $6\pi$, samples of $\omega_k$ will be 3 times closer together then for a period $2\pi$. As $T$ goes to infinity $\Delta\omega$ approaches zero, so the discrete frequency grid becomes continuous and we replace the sum over discrete frequencies with an integral over all real angular frequencies $\omega$.
 
-Thus, the Fourier series represents a periodic function using a countably infinite set of discrete frequencies, while the Fourier transform represents a non-periodic function using a continuous, uncountable range of frequencies.
+The Fourier series represents a periodic function using a countably infinite set of discrete frequencies, while the Fourier transform represents a non-periodic function using a continuous, uncountable range of frequencies.
 
 
 Lets derive this algebraically keeping in mind that as $T \to \infty \qquad \Delta \omega \to 0$.
@@ -116,6 +98,8 @@ Lets derive this algebraically keeping in mind that as $T \to \infty \qquad \Del
 Lets define:
 
 $$\widehat f_T(\omega)=\int_{-T/2}^{T/2}f(u)e^{-i\omega u}du$$
+which is really just the unscaled version of $c_k$. 
+(or from a linear algebra perspective the inner product between $f(x)$ and $e^{-i\omega x}$) !!! double check this statement.
 
 since earlier we saw:
 
@@ -153,6 +137,8 @@ $$\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat f_T(\omega_k)e^{i\omega_kx}\De
 \frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x}d\omega = f(x)$$
 
 This gives us the two continuous-frequency counterparts of the Fourier-series equations.
+
+## Analysis equation and Synthesis Equations
 
 Recall that the Fourier series itself had two steps. First, we **analyzed** the signal by computing how strongly it aligned with each allowed basis frequency:
 
@@ -220,7 +206,7 @@ which describes the magnitude and phase associated with that particular frequenc
 So we should distinguish between
 
 $$\boxed{f(x)\xrightarrow{\mathfrak F}\widehat f(\omega)}$$
-which is a transformation from one whole function to another, and
+which is a transformation from one function to another, and
 $$\boxed{\omega_0\longmapsto\widehat f(\omega_0)}$$
 
 which is simply evaluating the resulting frequency-domain function at one particular frequency.
@@ -256,14 +242,11 @@ The Fourier transform therefore does not merely return "the frequency of a signa
 The output of the analysis equation $\widehat f(\omega)$ for a desired frequency $\omega$ is a complex number $z\in\mathbb C$ which contains magnitude and phase information associated with that frequency.
 
 
-# Analysis equation outputs
+## Analysis equation outputs
 
 Lets dive deeper into what the output of the analysis equation:
 $$\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}dx$$
 tells us about the frequency $\omega$ in the function $f(x)$.
-
-
-## Complex Scalars
 
 When we take the Fourier transform, $e^{-i\omega x}$ is complex-valued, which can be explicitly seen by rewriting it using Euler's formula:
 
@@ -293,7 +276,6 @@ $$\boxed{\widehat f(\omega)=\text{cosine alignment}-i,\text{sine alignment}}$$
 
 We'll next see how these two measurements tell us the magnitude and phase of a sinusoidal component.
 
-## Why Sine and Cosine Encode Phase
 
 Suppose our signal contains a phase-shifted cosine wave:
 
@@ -325,8 +307,10 @@ These two values can be interpreted as coordinates in a two-dimensional plane as
 
 $$(C,S)=\left(A\cos\phi,-A\sin\phi\right)$$
 
-Changing the phase $\phi$ changes how much of the signal lies along the cosine direction and how much lies along the sine direction.
-For example,
+Changing the phase $\phi$ changes how much of the signal lies along both the cosine and sine direction.
+For example for $\phi = 0$,
+$$\cos(\omega t)=\cos(0)\cdot\cos(\omega t)+\sin(0)\cdot\sin(\omega t)$$
+
 $$\cos(\omega t)=1\cdot\cos(\omega t)+0\cdot\sin(\omega t)$$
 has coordinates
 $$(1,0).$$
@@ -337,7 +321,7 @@ with coordinates
 $$\left(\frac{\sqrt2}{2},-\frac{\sqrt2}{2}\right).$$
 
 A phase shift of $\pi/2$ gives
-$$\cos\left(\omega t+\frac{\pi}{2}\right)=-\sin(\omega t)$$
+$$\cos\left(\omega t+\frac{\pi}{2}\right)= 0 \cos(\omega t)-1\sin(\omega t)$$
 with coordinates
 $$(0,-1).$$
 
@@ -418,177 +402,11 @@ $$\boxed{
 }
 $$
 
-## Recovering Amplitude
+# DFT
 
-The length of the coefficient vector is
+## Discretization
 
-$$\sqrt{C^2+S^2}$$
-
-Substituting $C=A\cos\phi$ and $S=-A\sin\phi$ gives
-
-$$\sqrt{A^2\cos^2\phi+A^2\sin^2\phi}$$
-
-and since
-
-$$\cos^2\phi+\sin^2\phi=1,$$
-
-we get
-
-$$\boxed{\sqrt{C^2+S^2}=A}$$
-
-so the length of the coefficient vector recovers the amplitude.
-
-Recovering Phase
-
-Since
-
-$$C=A\cos\phi$$
-
-and
-
-$$S=-A\sin\phi,$$
-
-we have
-
-$$\frac{-S}{C}=\frac{A\sin\phi}{A\cos\phi}=\tan\phi$$
-
-Therefore,
-
-$$\phi=\operatorname{atan2}(-S,C)$$
-
-The phase is therefore encoded by the direction of the vector formed by the cosine and sine coefficients.
-
-This explains why the Fourier transform needs both measurements. A single cosine or sine measurement cannot uniquely determine phase, but the pair of measurements can determine both amplitude and phase.
-
-## Complex Numbers Package These Two Coordinates
-
-Instead of carrying around two separate real numbers, we can package the cosine and sine coordinates into a single complex number.
-
-A complex number
-
-$$z=a+ib$$
-
-can be interpreted geometrically as the two-dimensional vector
-
-$$(a,b).$$
-
-The same number can be written in polar form,
-
-$$z=re^{i\phi},$$
-
-where
-
-$$r=|z|=\sqrt{a^2+b^2}$$
-
-and
-
-$$\phi=\arg(z)=\operatorname{atan2}(b,a)$$
-
-Euler's formula makes the relationship explicit:
-
-$$re^{i\phi}=r\cos\phi+ir\sin\phi$$
-
-So a complex number naturally stores the same two pieces of information: its magnitude gives the length of the coefficient vector, while its argument gives the angle of the coefficient vector.
-
-This is why complex numbers are especially convenient in Fourier analysis: one complex number can represent both magnitude and phase information associated with a frequency.
-
-Interpreting the Fourier Transform Output
-
-Let's say that we have some function $f(t)$ in the time domain that represents a signal over time. We evaluate its Fourier transform at a specific frequency $\omega_0$:
-
-$$\widehat f(\omega_0)=\int_{-\infty}^{\infty}f(t)e^{-i\omega_0t}dt$$
-
-Suppose this evaluates to some complex number
-
-$$z=\widehat f(\omega_0)=a+ib$$
-
-This complex number tells us something about the presence of the frequency $\omega_0$ in our signal. It is important to note that the frequency is not recovered from the complex number. The frequency $\omega_0$ is the input that we used to query the Fourier transform.
-
-The complex output $z$ contains the magnitude and phase information associated with that frequency.
-
-We can convert the complex number from Cartesian form,
-
-$$z=a+ib$$
-
-into polar form,
-
-$$z=re^{i\phi}$$
-
-where
-
-$$r=|z|=\sqrt{a^2+b^2}$$
-
-and
-
-$$\phi=\arg(z)=\operatorname{atan2}(b,a)$$
-
-Therefore,
-
-$$\widehat f(\omega_0)=\left|\widehat f(\omega_0)\right|e^{i\arg\left(\widehat f(\omega_0)\right)}$$
-
-Magnitude
-
-The magnitude of the Fourier coefficient is
-
-$$\left|\widehat f(\omega_0)\right|=\sqrt{\operatorname{Re}\left(\widehat f(\omega_0)\right)^2+\operatorname{Im}\left(\widehat f(\omega_0)\right)^2}$$
-
-Geometrically, the real and imaginary parts form the horizontal and vertical components of a vector in the complex plane, while the magnitude is the length of that vector.
-
-The magnitude tells us how strongly the signal aligns with a sinusoidal component at the queried frequency $\omega_0$. A large magnitude means that the frequency is strongly present in the signal, while a small magnitude means that little of the frequency is present.
-
-The function
-
-$$\left|\widehat f(\omega)\right|$$
-
-is called the magnitude spectrum.
-
-Technically, the magnitude of the continuous Fourier transform is a spectral magnitude and is not always directly equal to the amplitude of a sinusoid in the original time-domain signal. The exact relationship depends on the Fourier-transform normalization, the duration of the signal, and whether we are working with a continuous or discrete transform.
-
-When we introduce the DFT, we will be able to give a more direct formula for recovering the amplitude of a sampled sinusoid.
-
-Frequency
-
-The frequency is simply the value used to query the Fourier-transform function:
-
-$$\omega_0$$
-
-Therefore, the Fourier transform answers the question:
-
-How strongly does the signal align with a complex exponential rotating at angular frequency $\omega_0$, and with what phase?
-
-If $\omega_0$ is measured in radians per second, then the corresponding ordinary frequency in cycles per second, or hertz, is
-
-$$f_0=\frac{\omega_0}{2\pi}$$
-
-Phase
-
-The phase information associated with the frequency $\omega_0$ is contained in the angle of the complex Fourier coefficient:
-
-$$\phi=\arg\left(\widehat f(\omega_0)\right)$$
-
-Equivalently, if
-
-$$\widehat f(\omega_0)=a+ib$$
-
-then
-
-$$\phi=\operatorname{atan2}(b,a)$$
-
-Geometrically, this angle describes the direction of the coefficient vector in the cosine / sine plane.
-
-The exact sign of the phase depends on the Fourier-transform convention being used. Here we use $e^{-i\omega t}$ for the analysis transform. For a real-valued signal, positive and negative frequencies occur as complex-conjugate pairs, so the two corresponding coefficients carry opposite phase angles.
-
-Overall, the way to interpret the Fourier-transform output is that
-
-$$\boxed{\widehat f(\omega_0)\text{ contains the magnitude and phase information associated with the queried frequency }\omega_0}$$
-
-while $\omega_0$ itself is the frequency we chose to query.
-
-One subtlety is that an ideal sinusoid which continues forever does not have a regular finite-valued Fourier transform. Instead, its Fourier transform is described using Dirac delta distributions. We will avoid getting too sidetracked by this for now and return to finite sampled signals when introducing the DFT.
-
-DFT
-
-In real life, we might not know the underlying continuous function which produces a signal, so directly integrating it to produce $\widehat f(\omega)$ may not be possible.
+In real life, we might not know the underlying continuous function which produces a signal or function $f(t)$ over some time period, so directly integrating it to produce $\widehat f(\omega)$ may not be possible.
 
 Instead, we usually have a finite number of measurements sampled from the signal at regular time intervals:
 
