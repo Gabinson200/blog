@@ -25,7 +25,7 @@ From the previous article on [Fourier series / transform](article.html?slug=\mis
 
 The Fourier Series statest that a periodic function $f(x)$ with period $T = 2\pi$ can be reconstructed as an infinite sum of weighted exponentials:
 
-$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx}\tag*{$k \in \mathbb{Z}$}$$ 
+$$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx} \qquad {k \in \mathbb{Z}}$$
 
 where
 
@@ -56,7 +56,7 @@ $$\boxed{
 f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x},\qquad c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}dx 
 }$$
 
-Notice that the Fourier index $k$ is still an integer. Changing the period does not change the set of integers we sample. Instead, it changes the frequency represented by each integer.
+Notice that the Fourier index $k$ is still an integer. Changing the period does not change the set of integers we sample, it changes the fundamental frequency which multiplies each $k$.
 
 Ok, so now we can compute functions with any period $T$, but the Fourier series still assumes that the function is periodic: a finite interval of length $T$ is repeated indefinitely.
 
@@ -244,6 +244,8 @@ The output of the analysis equation $\widehat f(\omega)$ for a desired frequency
 
 ## Analysis equation outputs
 
+In this setion we will unpack the analysis equation and see how that reveals the components responsible for different parts of the output allowing us to better interpret the output.
+
 Lets dive deeper into what the output of the analysis equation:
 $$\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}dx$$
 tells us about the frequency $\omega$ in the function $f(x)$.
@@ -260,7 +262,7 @@ Distributing the integral gives
 
 $$\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)\cos(\omega x)dx-i\int_{-\infty}^{\infty}f(x)\sin(\omega x)dx$$
 
-Therefore,
+Whcih we can split up into the real and imaginary compoennts,
 
 $$\operatorname{Re}\left(\widehat f(\omega)\right)=\int_{-\infty}^{\infty}f(x)\cos(\omega x)dx$$
 
@@ -277,9 +279,11 @@ $$\boxed{\widehat f(\omega)=\text{cosine alignment}-i,\text{sine alignment}}$$
 We'll next see how these two measurements tell us the magnitude and phase of a sinusoidal component.
 
 
-Suppose our signal contains a phase-shifted cosine wave:
+### Phase
 
-$$f(t)=A\cos(\omega_0t+\phi)$$
+Suppose our signal is a phase-shifted cosine wave:
+
+$$f(x)=A\cos(\omega_0x+\phi)$$
 
 Using the angle addition identity,
 
@@ -287,81 +291,118 @@ $$\cos(\alpha+\beta)=\cos(\alpha)\cos(\beta)-\sin(\alpha)\sin(\beta)$$
 
 we get
 
-$$\cos(\omega_0t+\phi)=\cos(\omega_0t)\cos(\phi)-\sin(\omega_0t)\sin(\phi)$$
+$$\cos(\omega_0x+\phi)=\cos(\omega_0x)\cos(\phi)-\sin(\omega_0x)\sin(\phi)$$
 
-Therefore,
+So we can rewrite our original phase-shifted cosine wave as,
 
-$$f(t)=A\cos(\phi)\cos(\omega_0t)-A\sin(\phi)\sin(\omega_0t)$$
+$$f(x)=A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x)$$
 
-This shows that a phase-shifted cosine can always be represented as a scaled but unshifted combination of cosine and sine at the same frequency.
+This shows that a phase-shifted cosine can always be represented as a scaled but unshifted combination of cosine and sine at the same frequency. The same is true for a phase shifted sine wave:
 
-The coefficient of the cosine component is
+PUT THE ANGLE ADDITION IDENTITY FOR SINE BELOW:
+$$\sin(\omega_0x+\phi)=\cos(\omega_0x)\cos(\phi)+\sin(\omega_0x)\sin(\phi)$$
 
-$$C=A\cos(\phi),$$
+    A bit of geometric intuition: 
 
-while the coefficient of the sine component is
+    Back to our original phase-shifted cosine, the coefficient of the cosine component is
 
-$$S=-A\sin(\phi)$$
+    $$C=A\cos(\phi),$$
 
-These two values can be interpreted as coordinates in a two-dimensional plane associated with the frequency $\omega_0$:
+    while the coefficient of the sine component is
 
-$$(C,S)=\left(A\cos\phi,-A\sin\phi\right)$$
+    $$S=-A\sin(\phi)$$
 
-Changing the phase $\phi$ changes how much of the signal lies along both the cosine and sine direction.
-For example for $\phi = 0$,
-$$\cos(\omega t)=\cos(0)\cdot\cos(\omega t)+\sin(0)\cdot\sin(\omega t)$$
+    These two values can be geometrically interpreted as coordinates in a two-dimensional plane associated with the frequency $\omega_0$:
 
-$$\cos(\omega t)=1\cdot\cos(\omega t)+0\cdot\sin(\omega t)$$
-has coordinates
-$$(1,0).$$
+    $$(C,S)=\left(A\cos\phi,-A\sin\phi\right)$$
 
-A phase shift of $\pi/4$ gives
-$$\cos\left(\omega t+\frac{\pi}{4}\right)=\frac{\sqrt2}{2}\cos(\omega t)-\frac{\sqrt2}{2}\sin(\omega t)$$
-with coordinates
-$$\left(\frac{\sqrt2}{2},-\frac{\sqrt2}{2}\right).$$
+    Changing the phase $\phi$ changes how much of the signal lies along both the cosine and sine direction.
+    For example for $\phi = 0$,
+    $$\cos(\omega t)=\cos(0)\cdot\cos(\omega t)+\sin(0)\cdot\sin(\omega t)$$
 
-A phase shift of $\pi/2$ gives
-$$\cos\left(\omega t+\frac{\pi}{2}\right)= 0 \cos(\omega t)-1\sin(\omega t)$$
-with coordinates
-$$(0,-1).$$
+    $$\cos(\omega t)=1\cdot\cos(\omega t)+0\cdot\sin(\omega t)$$
+    has coordinates
+    $$(1,0).$$
 
-As the phase changes, these cosine and sine coefficients rotate around clockwise in a two-dimensional plane.
+    A phase shift of $\pi/4$ gives
+    $$\cos\left(\omega t+\frac{\pi}{4}\right)=\frac{\sqrt2}{2}\cos(\omega t)-\frac{\sqrt2}{2}\sin(\omega t)$$
+    with coordinates
+    $$\left(\frac{\sqrt2}{2},-\frac{\sqrt2}{2}\right).$$
 
-However, recall that the imaginary part of the Fourier transform is the **negative** of the sine alignment:
+    A phase shift of $\pi/2$ gives
+    $$\cos\left(\omega t+\frac{\pi}{2}\right)= 0 \cos(\omega t)-1\sin(\omega t)$$
+    with coordinates
+    $$(0,-1).$$
 
-$$\operatorname{Im}\left(\widehat f(\omega)\right)=-\int_{-\infty}^{\infty}f(t)\sin(\omega t)dt$$
+    As the phase changes, these cosine and sine coefficients rotate around clockwise in a two-dimensional plane. I know there are a lot of trig functions floating around but right now we are just looking at how a phase-shifted cos / sin can be equivalently expressed using the angle addition identity. Now, we'll introduce back the real and imaginary parts of the Fourier transform's output. 
 
-For our phase-shifted cosine,
 
-$$f(t)=A\cos(\omega_0t+\phi),$$
-
-the cosine and sine components are proportional to
-
-$$A\cos(\phi)$$
-
+Recall:
+$$\operatorname{Re}\left(\widehat f(\omega)\right)=\int_{-\infty}^{\infty}f(x)\cos(\omega x)dx$$
 and
+$$\operatorname{Im}\left(\widehat f(\omega)\right)=-\int_{-\infty}^{\infty}f(x)\sin(\omega x)dx$$
 
-$$-A\sin(\phi),$$
+Note that the imaginary part of the Fourier transform output is the **negative** of the sine alignment.
 
-respectively. Since the Fourier transform negates the sine alignment, the real and imaginary components of the Fourier coefficient at the positive frequency $\omega_0$ are proportional to
+Now a blast from the past; as explored in the previous Fourier blog we saw that the inner product of two functions is:
+$$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
+
+namely for sine and cosine:
+
+$$\langle \sin(mx),\sin(nx)\rangle=\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=
+\begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
+$$
+\langle \cos(mx),\cos(nx)\rangle=\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=
+\begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
+and
+$$\langle \sin(mx),\cos(nx)\rangle=\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0$$
+
+So for our phase-shifted cosine,
+
+$$f(x)=A\cos(\omega_0x+\phi),$$
+
+we can rewrite it equivalently as:
+
+$$f(x)=A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x)$$
+
+Plugging in $f(t)$ into the Fourier analysis equation basically performs an inner product between the phase shifted input function $f(x)$ and a cosine / sine function giving us the real and imaginary parts of the output respectivelly.
+
+
+$$\operatorname{Re}\left(\widehat f(\omega)\right) =
+ \langle f(x),\cos(\omega t)\rangle = 
+ \langle A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x), \cos(\omega x)\rangle
+$$
+
+Since the inner product is a linear operator we can split this up into:
+
+$$\langle \cos(\omega x), A\cos(\phi)\cos(\omega_0x)\rangle \propto A\cos(\phi)$$
+
+$$\langle \cos(\omega x), -A\sin(\phi)\sin(\omega_0x)\rangle = 0$$
+
+Thus
 
 $$\operatorname{Re}\left(\widehat f(\omega_0)\right)\propto A\cos(\phi)$$
 
-and
+Similarly:
 
-$$\operatorname{Im}\left(\widehat f(\omega_0)\right)\propto A\sin(\phi).$$
+$$\operatorname{Im}\left(\widehat f(\omega_0)\right) = 
+\langle f(x),\sin(\omega x)\rangle = 
+\langle A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x), \sin(\omega x)\rangle
+$$
+
+Now splitting the terms in the inner product gives us:
+
+$$\langle \sin(\omega x), A\cos(\phi)\cos(\omega_0x)\rangle = 0$$
+
+$$\langle \sin(\omega x), -A\sin(\phi)\sin(\omega_0x)\rangle \propto A\sin(\phi)$$
+
+thus
+
+$$\operatorname{Im}\left(\widehat f(\omega_0)\right)\propto A\sin(\phi)$$
 
 Therefore, the resulting complex coefficient has the form
 
 $$z\propto A\cos(\phi)+iA\sin(\phi).$$
-
-Using Euler's formula,
-
-$$e^{i\phi}=\cos(\phi)+i\sin(\phi),$$
-
-we can rewrite this as
-
-$$z\propto Ae^{i\phi}.$$
 
 This is the connection we were looking for. The real and imaginary parts of the Fourier coefficient act as two coordinates,
 
@@ -369,7 +410,19 @@ $$(A\cos\phi,A\sin\phi),$$
 
 whose positions depends on the phase $\phi$.
 
-The magnitude of this vector is
+We can even rewrite this with Euler's formula,
+
+$$e^{i\phi}=\cos(\phi)+i\sin(\phi),$$
+
+packadging it as: 
+$$z\propto Ae^{i\phi}.$$
+
+
+The main takeaway is that taking the forward Fourier transform of an equation takes the inner product of that equation with respect to the basis functions sine and cosine and when we querry a frequency from the resulting analysis equation we get a complex number that packadges information into a complex number. The real and imaginary parts of the complex number encode phase since they are proportional to $A \cos(\phi)$ and $A \sin(\phi)$ respectivelly.
+
+### Magnitude 
+
+Thinking about htis more geometrically if we graphed $(A\cos\phi,A\sin\phi),$ as a point on the complex plane the magnitude of complex output can be defined as the length of a vector from the origin to that point.
 
 $$|z|\propto\sqrt{A^2\cos^2\phi+A^2\sin^2\phi}=A,$$
 
@@ -378,6 +431,8 @@ up to the scaling introduced by the particular Fourier transform or DFT normaliz
 Its angle is
 
 $$\arg(z)=\operatorname{atan2}\left(A\sin\phi,A\cos\phi\right)=\phi.$$
+
+Which is the phase of our original function.
 
 So the Fourier transform's complex output can be interpreted geometrically as a vector in the complex plane:
 
@@ -391,22 +446,13 @@ $$\frac{\widehat f(\omega)}{|\widehat f(\omega)|}=e^{i\phi},$$
 
 removes the magnitude information and leaves a point on the unit circle whose angle encodes only the phase.
 
-Therefore, when we query the Fourier transform at a frequency $\omega_0$, the frequency itself is already known: it is the input $\omega_0$. The complex number returned by the transform then gives us the two remaining pieces of information about that frequency component:
+A cool geometric visualization of the output is, that as we querry different frequencies $\omega$ in $\widehat f(\omega)$ we plot those points in the complex plain which will produce points at different angles from the real line depending on phase and different radii from the origin depending on amplitude. This creates a rubber band like visualization for funky input functions.
 
-$$\boxed{
-\omega_0
-\quad\longrightarrow\quad
-\widehat f(\omega_0)
-=
-\text{magnitude and phase at }\omega_0
-}
-$$
+Put a visualization here:
 
 # DFT
 
 ## Discretization
-
-the issue is once it saves it will automatically jumpt ot the top
 
 In real life, we might not know the underlying continuous function which produces a signal or function $f(t)$ over some time period, so directly integrating it to produce $\widehat f(\omega)$ may not be possible.
 
@@ -414,13 +460,19 @@ Instead, we usually have a finite number of measurements sampled from the signal
 
 $$x[0],x[1],x[2],\ldots,x[N-1]$$
 
+each element of which can be accessed by:
+
+$$\bar f(n)$$
+
+where 0 <= n <= N - 1
+
 The Discrete Fourier Transform replaces the continuous Fourier-transform integral with a finite sum and evaluates the signal at a finite collection of discrete frequency bins.
+
+$$\sum_{n=0}^{n=N-1} \bar f(n)e^{i n \omega_k}$$
+
 
 This gives us a finite collection of Fourier coefficients rather than a continuous function of frequency. Each DFT output has the same basic interpretation developed above:
 
-$$\boxed{\text{frequency bin}\quad\longrightarrow\quad\text{complex coefficient containing magnitude and phase}}$$
-
-Before looking at how the FFT computes these coefficients more efficiently, we first need to understand the mathematical structure of the DFT itself.
 
 Polynomial Duality  
 Symmetry  
