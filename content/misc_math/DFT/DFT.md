@@ -456,24 +456,58 @@ Put a visualization here:
 
 In real life, we might not know the underlying continuous function which produces a signal or function $f(t)$ over some time period, so directly integrating it to produce $\widehat f(\omega)$ may not be possible.
 
-Instead, we usually have a finite number of measurements sampled from the signal at regular time intervals:
+Instead, we usually have a finite number of measurements over some time $T$, sampled from the signal at regular time intervals $\Delta t$:
 
 $$x[0],x[1],x[2],\ldots,x[N-1]$$
 
-each element of which can be accessed by:
+each element of which can be accessed by a sampling function:
+$$\bar S(n)$$
+Which takes in $n$ as an argument and returns the $n$'th sampled value. (The reason for describing this sampling function in more general terms will be useful later).
 
-$$\bar f(n)$$
+The uniform time between samples, called the sampling interval $\Delta t$ can be written as:
+$$\frac{T}{N} = \Delta t$$
+whose reciprocal, the sampling frequency $f_s$, is defined as:
 
-where 0 <= n <= N - 1
+$$f_s = \frac{1}{\Delta t} = \frac{N}{T}$$
+
+relationship between querry frequency and number of samples
+we could apporach this from an information theoretical perspective (nyquist frequency) or the different polynomial representations (root, point)
+
+
 
 The Discrete Fourier Transform replaces the continuous Fourier-transform integral with a finite sum and evaluates the signal at a finite collection of discrete frequency bins.
 
-$$\sum_{n=0}^{n=N-1} \bar f(n)e^{i n \omega_k}$$
+$$\widehat f(k) = \sum_{n=0}^{N-1} \bar f(n)e^{-i n \omega_k}$$
+
+where $\omega_k = k \frac{2\pi}{N}$
+
+sin @ 4 points
+- $(0,       0)$
+- $(\pi/2,   1)$
+- $(\pi,     0)$
+- $(3\pi/2, -1)$
 
 
-This gives us a finite collection of Fourier coefficients rather than a continuous function of frequency. Each DFT output has the same basic interpretation developed above:
+
+
+
+This gives us a finite collection of Fourier coefficients rather than a continuous function of frequency. 
+
+Each DFT output has the same basic interpretation developed above:
+
+
+
+Discrete Synthesis Equation:
+
+
+$$f(n) = \frac{1}{N}\sum_{n=0}^{N-1} \widehat f(n)e^{i n \omega_k}$$
+
+
 
 
 Polynomial Duality  
 Symmetry  
 FFT
+
+
+$$\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}dx$$

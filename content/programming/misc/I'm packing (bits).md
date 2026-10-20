@@ -80,8 +80,8 @@ color |= (B & 0x1F);
 #include <cstdint>
 
 struct RGB565 {
-    uint16_t r = 0;  // 0..31
-    uint16_t g = 0;  // 0..63
+    uint16_t r = 0;  // 0..31 [11111] = 16 + 8 + 4 + 2 + 1
+    uint16_t g = 0;  // 0..63 [111111] = 32 +  16 + 8 + 4 + 2 + 1
     uint16_t b = 0;  // 0..31
 };
 
