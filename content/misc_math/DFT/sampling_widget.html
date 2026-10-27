@@ -1,0 +1,618 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosine Sampling Visualizer</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  .sampling-widget {
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    background: #121212;
+    border: 1px solid #444;
+    border-radius: 12px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.18rem;
+  }
+
+  .description {
+    margin: 0 0 16px;
+    color: #ccc;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .control {
+    padding: 12px;
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    min-width: 0;
+  }
+
+  .control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+  }
+
+  .control-value {
+    color: #42a5f5;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  input[type="range"] {
+    display: block;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #42a5f5;
+  }
+
+  .plot-container {
+    width: 100%;
+    height: 290px;
+    background: #101010;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 12px 0 16px;
+    color: #bbb;
+    font-size: 0.82rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .legend-line {
+    width: 20px;
+    height: 3px;
+    background: #42a5f5;
+  }
+
+  .legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ffb74d;
+  }
+
+  .legend-alias {
+    width: 20px;
+    border-top: 2px dashed #ab80e8;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metric {
+    min-width: 0;
+    padding: 12px;
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }
+
+  .metric-label {
+    color: #aaa;
+    font-size: 0.78rem;
+  }
+
+  .metric-value {
+    margin-top: 5px;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .status {
+    margin: 14px 0 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #a5d6a7;
+  }
+
+  .status.warning {
+    color: #ffca80;
+  }
+
+  .equation {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    font-family: Consolas, monospace;
+  }
+
+  @media (max-width: 560px) {
+    .sampling-widget {
+      padding: 12px;
+    }
+
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    .plot-container {
+      height: 250px;
+    }
+
+    .metrics {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .metric:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .metric-value {
+      font-size: 1.05rem;
+    }
+
+    .legend {
+      gap: 10px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="sampling-widget" id="sampling-widget">
+
+  <h3>Sampling a Cosine Wave</h3>
+
+  <p class="description">
+    Adjust the cosine frequency and number of samples.
+    Notice how different continuous frequencies can produce
+    exactly the same discrete measurements.
+  </p>
+
+  <div class="controls">
+
+    <div class="control">
+      <div class="control-header">
+        <label for="frequency">
+          Cosine Frequency
+        </label>
+        <span class="control-value" id="frequency-value">
+          5 Hz
+        </span>
+      </div>
+
+      <input
+        type="range"
+        id="frequency"
+        min="0"
+        max="20"
+        step="0.25"
+        value="5"
+      >
+    </div>
+
+    <div class="control">
+      <div class="control-header">
+        <label for="samples">
+          Number of Samples
+        </label>
+        <span class="control-value" id="samples-value">
+          8
+        </span>
+      </div>
+
+      <input
+        type="range"
+        id="samples"
+        min="4"
+        max="64"
+        step="1"
+        value="8"
+      >
+    </div>
+
+  </div>
+
+  <div class="plot-container">
+    <canvas id="sampling-canvas"></canvas>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <span class="legend-line"></span>
+      Continuous cosine
+    </div>
+
+    <div class="legend-item">
+      <span class="legend-dot"></span>
+      Discrete samples
+    </div>
+
+    <div class="legend-item">
+      <span class="legend-alias"></span>
+      Aliased cosine
+    </div>
+  </div>
+
+  <div class="metrics">
+
+    <div class="metric">
+      <div class="metric-label">Sampling Frequency</div>
+      <div class="metric-value" id="rate">8 Hz</div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-label">Nyquist Frequency</div>
+      <div class="metric-value" id="nyquist">4 Hz</div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-label">Apparent Frequency</div>
+      <div class="metric-value" id="apparent">3 Hz</div>
+    </div>
+
+  </div>
+
+  <p class="status" id="status"></p>
+  <p class="equation" id="equation"></p>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const TWO_PI = 2 * Math.PI;
+
+  // Fixed observation duration: one second.
+  const T = 1;
+
+  const canvas = document.getElementById("sampling-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const frequencySlider = document.getElementById("frequency");
+  const samplesSlider = document.getElementById("samples");
+
+  const frequencyValue = document.getElementById("frequency-value");
+  const samplesValue = document.getElementById("samples-value");
+
+  const rateDisplay = document.getElementById("rate");
+  const nyquistDisplay = document.getElementById("nyquist");
+  const apparentDisplay = document.getElementById("apparent");
+
+  const statusDisplay = document.getElementById("status");
+  const equationDisplay = document.getElementById("equation");
+
+  function format(value) {
+    return Number(value.toFixed(3)).toString();
+  }
+
+  function cosine(t, frequency) {
+    return Math.cos(TWO_PI * frequency * t);
+  }
+
+  // Calculate the apparent frequency of a sampled cosine.
+  function aliasFrequency(frequency, samplingRate) {
+    const wrapped =
+      ((frequency % samplingRate) + samplingRate)
+      % samplingRate;
+
+    return Math.min(
+      wrapped,
+      samplingRate - wrapped
+    );
+  }
+
+  function resizeIframe() {
+    // When embedded on the same website, the iframe can
+    // directly resize itself to its content height.
+    try {
+      if (window.frameElement) {
+        const height = Math.ceil(
+          document.getElementById("sampling-widget")
+            .getBoundingClientRect().height
+        );
+
+        window.frameElement.style.height = height + "px";
+        window.frameElement.style.overflow = "hidden";
+        window.frameElement.setAttribute("scrolling", "no");
+      }
+    } catch (error) {
+      // Ignore cross-origin frame restrictions.
+    }
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+
+    canvas.width = Math.max(
+      1,
+      Math.round(rect.width * dpr)
+    );
+
+    canvas.height = Math.max(
+      1,
+      Math.round(rect.height * dpr)
+    );
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    render();
+  }
+
+  function render() {
+    const frequency = Number(frequencySlider.value);
+    const N = Number(samplesSlider.value);
+
+    const samplingRate = N / T;
+    const nyquist = samplingRate / 2;
+
+    const apparent = aliasFrequency(
+      frequency,
+      samplingRate
+    );
+
+    const isAliased = frequency > nyquist;
+
+    frequencyValue.textContent = format(frequency) + " Hz";
+    samplesValue.textContent = N;
+
+    rateDisplay.textContent =
+      format(samplingRate) + " Hz";
+
+    nyquistDisplay.textContent =
+      format(nyquist) + " Hz";
+
+    apparentDisplay.textContent =
+      format(apparent) + " Hz";
+
+    if (isAliased) {
+      statusDisplay.className = "status warning";
+      statusDisplay.textContent =
+        "Aliasing: the " + format(frequency) +
+        " Hz cosine produces the same samples as a " +
+        format(apparent) + " Hz cosine.";
+    } else if (Math.abs(frequency - nyquist) < 1e-8) {
+      statusDisplay.className = "status warning";
+      statusDisplay.textContent =
+        "Nyquist boundary: exactly two samples per cycle. " +
+        "Signals at this boundary can be ambiguous.";
+    } else {
+      statusDisplay.className = "status";
+      statusDisplay.textContent =
+        "Below the Nyquist limit: the signal frequency " +
+        "is within the unaliased frequency range.";
+    }
+
+    equationDisplay.textContent =
+      "x[n] = cos(2π · " + format(frequency) +
+      " · n / " + N + "),  n = 0, ..., " + (N - 1);
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (width < 2 || height < 2) {
+      return;
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    const margin = {
+      left: 43,
+      right: 17,
+      top: 16,
+      bottom: 35
+    };
+
+    const plotWidth =
+      width - margin.left - margin.right;
+
+    const plotHeight =
+      height - margin.top - margin.bottom;
+
+    function toX(t) {
+      return margin.left + (t / T) * plotWidth;
+    }
+
+    function toY(value) {
+      return margin.top +
+        ((1 - value) / 2) * plotHeight;
+    }
+
+    // Draw axes and grid.
+    ctx.font = "12px Arial";
+    ctx.lineWidth = 1;
+    ctx.textBaseline = "middle";
+
+    for (let value = -1; value <= 1.001; value += 0.5) {
+      const y = toY(value);
+
+      ctx.strokeStyle =
+        Math.abs(value) < 1e-8 ? "#555" : "#282828";
+
+      ctx.beginPath();
+      ctx.moveTo(margin.left, y);
+      ctx.lineTo(width - margin.right, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "#aaa";
+      ctx.textAlign = "right";
+      ctx.fillText(
+        format(value),
+        margin.left - 8,
+        y
+      );
+    }
+
+    for (let j = 0; j <= 4; j++) {
+      const t = j * T / 4;
+      const x = toX(t);
+
+      ctx.strokeStyle = "#282828";
+
+      ctx.beginPath();
+      ctx.moveTo(x, margin.top);
+      ctx.lineTo(x, height - margin.bottom);
+      ctx.stroke();
+
+      ctx.fillStyle = "#aaa";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        format(t) + "s",
+        x,
+        height - margin.bottom + 18
+      );
+    }
+
+    // Draw a continuous function.
+    function drawWave(f, color, lineWidth, dashed) {
+      const steps = Math.max(
+        1000,
+        Math.ceil(f * 80)
+      );
+
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash(dashed ? [5, 4] : []);
+
+      for (let j = 0; j <= steps; j++) {
+        const t = T * j / steps;
+        const x = toX(t);
+        const y = toY(cosine(t, f));
+
+        if (j === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Original continuous cosine.
+    drawWave(frequency, "#42a5f5", 2.5, false);
+
+    // Show a lower-frequency cosine with identical
+    // sample values when the original is above Nyquist.
+    if (isAliased) {
+      drawWave(apparent, "#ab80e8", 2, true);
+    }
+
+    // Draw discrete samples.
+    // The interval is [0, T), so t = T is excluded.
+    for (let n = 0; n < N; n++) {
+      const t = n / samplingRate;
+      const value = cosine(t, frequency);
+
+      const x = toX(t);
+      const y = toY(value);
+
+      const radius = Math.max(
+        2.5,
+        Math.min(4.5, 140 / N)
+      );
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, TWO_PI);
+
+      ctx.fillStyle = "#ffb74d";
+      ctx.fill();
+
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = "#101010";
+      ctx.stroke();
+    }
+
+    resizeIframe();
+  }
+
+  // Slider interactions.
+  frequencySlider.addEventListener("input", render);
+  samplesSlider.addEventListener("input", render);
+
+  // Resize canvas when its layout width changes.
+  if (window.ResizeObserver) {
+    const canvasObserver = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+
+    canvasObserver.observe(canvas);
+
+    const widgetObserver = new ResizeObserver(() => {
+      resizeIframe();
+    });
+
+    widgetObserver.observe(
+      document.getElementById("sampling-widget")
+    );
+  } else {
+    window.addEventListener("resize", resizeCanvas);
+  }
+
+  window.addEventListener("load", () => {
+    resizeCanvas();
+    resizeIframe();
+  });
+
+  resizeCanvas();
+  resizeIframe();
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,940 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>DFT Matrix — Complex Phase Vectors</title>
+
+  <style>
+    /* ==========================================
+       General layout
+       ========================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: #f0f2f6;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .widget {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 17px;
+
+      background: #121212;
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+
+    h3 {
+      font-size: 1.12rem;
+      margin: 0 0 6px;
+    }
+
+    .intro {
+      margin: 0 0 14px;
+      color: #bbb;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* ==========================================
+       Controls
+       ========================================== */
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .sizes {
+      display: flex;
+      gap: 5px;
+      padding: 4px;
+
+      background: #202020;
+      border: 1px solid #363636;
+      border-radius: 9px;
+    }
+
+    .sizes button {
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #bdbdbd;
+
+      font: inherit;
+      font-size: 0.87rem;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    .sizes button.active {
+      background: #343c4c;
+      color: #fff;
+      box-shadow: inset 0 0 0 1px #5375aa;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #bbb;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      accent-color: #61a6ff;
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ==========================================
+       Matrix visualization
+       ========================================== */
+
+    .canvas-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 10px 10px 6px;
+
+      background: #0f1013;
+      border: 1px solid #2e3035;
+      border-radius: 9px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      max-width: 570px;
+      height: auto;
+      overflow: visible;
+      touch-action: manipulation;
+    }
+
+    .cell {
+      cursor: pointer;
+    }
+
+    .cell:hover .cell-bg {
+      stroke: #fff;
+      stroke-width: 1.7;
+    }
+
+    .cell.selected .cell-bg {
+      stroke: #fff;
+      stroke-width: 1.6;
+    }
+
+    /* ==========================================
+       Phase color legend
+       ========================================== */
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      color: #aaa;
+      font-size: 0.77rem;
+      margin: 13px 0 8px;
+    }
+
+    .rainbow {
+      flex: 1;
+      min-width: 130px;
+      height: 11px;
+
+      border: 1px solid #535353;
+      border-radius: 5px;
+
+      background: linear-gradient(
+        to right,
+        hsl(0 78% 59%),
+        hsl(60 78% 59%),
+        hsl(120 78% 59%),
+        hsl(180 78% 59%),
+        hsl(240 78% 59%),
+        hsl(300 78% 59%),
+        hsl(360 78% 59%)
+      );
+    }
+
+    /* ==========================================
+       Selected-cell information
+       ========================================== */
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 12px;
+
+      background: #1b1c20;
+      border: 1px solid #32343a;
+      border-radius: 8px;
+
+      font-size: 0.85rem;
+      color: #b7bbc4;
+      line-height: 1.5;
+    }
+
+    .panel b {
+      color: #f5f5f5;
+    }
+
+    .panel .value {
+      margin-top: 3px;
+      color: #f3f4f6;
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+
+      font-family:
+        ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .tip {
+      margin: 11px 0 0;
+      color: #aeb5c0;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    /* ==========================================
+       Responsive layout
+       ========================================== */
+
+    @media (max-width: 520px) {
+      .widget {
+        padding: 11px;
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+
+      .sizes button {
+        padding: 7px 9px;
+      }
+
+      .canvas-wrap {
+        padding: 5px;
+      }
+
+      .intro {
+        font-size: 0.84rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="widget" class="widget">
+
+    <h3>DFT Matrix — Complex Phase Vectors</h3>
+
+    <p class="intro">
+      Each cell represents a complex exponential
+      e<sup>−i2πkn/N</sup>, drawn as a unit vector in
+      the complex plane.
+
+      Color represents phase: identical directions
+      have identical colors.
+    </p>
+
+    <!-- Matrix controls -->
+
+    <div class="controls">
+
+      <div
+        class="sizes"
+        role="group"
+        aria-label="Matrix dimensions"
+      >
+        <button type="button" data-n="4">
+          N = 4
+        </button>
+
+        <button type="button" data-n="8" class="active">
+          N = 8
+        </button>
+
+        <button type="button" data-n="16">
+          N = 16
+        </button>
+      </div>
+
+      <label class="toggle">
+        <input
+          id="pairs"
+          type="checkbox"
+          checked
+        >
+        Highlight conjugate row pairs
+      </label>
+
+    </div>
+
+    <!-- Matrix visualization -->
+
+    <div class="canvas-wrap">
+      <svg
+        id="matrix"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 550 555"
+        role="img"
+        aria-label="DFT matrix with color-coded phase vectors"
+      ></svg>
+    </div>
+
+    <!-- Phase legend -->
+
+    <div class="legend">
+      <span>Phase: 0°</span>
+      <span class="rainbow"></span>
+      <span>360° ≡ 0°</span>
+    </div>
+
+    <!-- Selected matrix element -->
+
+    <div class="details">
+
+      <div class="panel">
+        Selected entry
+        <b id="indices">(k = 1, n = 1)</b>
+
+        <div class="value" id="complexValue"></div>
+        <div class="value" id="angleValue"></div>
+      </div>
+
+      <div class="panel">
+        Corresponding row
+        <b id="pairValue"></b>
+
+        <div id="pairExplanation">
+          Select a cell to compare conjugate rows.
+        </div>
+      </div>
+
+    </div>
+
+    <p class="tip">
+      Click any cell to highlight its row and conjugate
+      partner. The first row and column are all 1;
+      pairs of rows k and N − k reflect across
+      the real axis.
+    </p>
+
+  </section>
+
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* ==========================================
+         Constants and state
+         ========================================== */
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+
+      const svg = document.getElementById("matrix");
+      const widget = document.getElementById("widget");
+
+      const buttons = [
+        ...document.querySelectorAll("[data-n]")
+      ];
+
+      const pairToggle = document.getElementById("pairs");
+
+      let N = 8;
+      let selectedK = 1;
+      let selectedN = 1;
+
+      /* ==========================================
+         Helpers
+         ========================================== */
+
+      function mod(a, b) {
+        return ((a % b) + b) % b;
+      }
+
+      function createSVG(name, attributes = {}, parent = svg) {
+        const element = document.createElementNS(
+          SVG_NS,
+          name
+        );
+
+        for (const [key, value] of Object.entries(attributes)) {
+          element.setAttribute(key, String(value));
+        }
+
+        parent.appendChild(element);
+
+        return element;
+      }
+
+      function formatNumber(value) {
+        if (Math.abs(value) < 1e-8) {
+          return "0";
+        }
+
+        return Number(value.toFixed(4)).toString();
+      }
+
+      /* ==========================================
+         Complex DFT matrix elements
+
+         F[k,n] = exp(-i * 2π * k * n / N)
+
+         Magnitude = 1
+         Phase = -2πkn/N
+         ========================================== */
+
+      function matrixEntry(k, n) {
+        const index = mod(k * n, N);
+
+        const theta = -2 * Math.PI * index / N;
+
+        // Normalize phase into [0, 360).
+        const phase = mod(
+          -360 * index / N,
+          360
+        );
+
+        return {
+          theta,
+          phase,
+          real: Math.cos(theta),
+          imag: Math.sin(theta)
+        };
+      }
+
+      /* ==========================================
+         Automatic iframe height
+
+         The iframe and article are hosted
+         on the same origin.
+         ========================================== */
+
+      function notifyHeight() {
+        const height = Math.ceil(
+          widget.getBoundingClientRect().height
+        ) + 2;
+
+        try {
+          if (window.frameElement) {
+            window.frameElement.style.height =
+              height + "px";
+
+            window.frameElement.setAttribute(
+              "scrolling",
+              "no"
+            );
+          }
+        } catch (error) {
+          // Cross-origin iframe restrictions.
+        }
+
+        if (window.parent !== window) {
+          window.parent.postMessage(
+            {
+              type: "dft-matrix-vector-resize",
+              height
+            },
+            "*"
+          );
+        }
+      }
+
+      /* ==========================================
+         Display selected matrix element
+         ========================================== */
+
+      function updateDetails() {
+        const entry = matrixEntry(
+          selectedK,
+          selectedN
+        );
+
+        const real = Math.round(
+          entry.real * 1e9
+        ) / 1e9;
+
+        const imag = Math.round(
+          entry.imag * 1e9
+        ) / 1e9;
+
+        const complexValue =
+          formatNumber(real) +
+          (imag < 0 ? " − " : " + ") +
+          formatNumber(Math.abs(imag)) +
+          "i";
+
+        document.getElementById("indices").textContent =
+          `(k = ${selectedK}, n = ${selectedN})`;
+
+        document.getElementById("complexValue").textContent =
+          complexValue;
+
+        document.getElementById("angleValue").textContent =
+          `Phase: ${entry.phase.toFixed(2)}° | magnitude: 1`;
+
+        // The conjugate row of k is (N-k) mod N.
+        const partner = mod(
+          N - selectedK,
+          N
+        );
+
+        document.getElementById("pairValue").textContent =
+          `k = ${selectedK} and k = ${partner}`;
+
+        const explanation =
+          document.getElementById("pairExplanation");
+
+        if (partner === selectedK) {
+          explanation.textContent =
+            "This row is its own conjugate: " +
+            "all its entries are real.";
+        } else {
+          explanation.textContent =
+            `The entries in row ${partner} are ` +
+            `complex conjugates of row ${selectedK}.`;
+        }
+      }
+
+      /* ==========================================
+         Draw DFT matrix
+         ========================================== */
+
+      function drawMatrix() {
+        svg.replaceChildren();
+
+        const left = 37;
+        const top = 10;
+        const side = 496;
+
+        const cellSize = side / N;
+
+        svg.setAttribute(
+          "viewBox",
+          "0 0 550 555"
+        );
+
+        const matrixGroup = createSVG("g");
+
+        const conjugateRow = mod(
+          N - selectedK,
+          N
+        );
+
+        for (let k = 0; k < N; k++) {
+          for (let n = 0; n < N; n++) {
+
+            const entry = matrixEntry(k, n);
+
+            const theta = entry.theta;
+            const phase = entry.phase;
+
+            const centerX =
+              left + (n + 0.5) * cellSize;
+
+            const centerY =
+              top + (k + 0.5) * cellSize;
+
+            // Each angle maps to one hue.
+            const hue = phase;
+
+            const isSelectedRow =
+              k === selectedK;
+
+            const isConjugateRow =
+              pairToggle.checked &&
+              k === conjugateRow &&
+              conjugateRow !== selectedK;
+
+            const group = createSVG(
+              "g",
+              {
+                class:
+                  "cell" +
+                  (isSelectedRow ? " selected" : ""),
+
+                tabindex: "0",
+                role: "button",
+
+                "aria-label":
+                  `Row ${k}, column ${n}, ` +
+                  `phase ${phase.toFixed(2)} degrees`
+              },
+              matrixGroup
+            );
+
+            /* ------------------------------
+               Cell background
+               ------------------------------ */
+
+            const lightness =
+              isSelectedRow ? "25%" :
+              isConjugateRow ? "18%" :
+              "12%";
+
+            const backgroundColor =
+              `hsl(${hue} 68% ${lightness})`;
+
+            const borderColor =
+              isSelectedRow ? "#ffffff" :
+              isConjugateRow ? "#a2b8df" :
+              "#383b43";
+
+            createSVG(
+              "rect",
+              {
+                class: "cell-bg",
+
+                x: left + n * cellSize + 0.9,
+                y: top + k * cellSize + 0.9,
+
+                width: cellSize - 1.8,
+                height: cellSize - 1.8,
+
+                rx: Math.max(
+                  1,
+                  cellSize * 0.06
+                ),
+
+                fill: backgroundColor,
+                stroke: borderColor,
+
+                "stroke-width":
+                  isSelectedRow ? 1.1 : 0.5
+              },
+              group
+            );
+
+            /* ------------------------------
+               Complex-plane unit vector
+               ------------------------------ */
+
+            const radius = cellSize * 0.31;
+
+            // SVG y coordinates increase downward,
+            // so invert the imaginary component.
+            const endpointX =
+              centerX + radius * Math.cos(theta);
+
+            const endpointY =
+              centerY - radius * Math.sin(theta);
+
+            const vectorColor =
+              `hsl(${hue} 88% 66%)`;
+
+            createSVG(
+              "line",
+              {
+                x1: centerX,
+                y1: centerY,
+
+                x2: endpointX,
+                y2: endpointY,
+
+                stroke: vectorColor,
+
+                "stroke-width": Math.max(
+                  1.7,
+                  cellSize * 0.07
+                ),
+
+                "stroke-linecap": "round"
+              },
+              group
+            );
+
+            /* ------------------------------
+               Arrowhead
+               ------------------------------ */
+
+            const headSize = Math.max(
+              2.6,
+              cellSize * 0.12
+            );
+
+            const direction = Math.atan2(
+              endpointY - centerY,
+              endpointX - centerX
+            );
+
+            const wing1X =
+              endpointX -
+              headSize * Math.cos(direction - 0.48);
+
+            const wing1Y =
+              endpointY -
+              headSize * Math.sin(direction - 0.48);
+
+            const wing2X =
+              endpointX -
+              headSize * Math.cos(direction + 0.48);
+
+            const wing2Y =
+              endpointY -
+              headSize * Math.sin(direction + 0.48);
+
+            const arrowPath =
+              `M ${wing1X} ${wing1Y} ` +
+              `L ${endpointX} ${endpointY} ` +
+              `L ${wing2X} ${wing2Y}`;
+
+            createSVG(
+              "path",
+              {
+                d: arrowPath,
+                fill: "none",
+
+                stroke: `hsl(${hue} 88% 74%)`,
+
+                "stroke-width": Math.max(
+                  1.5,
+                  cellSize * 0.065
+                ),
+
+                "stroke-linejoin": "round",
+                "stroke-linecap": "round"
+              },
+              group
+            );
+
+            /* ------------------------------
+               Vector origin
+               ------------------------------ */
+
+            createSVG(
+              "circle",
+              {
+                cx: centerX,
+                cy: centerY,
+
+                r: Math.max(
+                  1.2,
+                  cellSize * 0.032
+                ),
+
+                fill: "#eff2fa"
+              },
+              group
+            );
+
+            /* ------------------------------
+               Cell selection
+               ------------------------------ */
+
+            function selectCell() {
+              selectedK = k;
+              selectedN = n;
+
+              drawMatrix();
+            }
+
+            group.addEventListener(
+              "click",
+              selectCell
+            );
+
+            group.addEventListener(
+              "keydown",
+              event => {
+                if (
+                  event.key === "Enter" ||
+                  event.key === " "
+                ) {
+                  event.preventDefault();
+                  selectCell();
+                }
+              }
+            );
+          }
+        }
+
+        /* ==========================================
+           Frequency row labels
+           ========================================== */
+
+        for (let k = 0; k < N; k++) {
+          const y =
+            top + (k + 0.5) * cellSize + 4;
+
+          const label = createSVG(
+            "text",
+            {
+              x: 27,
+              y,
+
+              fill:
+                k === selectedK ? "#fff" : "#9298a4",
+
+              "font-size":
+                N === 16 ? 10 : 12,
+
+              "font-weight":
+                k === selectedK ? 700 : 400,
+
+              "text-anchor": "middle"
+            }
+          );
+
+          label.textContent = k;
+        }
+
+        /* ==========================================
+           Sample column labels
+           ========================================== */
+
+        for (let n = 0; n < N; n++) {
+          const label = createSVG(
+            "text",
+            {
+              x: left + (n + 0.5) * cellSize,
+              y: top + side + 17,
+
+              fill: "#9298a4",
+
+              "font-size":
+                N === 16 ? 10 : 12,
+
+              "text-anchor": "middle"
+            }
+          );
+
+          label.textContent = n;
+        }
+
+        /* ==========================================
+           Axis titles
+           ========================================== */
+
+        const sampleLabel = createSVG(
+          "text",
+          {
+            x: left + side / 2,
+            y: 546,
+
+            fill: "#afb3bc",
+            "font-size": 12,
+            "text-anchor": "middle"
+          }
+        );
+
+        sampleLabel.textContent =
+          "Sample index n →";
+
+        const frequencyLabel = createSVG(
+          "text",
+          {
+            x: 10,
+            y: top + side / 2,
+
+            fill: "#afb3bc",
+            "font-size": 12,
+            "text-anchor": "middle",
+
+            transform:
+              `rotate(-90 10 ${top + side / 2})`
+          }
+        );
+
+        frequencyLabel.textContent =
+          "Frequency index k →";
+
+        updateDetails();
+        notifyHeight();
+      }
+
+      /* ==========================================
+         Matrix size controls
+         ========================================== */
+
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          N = Number(button.dataset.n);
+
+          selectedK = 1;
+          selectedN = 1;
+
+          buttons.forEach(otherButton => {
+            const active = otherButton === button;
+
+            otherButton.classList.toggle(
+              "active",
+              active
+            );
+
+            otherButton.setAttribute(
+              "aria-pressed",
+              String(active)
+            );
+          });
+
+          drawMatrix();
+        });
+      });
+
+      /* ==========================================
+         Conjugate-row toggle
+         ========================================== */
+
+      pairToggle.addEventListener(
+        "change",
+        drawMatrix
+      );
+
+      /* ==========================================
+         Responsive height handling
+         ========================================== */
+
+      if ("ResizeObserver" in window) {
+        const observer = new ResizeObserver(
+          notifyHeight
+        );
+
+        observer.observe(widget);
+      }
+
+      window.addEventListener(
+        "load",
+        notifyHeight
+      );
+
+      /* ==========================================
+         Initialize
+         ========================================== */
+
+      drawMatrix();
+
+    })();
+  </script>
+
+</body>
+</html>

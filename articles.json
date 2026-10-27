@@ -616,6 +616,50 @@
     "date": "2026-9-19",
     "nodeType": "article",
     "links": ["misc_math/Fourier/Fourier"]
+  },
+
+  {
+    "slug": "Robotics/Robotics",
+    "title": "Robotics",
+    "category": "Robotics",
+    "subcategory": "",
+    "summary": "Center for Robotics",
+    "date": "2026-10-23",
+    "nodeType": "topic",
+    "links": []
+  },
+  {
+    "slug": "Robotics/Underactuated Robotics/Underactuated Robotics",
+    "title": "Underactuated Robotics",
+    "category": "Robotics",
+    "subcategory": "Underactuated Robotics",
+    "summary": "Center for Underactuated Robotics",
+    "date": "2026-10-22",
+    "nodeType": "subtopic",
+    "links": []
+  },
+  {
+    "slug": "Robotics/Underactuated Robotics/Lecture 1",
+    "title": "1 Dynamics and model-based control",
+    "category": "Robotics",
+    "subcategory": "Underactuated Robotics",
+    "summary": "Lecture 1 for Underactuated Robotics",
+    "date": "2026-10-23",
+    "nodeType": "subtopic",
+    "links": []
+  },
+
+
+
+  {
+    "slug": "ai/ramblings/Technobabble 0.1",
+    "title": "Technobabble 0.1",
+    "category": "AI",
+    "subcategory": "ramblings",
+    "summary": "Ramblings on AI 1",
+    "date": "2026-10-22",
+    "nodeType": "article",
+    "links": []
   }
 
 ]
