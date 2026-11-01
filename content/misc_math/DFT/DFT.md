@@ -23,7 +23,7 @@ From the previous article on [Fourier series / transform](article.html?slug=\mis
 
 <div class="formula-box">
 
-The Fourier Series statest that a periodic function $f(x)$ with period $T = 2\pi$ can be reconstructed as an infinite sum of weighted exponentials:
+The Fourier Series states that a periodic function $f(x)$ with period $T = 2\pi$ can be reconstructed as an infinite sum of weighted exponential:
 
 $$f(x)=\sum_{k=-\infty}^{\infty}c_k e^{ikx} \qquad {k \in \mathbb{Z}}$$
 
@@ -88,7 +88,7 @@ Keep in mind that even for finite $T$, reconstructing the periodic signal requir
 
 $$\omega_k=k\frac{2\pi}{T}.$$
 
-As $T$ increases, these discrete frequencies become more and more densely packed. For example, if you compare two periodic functions with periods $2\pi$ and $6\pi$ you would still need infinitelly many  samples ($k$) to reconstruct them, the difference is the spacing between frequency samples ($\omega_k$); for a period of $6\pi$, samples of $\omega_k$ will be 3 times closer together then for a period $2\pi$. As $T$ goes to infinity $\Delta\omega$ approaches zero, so the discrete frequency grid becomes continuous and we replace the sum over discrete frequencies with an integral over all real angular frequencies $\omega$.
+As $T$ increases, these discrete frequencies become more and more densely packed. For example, if you compare two periodic functions with periods $2\pi$ and $6\pi$ you would still need infinitely many  samples ($k$) to reconstruct them, the difference is the spacing between frequency samples ($\omega_k$); for a period of $6\pi$, samples of $\omega_k$ will be 3 times closer together then for a period $2\pi$. As $T$ goes to infinity $\Delta\omega$ approaches zero, so the discrete frequency grid becomes continuous and we replace the sum over discrete frequencies with an integral over all real angular frequencies $\omega$.
 
 The Fourier series represents a periodic function using a countably infinite set of discrete frequencies, while the Fourier transform represents a non-periodic function using a continuous, uncountable range of frequencies.
 
@@ -371,7 +371,7 @@ we can rewrite it equivalently as:
 
 $$f(x)=A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x)$$
 
-Plugging in $f(t)$ into the Fourier analysis equation basically performs an inner product between the phase shifted input function $f(x)$ and a cosine / sine function giving us the real and imaginary parts of the output respectivelly.
+Plugging in $f(t)$ into the Fourier analysis equation basically performs an inner product between the phase shifted input function $f(x)$ and a cosine / sine function giving us the real and imaginary parts of the output respectively.
 
 
 $$\operatorname{Re}\left(\widehat f(\omega)\right) =
@@ -420,11 +420,11 @@ We can even rewrite this with Euler's formula,
 
 $$e^{i\phi}=\cos(\phi)+i\sin(\phi),$$
 
-packadging it as: 
+packaging it as: 
 $$z\propto Ae^{i\phi}.$$
 
 
-The main takeaway is that taking the forward Fourier transform of an equation takes the inner product of that equation with respect to the basis functions sine and cosine and when we querry a frequency from the resulting analysis equation we get a complex number that packadges information into a complex number. The real and imaginary parts of the complex number encode phase since they are proportional to $A \cos(\phi)$ and $A \sin(\phi)$ respectivelly.
+The main takeaway is that taking the forward Fourier transform of an equation takes the inner product of that equation with respect to the basis functions sine and cosine and when we query a frequency from the resulting analysis equation we get a complex number that packages information into a complex number. The real and imaginary parts of the complex number encode phase since they are proportional to $A \cos(\phi)$ and $A \sin(\phi)$ respectively.
 
 ### Magnitude 
 
@@ -452,14 +452,14 @@ $$\frac{\widehat f(\omega)}{|\widehat f(\omega)|}=e^{i\phi},$$
 
 removes the magnitude information and leaves a point on the unit circle whose angle encodes only the phase.
 
-A cool geometric visualization of the output is, that as we querry different frequencies $\omega$ in $\widehat f(\omega)$ we plot those points in the complex plain which will produce points at different angles from the real line depending on phase and different radii from the origin depending on amplitude. This creates a rubber band like visualization for funky input functions that we will program in the implementation section of this article.
+A cool geometric visualization of the output is, that as we query different frequencies $\omega$ in $\widehat f(\omega)$ we plot those points in the complex plain which will produce points at different angles from the real line depending on phase and different radii from the origin depending on amplitude. This creates a rubber band like visualization for funky input functions that we will program in the implementation section of this article.
 
 Put a promo picture here:
 
 
 ## Recap
 
-Ok, just to birefly recap, thus far we have taken the Fourier Series, let it's period extend to infinity which allowed us to derive the forward and backward Fourier Transform. With these transforms we can \**akhem caughs\** transform, a function of position or time into a function of frequency and then back to its original domain by integrating it (taking the inner product) with $e^{i \omega x}$. Lastly we looked at what features of an input function influence the output of the analysis equation, namely how the phase and magnitude of a function determine the complex output.
+Ok, just to briefly recap, thus far we have taken the Fourier Series, let it's period extend to infinity which allowed us to derive the forward and backward Fourier Transform. With these transforms we can \**akhem coughs\** transform, a function of position or time into a function of frequency and then back to its original domain by integrating it (taking the inner product) with $e^{i \omega x}$. Lastly we looked at what features of an input function influence the output of the analysis equation, namely how the phase and magnitude of a function determine the complex output.
 
 Now we will transition to the applications side of things and discretize our equations so that we can use the magic of computer science to solve them analytically.
 
@@ -540,7 +540,7 @@ Now substitute the definitions we introduced earlier:
 
 $$t_n=n\Delta t$$
 and
-$$x[n]=f(n\Delta t)$$
+$$x[n]= f(t_n) = f(n\Delta t)$$
 
 This gives:
 $$
@@ -596,7 +596,7 @@ $$
 
 This is almost exactly the equation for the Discrete Fourier Transform.
 
-The only difference is the factor $\Delta t$ outside the sum, which accounts for the time interval represented by each sample when approximating the continuous integral. It is important to distinguish between increasing the number of samples and increasing the duration of the observed signal.
+The only difference is the factor $\Delta t$ outside the sum, which accounts for the time interval represented by each sample when approximating the continuous integral. It is important to distinguish between increasing the number of samples and increasing the duration of the observed signal:
 
 If we increase the sampling rate while keeping the observation duration $T$ constant, the sum contains more terms, but $\Delta t=T/N$ decreases proportionally, leaving the approximation of the integral approximately unchanged.
 
@@ -651,7 +651,7 @@ e^{-i\frac{2\pi kn}{N}}
 }
 $$
 
-This means that frequency indices $k$ and $k+N$ produce exactly the same exponential values at every sample index $n$. Gemoetrically, this is due to completing a full rotation around the imganiary unit circle and ending up where we started.
+This means that frequency indices $k$ and $k+N$ produce exactly the same exponential values at every sample index $n$. Geometrically, this is due to completing a full rotation around the imaginary unit circle and ending up where we started.
 
 Consequently:
 
@@ -727,7 +727,7 @@ where $n,k\in\{0,1,\ldots,N-1\}$.
 
 ## Sampling
 
-(This section could be very long and I will likely make some articles about sampling and connect it to information theory to get the Nyquist sampling rate but for now I'll take that as a given and only introduce some language and notation that will later be useful in the FFT sampling approach)
+(This section could be very long and I will likely make some articles about sampling and connect it to information theory to get the Nyquist sampling rate but for now I'll do a surface level exploration that should be enough to setup concepts later in this article.)
 
 
 The next question is: Given, we are interested in the phase and magnitude of a frequency $\omega_k$ in a signal, how many points do we need to sample from the signal for the DFT to be able to provide the desired output for the frequency component.
@@ -736,13 +736,13 @@ First, lets impose a simplifying assumption that the signal which we are decompo
 
 So how many samples do we need to take to have enough "granularity" to find $f_{max}$ with the DFT?
 
-Intuitivelly, when we look at a signal or function with a high frequency we see that the signal moves or oscillates more frequently, and to capture all these changes in the signal we will need to sample more points.  
+Intuitively, when we look at a signal or function with a high frequency we see that the signal moves or oscillates more frequently, and to capture all these changes in the signal we will need to sample more points.  
 
 Suppose we have a simple cosine function with frequency $f_0$.
 
 $$f(t) = \cos(2\pi f_0 t)$$
 
-Then lets sample this signal at a frequency $f_s$ called the sampling frequency
+Then lets sample this signal at a sampling frequency $f_s$.
 $$f_s = \frac{N}{T}$$
 In this case our discrete samples are:
 $$x[n] = \cos(2\pi f_0 \frac{n}{f_s})$$
@@ -833,7 +833,7 @@ $$\boxed{\omega_k=2\pi\frac{k}{T}=\frac{2\pi kf_s}{N}}$$
 
 ## Pseudocode
 
-I will give the pseudocode in Python and in C++ in a collapsable section.
+I will give the pseudocode in Python and in C++ in a collapsible section.
 
 ```py
 # x = [x1, x2, ... xn]
@@ -854,7 +854,7 @@ This is it, the outer loops iterates over the $N$ frequency bins and the inner l
 
 This gives a time complexity of $O(N^2)$ which is not great.
 
-To put that into perspective if we were to evaluate a recording sampled at 44.1kHz ie 44,100 samples every second for a duration of ten seconds it would require $(44100 * 10)^2$ complex multiply and accumulate operations. This would take in the ballpark of 15 seconds to compute on a 2015-ish iPhone. (kind of a weird metric but I just thought of a device that many people today might have had experience using). This might not seem to bad but since the computation is quadratic time, for a 3 minute long signal, the time jumps to over an hour.
+To put that into perspective if we were to evaluate a recording sampled at 44.1kHz ie 44,100 samples every second for a duration of ten seconds it would require $(44100 * 10)^2$ complex multiply and accumulate operations. This would take in the ballpark of 15 seconds to compute on a 2015-ish iPhone. (kind of a weird metric but I just thought of a device that many people today might have had experience using). This might not seem too bad but since the computation is quadratic time, for a 3 minute long signal, the time jumps to over an hour.
 
 ## View through the matrix
 
@@ -862,7 +862,7 @@ If we look at the DFT we see that the exponential term does not depend on a spec
 
 $$e^{-i\frac{2\pi kn}{N}}$$
 
-so we can precompute these values for each $k$ and store them in an $N \times N$ matrix $F_N$, which is nice because we can perform summation by matrix multiplying the matrix with the samples.
+so we can precompute these values for each $k$ and store them in an $N \times N$ matrix $F_N$, which is nice because we can perform multiply and summation by matrix multiplying the matrix with the samples.
 
 Ex. $N = 4$
 
@@ -906,6 +906,7 @@ x[3]
 \end{bmatrix} 
 $$
 
+Here is a visualization of the exponential term matrix for different values of $N$:
 
 <iframe
   src="./content/misc_math/DFT/dft_matrix_vectors.html"
@@ -924,5 +925,226 @@ $$
   ">
 </iframe>
 
+Here are some noteworthy observations about the exponential matrix:
+
+1. The entire first row ($k=0$) and first column ($n=0$) evaluate to $e^0=1$, regardless of the size of $N$.
+
+2. For $k=1$, each successive value advances by an angle of $-2\pi/N$ around the complex unit circle. It therefore takes exactly $N$ steps to complete one full rotation.
+
+3. For any row $k$, the angular step between consecutive values is $k$ times the angular step of row $k=1$:
+
+   $$\Delta\theta_k=-\frac{2\pi k}{N}$$
+
+   Note that the magnitude of every vector remains 1; only its direction changes. The number of distinct values in row $k$ is $N/\gcd(k,N)$ for $k>0$. Consequently, some rows complete their rotations and begin repeating before reaching $N$ steps.
+
+4. When $N$ is even, the row $k=N/2$ corresponds to the Nyquist frequency. Its values alternate between $1$ and $-1$:
+
+   $$e^{-i\frac{2\pi(N/2)n}{N}}=e^{-i\pi n}=(-1)^n$$
+
+   When $N$ is odd, there is no row corresponding exactly to the Nyquist frequency.
+
+5. Rows $k$ and $N-k$ are complex conjugates of each other:
+
+    $$\boxed{F_N[N-k,n]=\overline{F_N[k,n]}}$$
+
+   Geometrically, their vectors are reflected across the real axis of the complex plane. Their real components are identical, while their imaginary components have opposite signs. This symmetry exists for every $N$.
+
+6. The matrix is symmetric along its main diagonal because multiplication is commutative:
+    $$F_N[k,n]=F_N[n,k]$$
+
+7. The size and factorization of $N$ affect the repetition patterns within the matrix. For example, when $N=7$ (prime), every nonzero row visits all seven distinct roots of unity before repeating. When $N=6$ (composite), some rows repeat after fewer than six steps.
 
 
+## First Optimization: Conjugate Symmetry
+
+As we have seen in the sampling section and in the matrix one above: rows $k$ and $N-k$ are complex conjugates of each other:
+
+$$\boxed{F_N[N-k,n]=\overline{F_N[k,n]}}$$
+
+So instead of having to calculate all $N$ terms we can just calculate the first $0$ to $N/2$ terms and conjugate to get the remaining $floor(N/2)$ terms.
+
+```py
+def dft_conj(x):
+    N = len(x)
+    X = [0j] * N
+
+    # Calculate only the nonnegative frequencies
+    for k in range(N // 2 + 1):
+        for n in range(N):
+            angle = -2 * pi * k * n / N
+            X[k] += x[n] * exp(1j * angle)
+
+    # Reconstruct negative frequencies
+    for k in range(1, (N - 1) // 2 + 1):
+        X[N - k] = X[k].conjugate()
+
+    return X
+
+```
+
+This means that for evem $N$ the number of summation terms decreases from $N^2$ to $N(\frac{N}{2}+1)$ plus a small number of operatoins to reconstruct the remianing coefficients. Note, that while this improved our computation by a constant factor the asymptotic complexity is still $O(N^2)$ and this only works for real-valued input signals as complex sequences do not have this conjugate symmetry. (For our focus of signal processing this is fine as we will be working with real valued signals.)
+
+## Second Optimization: Precomputing $N$ Roots of Unity
+
+Looking again at our DFT matrix, we notice that the exponential terms depend only on $N$, $k$, and $n$, not on the input samples $x[n]$. Furthermore, as we observed earlier, these complex exponentials repeat after completing a full rotation.
+
+Let's define the $N$th root of unity:
+
+$$W_N=e^{-i\frac{2\pi}{N}}$$
+
+We can now express any element of our DFT matrix as:
+
+$$F_N[k,n]=W_N^{kn}$$
+
+Since $W_N^N=1$, raising it to powers that differ by a multiple of $N$ produces the same complex number:
+
+$$W_N^{kn}=W_N^{(kn)\bmod N}$$
+
+Therefore, instead of evaluating $N^2$ complex exponentials, we can precompute just $N$ distinct values and use modular indexing to retrieve the appropriate coefficient for any position in the matrix:
+
+$$\boxed{F_N[k,n]=W_N^{(kn)\bmod N}}$$
+
+This also means we don't actually need to construct and store the entire $N\times N$ matrix. We can generate its entries as needed using our precomputed array.
+
+```python
+
+def dft_precomputed(x):
+    N = len(x)
+    X = [0j] * N
+    # Precompute the N distinct roots of unity
+    roots = [exp(-2j * pi * r / N) for r in range(N)]
+
+    for k in range(N):
+        for n in range(N):
+            # Retrieve the appropriate exponential
+            X[k] += x[n] * roots[(k * n) % N]
+
+    return X
+```
+
+**Time Complexity:** We have reduced the number of complex exponential evaluations from $N^2$ to $N$. However, we still perform $N$ complex multiply-and-accumulate operations for each of the $N$ frequency coefficients. Consequently, the overall time complexity remains:
+
+$$\boxed{O(N^2)}$$
+
+**Space Complexity:** Rather than storing an $N\times N$ matrix requiring $O(N^2)$ space, we store only $N$ precomputed roots of unity and $N$ output coefficients:
+
+$$\boxed{O(N)}$$
+
+We can also combine our first two optimizations. For real-valued signals, we only need to calculate approximately half of the frequency coefficients, and each coefficient can use our precomputed roots of unity. This eliminates most complex exponential evaluations and approximately halves the remaining multiply-and-accumulate operations.
+
+ ```py
+def dft_combined(x):
+    N = len(x)
+    X = [0j] * N
+
+    # Precompute N distinct roots of unity
+    roots = [exp(-2j * pi * r / N) for r in range(N)]
+
+    # Only calculate independent frequency bins
+    for k in range(N // 2 + 1):
+        for n in range(N):
+            X[k] += x[n] * roots[(k * n) % N]
+
+    # Recover remaining bins using conjugate symmetry
+    for k in range(1, (N - 1) // 2 + 1):
+        X[N - k] = X[k].conjugate()
+
+    return X
+
+ ```
+
+While this is an improvement, we have only eliminated redundant calculations in the exponential coefficient matrix. The actual matrix-vector multiplication still involves a quadratic number of operations.
+
+To improve further, we need to examine how these coefficients are multiplied by our input samples and, more importantly, how the resulting products are added together. As we'll see, different frequency coefficients share intermediate arithmetic results that can be computed once and reused.
+
+By reorganizing these multiply-and-add operations into smaller, recursively combined computations, we arrive at the **radix-2 Fast Fourier Transform (FFT)**, which reduces the time complexity from $O(N^2)$ to $O(N\log N)$.
+
+
+## Radix-2 FFT
+
+### Symmetry
+
+PUT VISUALIZATION HERE
+
+A crucial symmetry appears when we compare the first half of a row of the DFT matrix to the second half.
+
+Recall that
+
+$$F_N[k,n]=e^{-i\frac{2\pi kn}{N}}$$
+
+Now compare the entry in column $n$ with the entry in column $n+\frac N2$:
+
+$$
+F_N\left[k,n+\frac N2\right]
+=
+e^{-i\frac{2\pi k(n+N/2)}{N}}
+=
+e^{-i\frac{2\pi kn}{N}}e^{-i\pi k}
+=
+(-1)^kF_N[k,n]
+$$
+
+Therefore:
+
+- if $k$ is even, then
+  $$
+  F_N\left[k,n+\frac N2\right]=F_N[k,n]
+  $$
+- if $k$ is odd, then
+  $$
+  F_N\left[k,n+\frac N2\right]=-F_N[k,n]
+  $$
+
+We can understand this property geometrically by remembering that each element of our DFT matrix is an $N$th root of unity raised to some integer power, representing a rotation around the complex unit circle.
+
+For a fixed row $k$, moving from column $n$ to column $n+\frac N2$ advances the rotation by
+
+$$\Delta\theta=-\frac{2\pi k}{N}\frac N2=-\pi k.$$
+
+In other words, moving halfway across a row corresponds to making $k/2$ complete clockwise revolutions around the unit circle. (This is a property we already stated as .2 and .3 when we observed hte exponential matrix initially)
+
+- **When $k$ is even**, $k/2$ is an integer, so we complete an integer number of full revolutions and return to exactly the same position. Therefore, the corresponding complex values are identical.
+- **When $k$ is odd**, $k/2$ is a half-integer, so after completing some number of full revolutions, we have an additional half-revolution ($\pi$ radians) remaining. This places us on the opposite side of the unit circle, giving us the negative of the original complex value.
+
+For example, when $k=2$, moving halfway across the row produces one complete revolution ($2\pi$), whereas for $k=3$, it produces one and a half revolutions ($3\pi$).
+
+This explains why the second half of every row is either a copy or the negation of its first half. The symmetry is a direct consequence of the periodicity of complex rotations, and as we'll see next, it allows us to combine pairs of input samples using additions and subtractions rather than calculating every contribution independently.
+
+### Divide and Conquer
+
+Keeping this flip-flopping sign symmetry in mind lets see how it could be used to divide and conquer the computation at the heart of the DFT:
+
+$$X[k]=\sum_{n=0}^{N-1}x[n]W_N^{kn}$$
+
+From the symmetry we know that we are interested in the even and odd $k$th rows and the first $N/2$ and the last $N/2$ elements of each row.
+
+So lets go and split up the computation above into first and second halves:
+
+$$X[k]=\sum_{n=0}^{N/2-1} W_N^{kn}\left(x[n]+(-1)^kx[N/2+n]\right)$$
+
+The $(-1)^k$ term above accounts for the fact that when $k$ is odd the sign flips.
+
+Interesting, so it looks like we can split the inputs in half and as long as we account for the flip-flopping sign of the $k$th rows we still get the same results.
+
+Namely when:
+
+$k \text{ is even: }sum_{even}[n]=s_e[n] = x[n]+x[n+N/2]$
+$k \text{ is odd: }sum_{odd}[n]= s_o[n] = x[n]-x[n+N/2]$
+
+are the only two computations we need to do. 
+
+**Here is the amazing part!**
+
+
+<iframe
+  src="./content/misc_math/DFT/dft_8_to_4.html"
+  width="100%"
+  height="1000"
+  scrolling="no"
+  loading="lazy"
+  title="Recursive DFT Matrix Decomposition"
+  style="display:block; border:0; width:100%; overflow:hidden; border-radius:12px;">
+</iframe>
+
+
+352213

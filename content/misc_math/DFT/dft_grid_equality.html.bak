@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>DFT Grid Equality Visualizer</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121212;
+      --panel: #1b1c20;
+      --panel-2: #16171a;
+      --border: #32343a;
+      --text: #f0f2f6;
+      --muted: #aeb5c0;
+      --accent: #9ccabf;
+      --highlight: #ffffff;
+      --quarter: #8ab4ff;
+      --quarter-soft: rgba(138, 180, 255, 0.18);
+      --match-soft: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .widget {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px;
+      background: var(--bg);
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .intro {
+      margin: 0 0 16px;
+      color: #bbb;
+      max-width: 980px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: #202020;
+      border: 1px solid #363636;
+      border-radius: 9px;
+      margin-bottom: 14px;
+    }
+
+    .controls button {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid #414650;
+      background: #28292d;
+      color: #d2d7e1;
+      padding: 8px 12px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .controls button:hover {
+      background: #393b42;
+    }
+
+    .controls button.active {
+      background: #31404a;
+      border-color: #95b6cf;
+      color: white;
+    }
+
+    .status {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .summary {
+      margin: 0 0 14px;
+      padding: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #c7ccd5;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .panel-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .axis-note {
+      text-align: center;
+      color: var(--muted);
+      font: 11px ui-monospace, SFMono-Regular, Consolas, monospace;
+      margin-bottom: 6px;
+    }
+
+    .grid-wrap {
+      overflow: auto;
+    }
+
+    .grid {
+      display: grid;
+      gap: 3px;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .header,
+    .corner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      min-height: 20px;
+      color: var(--muted);
+      font: 11px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .header.emphasis {
+      color: white;
+      font-weight: 700;
+    }
+
+    .cell {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1px solid #3a3c44;
+      background: var(--phase-bg);
+      color: #dbe3ef;
+      padding: 2px;
+      cursor: pointer;
+      transition:
+        transform 0.08s ease,
+        border-color 0.12s ease,
+        box-shadow 0.12s ease,
+        background 0.12s ease;
+    }
+
+    .cell:hover {
+      transform: translateY(-1px);
+      border-color: white;
+    }
+
+    .cell svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+      margin-bottom: 1px;
+    }
+
+    .arrow {
+      stroke: var(--phase-stroke);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .exp {
+      font: 700 10px ui-monospace, SFMono-Regular, Consolas, monospace;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .cell.match {
+      border-color: rgba(255,255,255,0.72);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.25),
+        0 0 0 2px rgba(255,255,255,0.08);
+    }
+
+    .cell.anchor {
+      border-color: white;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.2),
+        0 0 0 4px rgba(255,255,255,0.08);
+      background: var(--phase-bg-strong);
+    }
+
+    .cell.in-quarter {
+      box-shadow:
+        inset 0 0 0 2px var(--quarter),
+        0 0 0 2px var(--quarter-soft);
+    }
+
+    .cell.quarter-match {
+      box-shadow:
+        inset 0 0 0 1px rgba(138,180,255,0.72),
+        0 0 0 2px rgba(138,180,255,0.16);
+    }
+
+    .cell.anchor.in-quarter {
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.2),
+        0 0 0 4px rgba(255,255,255,0.08),
+        inset 0 0 0 2px var(--quarter);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: #2d323d;
+    }
+
+    .swatch.white {
+      background: rgba(255,255,255,0.22);
+    }
+
+    .swatch.blue {
+      background: rgba(138,180,255,0.28);
+      border-color: rgba(138,180,255,0.5);
+    }
+
+    .phase-bar {
+      width: 120px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background:
+        linear-gradient(
+          to right,
+          hsl(0 78% 58%),
+          hsl(60 78% 58%),
+          hsl(120 78% 58%),
+          hsl(180 78% 58%),
+          hsl(240 78% 58%),
+          hsl(300 78% 58%),
+          hsl(360 78% 58%)
+        );
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .widget {
+        padding: 12px;
+      }
+
+      .controls {
+        gap: 8px;
+      }
+
+      .status {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" id="widget">
+    <div class="eyebrow">DFT Matrix Visualizer</div>
+    <h2>Equal complex values across the DFT grids</h2>
+    <p class="intro">
+      Click a cell to toggle it. All cells with the same complex value
+      light up across both the <strong>N=4</strong> and <strong>N=8</strong> matrices.
+      Press <strong>Play</strong> to step through the four quarter-blocks from
+      top-left to bottom-right.
+    </p>
+
+    <section class="controls">
+      <button id="playBtn" type="button">▶ Play</button>
+      <button id="clearBtn" type="button">Clear selection</button>
+      <button id="stepBtn" type="button">Step quarter</button>
+      <span class="status" id="statusText">
+        No cell selected. Autoplay is stopped.
+      </span>
+    </section>
+
+    <section class="summary" id="summary">
+      Click any square to highlight all equal values.
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <h3>N = 4</h3>
+        <div class="panel-sub">
+          Matrix entries are \(F_4[k,n] = W_4^{kn}\).
+        </div>
+        <div class="axis-note">rows k × columns n</div>
+        <div class="grid-wrap">
+          <div id="grid4" class="grid"></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h3>N = 8</h3>
+        <div class="panel-sub">
+          Matrix entries are \(F_8[k,n] = W_8^{kn}\).
+        </div>
+        <div class="axis-note">rows k × columns n</div>
+        <div class="grid-wrap">
+          <div id="grid8" class="grid"></div>
+        </div>
+      </article>
+    </section>
+
+    <div class="legend">
+      <span class="legend-item">
+        <span class="swatch white"></span>
+        selected / equal-value match
+      </span>
+      <span class="legend-item">
+        <span class="swatch blue"></span>
+        current quarter block
+      </span>
+      <span class="legend-item">
+        phase color
+        <span class="phase-bar"></span>
+      </span>
+    </div>
+
+    <p class="note">
+      Two cells are treated as equal when they represent the same complex number.
+      For example, clicking a cell with value \(1\), \(-1\), \(i\), or \(-i\)
+      highlights every occurrence of that value across both grids.
+    </p>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const widget = document.getElementById("widget");
+      const grid4 = document.getElementById("grid4");
+      const grid8 = document.getElementById("grid8");
+      const summary = document.getElementById("summary");
+      const statusText = document.getElementById("statusText");
+      const playBtn = document.getElementById("playBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const stepBtn = document.getElementById("stepBtn");
+
+      let selectedKey = null;
+      let selectedCellId = null;
+      let activeQuarter = null; // 0,1,2,3 or null
+      let playing = false;
+      let timer = null;
+
+      const allCells = [];
+
+      function subscriptNumber(n) {
+        return String(n).replace(/\d/g, d => "₀₁₂₃₄₅₆₇₈₉"[Number(d)]);
+      }
+
+      function phaseAngle(N, k, n) {
+        const exponent = (k * n) % N;
+        return -2 * Math.PI * exponent / N;
+      }
+
+      function hueForPhase(N, k, n) {
+        const exponent = (k * n) % N;
+        return ((-360 * exponent / N) % 360 + 360) % 360;
+      }
+
+      function round3(x) {
+        return Math.round(x * 1000) / 1000;
+      }
+
+      function complexKey(N, k, n) {
+        const a = phaseAngle(N, k, n);
+        const re = round3(Math.cos(a));
+        const im = round3(Math.sin(a));
+        return `${re},${im}`;
+      }
+
+      function complexLabelFromKey(key) {
+        const [reRaw, imRaw] = key.split(",").map(Number);
+        const re = Math.abs(reRaw) < 1e-9 ? 0 : reRaw;
+        const im = Math.abs(imRaw) < 1e-9 ? 0 : imRaw;
+
+        if (re === 1 && im === 0) return "1";
+        if (re === -1 && im === 0) return "-1";
+        if (re === 0 && im === 1) return "i";
+        if (re === 0 && im === -1) return "-i";
+
+        const reStr = re.toFixed(3).replace(/\.000$/, "");
+        const imAbs = Math.abs(im).toFixed(3).replace(/\.000$/, "");
+        const sign = im >= 0 ? "+" : "−";
+        return `${reStr} ${sign} ${imAbs}i`;
+      }
+
+      function exponentLabel(N, k, n) {
+        return (k * n) % N;
+      }
+
+      function phaseGlyph(N, k, n) {
+        const angleDeg = -phaseAngle(N, k, n) * 180 / Math.PI;
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle
+              cx="12"
+              cy="12"
+              r="9.4"
+              fill="none"
+              stroke="currentColor"
+              stroke-opacity="0.16"
+            />
+            <g transform="rotate(${angleDeg} 12 12)">
+              <path class="arrow" d="M12 12 H20 M17 9 L20 12 L17 15"></path>
+            </g>
+          </svg>
+        `;
+      }
+
+      function makeGrid(container, N) {
+        container.style.gridTemplateColumns = `24px repeat(${N}, minmax(0, 1fr))`;
+
+        const corner = document.createElement("div");
+        corner.className = "corner";
+        corner.textContent = "k\\n";
+        container.appendChild(corner);
+
+        for (let n = 0; n < N; n++) {
+          const header = document.createElement("div");
+          header.className = "header";
+          header.textContent = n;
+          container.appendChild(header);
+        }
+
+        for (let k = 0; k < N; k++) {
+          const rowHeader = document.createElement("div");
+          rowHeader.className = "header";
+          rowHeader.textContent = k;
+          container.appendChild(rowHeader);
+
+          for (let n = 0; n < N; n++) {
+            const exponent = exponentLabel(N, k, n);
+            const hue = hueForPhase(N, k, n);
+            const key = complexKey(N, k, n);
+
+            const cell = document.createElement("button");
+            cell.type = "button";
+            cell.className = "cell";
+            cell.dataset.grid = String(N);
+            cell.dataset.k = String(k);
+            cell.dataset.n = String(n);
+            cell.dataset.exp = String(exponent);
+            cell.dataset.key = key;
+            cell.dataset.id = `${N}-${k}-${n}`;
+            cell.setAttribute(
+              "aria-label",
+              `N equals ${N}, row ${k}, column ${n}, value W ${N} power ${exponent}`
+            );
+
+            cell.style.setProperty("--phase-bg", `hsl(${hue} 68% 12%)`);
+            cell.style.setProperty("--phase-bg-strong", `hsl(${hue} 68% 24%)`);
+            cell.style.setProperty("--phase-stroke", `hsl(${hue} 86% 66%)`);
+
+            cell.innerHTML = `
+              ${phaseGlyph(N, k, n)}
+              <div class="exp">W${subscriptNumber(N)}^${exponent}</div>
+            `;
+
+            cell.addEventListener("click", () => {
+              toggleSelection(cell.dataset.id, key);
+            });
+
+            container.appendChild(cell);
+            allCells.push(cell);
+          }
+        }
+      }
+
+      function toggleSelection(id, key) {
+        if (selectedCellId === id) {
+          selectedCellId = null;
+          selectedKey = null;
+        } else {
+          selectedCellId = id;
+          selectedKey = key;
+        }
+        applyHighlights();
+      }
+
+      function quarterIndexForCell(cell) {
+        const N = Number(cell.dataset.grid);
+        const k = Number(cell.dataset.k);
+        const n = Number(cell.dataset.n);
+        const half = N / 2;
+
+        const top = k < half;
+        const left = n < half;
+
+        if (top && left) return 0;      // top-left
+        if (top && !left) return 1;     // top-right
+        if (!top && left) return 2;     // bottom-left
+        return 3;                       // bottom-right
+      }
+
+      function keysInQuarter(q) {
+        const set = new Set();
+        for (const cell of allCells) {
+          if (quarterIndexForCell(cell) === q) {
+            set.add(cell.dataset.key);
+          }
+        }
+        return set;
+      }
+
+      function applyHighlights() {
+        let quarterKeySet = null;
+        if (activeQuarter !== null) {
+          quarterKeySet = keysInQuarter(activeQuarter);
+        }
+
+        for (const cell of allCells) {
+          cell.classList.remove("match", "anchor", "in-quarter", "quarter-match");
+
+          const isSelectedMatch =
+            selectedKey !== null && cell.dataset.key === selectedKey;
+
+          const isAnchor =
+            selectedCellId !== null && cell.dataset.id === selectedCellId;
+
+          const inQuarter =
+            activeQuarter !== null && quarterIndexForCell(cell) === activeQuarter;
+
+          const quarterMatch =
+            quarterKeySet && quarterKeySet.has(cell.dataset.key);
+
+          if (isSelectedMatch) {
+            cell.classList.add("match");
+          }
+
+          if (isAnchor) {
+            cell.classList.add("anchor");
+          }
+
+          if (inQuarter) {
+            cell.classList.add("in-quarter");
+          } else if (quarterMatch) {
+            cell.classList.add("quarter-match");
+          }
+        }
+
+        updateSummary();
+      }
+
+      function updateSummary() {
+        const parts = [];
+
+        if (selectedKey !== null) {
+          parts.push(
+            `<strong>Selected value:</strong> ${complexLabelFromKey(selectedKey)}`
+          );
+        } else {
+          parts.push(`<strong>Selected value:</strong> none`);
+        }
+
+        if (activeQuarter !== null) {
+          const quarterNames = [
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right"
+          ];
+          parts.push(
+            `<strong>Quarter block:</strong> ${quarterNames[activeQuarter]}`
+          );
+        } else {
+          parts.push(`<strong>Quarter block:</strong> none`);
+        }
+
+        summary.innerHTML = parts.join(" &nbsp; • &nbsp; ");
+
+        const selectedText =
+          selectedKey !== null
+            ? `Selected ${complexLabelFromKey(selectedKey)}.`
+            : `No cell selected.`;
+
+        const playText =
+          playing
+            ? `Autoplay is running.`
+            : `Autoplay is stopped.`;
+
+        const quarterText =
+          activeQuarter === null
+            ? ``
+            : ` Active quarter: ${
+                ["top-left", "top-right", "bottom-left", "bottom-right"][activeQuarter]
+              }.`;
+
+        statusText.textContent = `${selectedText} ${playText}${quarterText}`;
+      }
+
+      function stepQuarter() {
+        if (activeQuarter === null) {
+          activeQuarter = 0;
+        } else {
+          activeQuarter = (activeQuarter + 1) % 4;
+        }
+        applyHighlights();
+      }
+
+      function startPlaying() {
+        if (playing) return;
+        playing = true;
+        playBtn.textContent = "⏸ Pause";
+        playBtn.classList.add("active");
+
+        if (activeQuarter === null) {
+          activeQuarter = 0;
+          applyHighlights();
+        }
+
+        timer = setInterval(() => {
+          activeQuarter = (activeQuarter + 1) % 4;
+          applyHighlights();
+        }, 1100);
+      }
+
+      function stopPlaying() {
+        playing = false;
+        playBtn.textContent = "▶ Play";
+        playBtn.classList.remove("active");
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        updateSummary();
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (playing) {
+          stopPlaying();
+        } else {
+          startPlaying();
+        }
+      });
+
+      clearBtn.addEventListener("click", () => {
+        selectedKey = null;
+        selectedCellId = null;
+        activeQuarter = null;
+        stopPlaying();
+        applyHighlights();
+      });
+
+      stepBtn.addEventListener("click", () => {
+        stopPlaying();
+        stepQuarter();
+      });
+
+      function resizeIframe() {
+        try {
+          if (!window.frameElement) return;
+          const h = Math.ceil(widget.getBoundingClientRect().height) + 2;
+          window.frameElement.style.height = h + "px";
+          window.frameElement.style.overflow = "hidden";
+          window.frameElement.setAttribute("scrolling", "no");
+        } catch (e) {}
+      }
+
+      makeGrid(grid4, 4);
+      makeGrid(grid8, 8);
+      applyHighlights();
+
+      if ("ResizeObserver" in window) {
+        const ro = new ResizeObserver(() => resizeIframe());
+        ro.observe(widget);
+      } else {
+        window.addEventListener("resize", resizeIframe);
+      }
+
+      resizeIframe();
+    })();
+  </script>
+</body>
+</html>

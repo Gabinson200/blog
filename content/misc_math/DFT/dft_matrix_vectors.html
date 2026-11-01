@@ -62,15 +62,17 @@
       margin-bottom: 15px;
     }
 
+    
     .sizes {
       display: flex;
+      flex-wrap: wrap;
       gap: 5px;
       padding: 4px;
-
       background: #202020;
-      border: 1px solid #363636;
       border-radius: 9px;
+      border: 1px solid #363636;
     }
+
 
     .sizes button {
       border: none;
@@ -269,23 +271,15 @@
 
     <div class="controls">
 
-      <div
-        class="sizes"
-        role="group"
-        aria-label="Matrix dimensions"
-      >
-        <button type="button" data-n="4">
-          N = 4
-        </button>
+      
+    <div class="sizes" role="group" aria-label="Matrix dimensions">
+      <button type="button" data-n="4">N = 4</button>
+      <button type="button" data-n="6">N = 6</button>
+      <button type="button" data-n="7">N = 7</button>
+      <button type="button" data-n="8" class="active">N = 8</button>
+      <button type="button" data-n="16">N = 16</button>
+    </div>
 
-        <button type="button" data-n="8" class="active">
-          N = 8
-        </button>
-
-        <button type="button" data-n="16">
-          N = 16
-        </button>
-      </div>
 
       <label class="toggle">
         <input

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DFT Grid Equality</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121212;
+      --panel: #1b1c20;
+      --border: #32343a;
+      --text: #f0f2f6;
+      --muted: #aeb5c0;
+      --accent: #9ccabf;
+      --flip: #f2b45a;
+      --cell: clamp(30px, 5.4vw, 54px);
+      --gap: 3px;
+      --quad-gap: 7px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .widget {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 18px;
+      background: var(--bg);
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .intro {
+      margin: 0 0 14px;
+      color: #bbb;
+      font-size: 13.5px;
+      max-width: 860px;
+    }
+
+    .intro b { color: #e8e8e8; }
+
+    /* ---------- controls ---------- */
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      background: #202020;
+      border: 1px solid #363636;
+      border-radius: 9px;
+      margin-bottom: 10px;
+    }
+
+    .controls button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      border: 1px solid #414650;
+      background: #28292d;
+      color: #d2d7e1;
+      padding: 7px 12px;
+      border-radius: 7px;
+      min-width: 44px;
+    }
+
+    .controls button:hover { background: #34363c; }
+
+    .controls button:focus-visible,
+    .cell:focus-visible {
+      outline: 2px solid #8ab4ff;
+      outline-offset: 2px;
+    }
+
+    #play {
+      background: #2c3b47;
+      border-color: #5f8fb3;
+      color: #fff;
+      min-width: 92px;
+    }
+
+    #play.playing {
+      background: #3a3326;
+      border-color: #b8925a;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #c4c8d0;
+      font-size: 13px;
+      cursor: pointer;
+      margin-left: auto;
+      user-select: none;
+    }
+
+    .toggle input {
+      accent-color: var(--flip);
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    .status {
+      min-height: 44px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #c7ccd5;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .status b { color: #fff; }
+    .status .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .status .flip { color: var(--flip); }
+
+    /* ---------- grids ---------- */
+
+    .grids {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .panel {
+      padding: 12px 14px 12px 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 8px 4px;
+    }
+
+    .panel h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .meter {
+      color: var(--muted);
+      font: 11px ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .meter b { color: #fff; font-weight: 700; }
+
+    .grid {
+      display: grid;
+      gap: var(--gap);
+      position: relative;
+    }
+
+    .hdr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7d838e;
+      font: 10.5px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .hdr.corner { color: #5d626b; font-size: 9.5px; }
+
+    .cell {
+      position: relative;
+      width: var(--cell);
+      height: var(--cell);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 0;
+      border-radius: 6px;
+      border: 1px solid #34363d;
+      background: var(--bg-dim);
+      color: #dbe3ef;
+      cursor: pointer;
+      font: inherit;
+      transition: opacity 0.18s ease, background 0.18s ease,
+                  border-color 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
+    }
+
+    .cell:hover {
+      border-color: #d8dbe2;
+      transform: translateY(-1px);
+    }
+
+    .cell svg {
+      width: calc(var(--cell) * 0.52);
+      height: calc(var(--cell) * 0.52);
+      display: block;
+    }
+
+    .ring { fill: none; stroke: currentColor; stroke-opacity: 0.18; }
+    .arrow {
+      stroke: var(--stroke);
+      stroke-width: 2.3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .hub { fill: var(--stroke); }
+
+    .lbl {
+      font: 700 max(9px, calc(var(--cell) * 0.19)) / 1 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: nowrap;
+      color: #cfd5df;
+    }
+
+    /* states */
+
+    .grid.has-cov .cell { opacity: 0.32; }
+    .grid.has-cov .cell.covered { opacity: 1; }
+    .grid.has-sel .cell { opacity: 0.28; }
+    .grid.has-sel .cell.covered { opacity: 0.62; }
+
+    .cell.covered {
+      background: var(--bg-mid);
+      border-color: var(--edge);
+    }
+
+    .grid .cell.match,
+    .grid .cell.anchor,
+    .grid .cell.negmatch { opacity: 1; }
+
+    .cell.match {
+      background: var(--bg-hot);
+      border-color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.55), 0 0 14px -2px var(--stroke);
+    }
+
+    .cell.anchor {
+      background: var(--bg-hot);
+      border-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 0 18px 0 var(--stroke);
+      z-index: 2;
+    }
+
+    .cell.negmatch {
+      background: var(--bg-mid);
+      border: 1.5px dashed var(--flip);
+    }
+
+    .cell.negmatch::after {
+      content: "−";
+      position: absolute;
+      top: 1px;
+      right: 3px;
+      color: var(--flip);
+      font: 800 11px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .quarter {
+      pointer-events: none;
+      border: 1.5px dashed rgba(156, 202, 191, 0.75);
+      border-radius: 9px;
+      margin: -4px;
+      z-index: 3;
+    }
+
+
+    /* ---------- legend ---------- */
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      align-items: center;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
+
+    .sw {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background: #23252b;
+    }
+
+    .sw.sel { border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(255,255,255,0.4); }
+    .sw.neg { border: 1.5px dashed var(--flip); }
+    .sw.cov { background: #2e3540; border-color: #56606f; }
+    .sw.box { border: 1.5px dashed rgba(156, 202, 191, 0.75); background: transparent; }
+
+    .phase-bar {
+      width: 110px;
+      height: 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: linear-gradient(to right,
+        hsl(0 78% 60%), hsl(60 78% 60%), hsl(120 78% 60%), hsl(180 78% 60%),
+        hsl(240 78% 60%), hsl(300 78% 60%), hsl(360 78% 60%));
+    }
+
+    @media (max-width: 600px) {
+      .widget { padding: 12px; }
+      .toggle { margin-left: 0; width: 100%; }
+      .status { font-size: 12.5px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" id="widget">
+    <div class="eyebrow">DFT matrix · repeated values</div>
+    <h2>Which squares hold the same number?</h2>
+    <p class="intro">
+      Each square is F<sub>N</sub>[k,n] = W<sub>N</sub><sup>kn</sup>, drawn as its rotation on the unit circle and
+      colored by phase. <b>Click a square</b> to toggle it: every square holding the same complex
+      number lights up, in both matrices. <b>Press Play</b> to walk through the top-left quarter
+      (the dashed box) one square at a time and watch how much of each matrix it accounts for.
+    </p>
+
+    <section class="controls">
+      <button id="play" type="button">▶ Play</button>
+      <button id="step" type="button">Step</button>
+      <button id="reset" type="button">Reset</button>
+      <label class="toggle">
+        <input id="neg" type="checkbox" />
+        Also light up sign flips (−w)
+      </label>
+    </section>
+
+    <section class="status" id="status" aria-live="polite"></section>
+
+    <section class="grids">
+      <article class="panel">
+        <div class="panel-head">
+          <h3>N = 4</h3>
+          <span class="meter" id="meter4"></span>
+        </div>
+        <div class="grid" id="grid4"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h3>N = 8</h3>
+          <span class="meter" id="meter8"></span>
+        </div>
+        <div class="grid" id="grid8"></div>
+      </article>
+    </section>
+
+    <div class="legend">
+      <span class="legend-item"><span class="sw sel"></span>selected / same value</span>
+      <span class="legend-item"><span class="sw neg"></span>negated value (−w)</span>
+      <span class="legend-item"><span class="sw cov"></span>already lit by the quarter</span>
+      <span class="legend-item"><span class="sw box"></span>top-left quarter</span>
+      <span class="legend-item">phase <span class="phase-bar"></span></span>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      // Every value in F_4 and F_8 is an 8th root of unity, so a value is identified
+      // by an integer "key" q in 0..7 meaning e^{-i 2π q / 8}.  Negation is q + 4.
+      const SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+      const SUB = "₀₁₂₃₄₅₆₇₈₉";
+      const sup = v => String(v).replace(/\d/g, d => SUP[d]);
+      const sub = v => String(v).replace(/\d/g, d => SUB[d]);
+
+      const VALUE_TEXT = ["1", "(1 − i)/√2", "−i", "(−1 − i)/√2", "−1", "(−1 + i)/√2", "i", "(1 + i)/√2"];
+
+      const widget = document.getElementById("widget");
+      const statusEl = document.getElementById("status");
+      const playBtn = document.getElementById("play");
+      const stepBtn = document.getElementById("step");
+      const resetBtn = document.getElementById("reset");
+      const negBox = document.getElementById("neg");
+
+      const SIZES = [4, 8];
+      const grids = {};      // N -> grid element
+      const meters = {};     // N -> meter element
+      const cells = [];      // all cell records
+      const byId = new Map();
+
+      // ---------- state ----------
+      let selected = null;              // cell record
+      let showNeg = false;
+      const played = { 4: [], 8: [] };  // cells visited by Play, per grid
+      let seqIndex = -1;                // position in play sequence
+      let playing = false;
+      let timer = null;
+      let finished = false;
+
+      // ---------- build ----------
+      function glyph(q, hue) {
+        const deg = 45 * q; // negative angle = clockwise; SVG rotate(+) is clockwise on screen
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle class="ring" cx="12" cy="12" r="9.5"/>
+            <g transform="rotate(${deg} 12 12)">
+              <path class="arrow" d="M12 12 H20.2 M17.2 9 L20.2 12 L17.2 15"/>
+            </g>
+            <circle class="hub" cx="12" cy="12" r="1.4"/>
+          </svg>`;
+      }
+
+      function place(el, row, col) {
+        el.style.gridRow = String(row);
+        el.style.gridColumn = String(col);
+      }
+
+      function build(N) {
+        const grid = document.getElementById("grid" + N);
+        grids[N] = grid;
+        meters[N] = document.getElementById("meter" + N);
+        const h = N / 2;
+
+        // track 1 = headers, then h cells, a thin spacer, h cells
+        const tracks = `22px repeat(${h}, var(--cell)) calc(var(--quad-gap) - var(--gap)) repeat(${h}, var(--cell))`;
+        grid.style.gridTemplateColumns = tracks;
+        grid.style.gridTemplateRows = `18px repeat(${h}, var(--cell)) calc(var(--quad-gap) - var(--gap)) repeat(${h}, var(--cell))`;
+
+        const track = i => (i < h ? 2 + i : 3 + i); // index -> grid line accounting for spacer
+
+        const corner = document.createElement("div");
+        corner.className = "hdr corner";
+        corner.textContent = "k\\n";
+        place(corner, 1, 1);
+        grid.appendChild(corner);
+
+        for (let i = 0; i < N; i++) {
+          const ch = document.createElement("div");
+          ch.className = "hdr";
+          ch.textContent = i;
+          place(ch, 1, track(i));
+          grid.appendChild(ch);
+
+          const rh = document.createElement("div");
+          rh.className = "hdr";
+          rh.textContent = i;
+          place(rh, track(i), 1);
+          grid.appendChild(rh);
+        }
+
+        for (let k = 0; k < N; k++) {
+          for (let n = 0; n < N; n++) {
+            const e = (k * n) % N;
+            const q = (e * (8 / N)) % 8;
+            const hue = ((-45 * q) % 360 + 360) % 360;
+            const id = `${N}-${k}-${n}`;
+
+            const el = document.createElement("button");
+            el.type = "button";
+            el.className = "cell";
+            el.style.setProperty("--bg-dim", `hsl(${hue} 55% 11%)`);
+            el.style.setProperty("--bg-mid", `hsl(${hue} 50% 17%)`);
+            el.style.setProperty("--bg-hot", `hsl(${hue} 62% 27%)`);
+            el.style.setProperty("--edge", `hsl(${hue} 45% 38%)`);
+            el.style.setProperty("--stroke", `hsl(${hue} 85% 66%)`);
+            el.innerHTML = `${glyph(q, hue)}<span class="lbl">W${sub(N)}${sup(e)}</span>`;
+            el.title = `k = ${k}, n = ${n}:  kn = ${k * n} ≡ ${e} (mod ${N})  →  W${sub(N)}${sup(e)} = ${VALUE_TEXT[q]}`;
+            el.setAttribute("aria-label", `N ${N}, row ${k}, column ${n}, W ${N} to the ${e}, equals ${VALUE_TEXT[q]}`);
+            el.setAttribute("aria-pressed", "false");
+            place(el, track(k), track(n));
+
+            const rec = { id, N, k, n, e, q, el, inQuarter: k < h && n < h };
+            el.addEventListener("click", () => {
+              stopPlaying();
+              selected = selected && selected.id === id ? null : rec;
+              finished = false;
+              render();
+            });
+
+            grid.appendChild(el);
+            cells.push(rec);
+            byId.set(id, rec);
+          }
+        }
+
+        // dashed outline + tag around the top-left quarter
+        const box = document.createElement("div");
+        box.className = "quarter";
+        box.style.gridRow = `2 / span ${h}`;
+        box.style.gridColumn = `2 / span ${h}`;
+        grid.appendChild(box);
+
+      }
+
+      SIZES.forEach(build);
+
+      // Play order: N = 4's quarter, then N = 8's quarter, each top-left -> bottom-right.
+      const sequence = [];
+      SIZES.forEach(N => {
+        const h = N / 2;
+        for (let k = 0; k < h; k++)
+          for (let n = 0; n < h; n++) sequence.push(byId.get(`${N}-${k}-${n}`));
+      });
+
+      // ---------- logic ----------
+      function coveredKeys(N) {
+        const keys = new Set();
+        for (const c of played[N]) {
+          keys.add(c.q);
+          if (showNeg) keys.add((c.q + 4) % 8);
+        }
+        return keys;
+      }
+
+      function render() {
+        const selQ = selected ? selected.q : null;
+        const negQ = selected ? (selected.q + 4) % 8 : null;
+        const cov = { 4: coveredKeys(4), 8: coveredKeys(8) };
+        const counts = { match: { 4: 0, 8: 0 }, neg: { 4: 0, 8: 0 }, cov: { 4: 0, 8: 0 } };
+
+        SIZES.forEach(N => {
+          grids[N].classList.toggle("has-sel", !!selected);
+          grids[N].classList.toggle("has-cov", played[N].length > 0);
+        });
+
+        for (const c of cells) {
+          const isAnchor = selected && selected.id === c.id;
+          const isMatch = selected && c.q === selQ;
+          const isNeg = selected && showNeg && c.q === negQ;
+          const isCov = cov[c.N].has(c.q);
+
+          c.el.classList.toggle("anchor", !!isAnchor);
+          c.el.classList.toggle("match", !!isMatch && !isAnchor);
+          c.el.classList.toggle("negmatch", !!isNeg);
+          c.el.classList.toggle("covered", isCov);
+          c.el.setAttribute("aria-pressed", isAnchor ? "true" : "false");
+
+          if (isMatch) counts.match[c.N]++;
+          if (isNeg) counts.neg[c.N]++;
+          if (isCov) counts.cov[c.N]++;
+        }
+
+        // meters
+        SIZES.forEach(N => {
+          const total = N * N;
+          const q = (N / 2) * (N / 2);
+          if (played[N].length) {
+            meters[N].innerHTML =
+              `quarter <b>${played[N].length}/${q}</b> · lit <b>${counts.cov[N]}/${total}</b>`;
+          } else {
+            meters[N].textContent = `quarter: ${q} of ${total}`;
+          }
+        });
+
+        statusEl.innerHTML = statusText(counts);
+        playBtn.textContent = playing ? "⏸ Pause" : finished ? "↻ Replay" : seqIndex >= 0 ? "▶ Resume" : "▶ Play";
+        playBtn.classList.toggle("playing", playing);
+      }
+
+      function statusText(counts) {
+        if (selected) {
+          const { N, k, n, e, q } = selected;
+          const other = N === 4 ? 8 : 4;
+          let s = `<b class="mono">F${sub(N)}[${k}, ${n}] = W${sub(N)}${sup(e)} = ${VALUE_TEXT[q]}</b>` +
+                  ` &nbsp;·&nbsp; the same value sits in <b>${counts.match[N]}</b> of the ${N * N} squares of N = ${N}` +
+                  ` and <b>${counts.match[other]}</b> of N = ${other}.`;
+          if (showNeg) {
+            s += ` <span class="flip">Its negative ${VALUE_TEXT[(q + 4) % 8]} (dashed) fills ` +
+                 `${counts.neg[N]} more in N = ${N}.</span>`;
+          }
+          return s;
+        }
+        if (finished) {
+          const lit8 = counts.cov[8];
+          if (showNeg) {
+            return `<b>Done.</b> With sign flips counted, the top-left quarter accounts for <b>every</b> square: ` +
+                   `${counts.cov[4]}/16 in N = 4 and ${lit8}/64 in N = 8. Every value in the matrix is a quarter value or its negative.`;
+          }
+          return `<b>Done.</b> The top-left quarter's values alone show up in ${counts.cov[4]}/16 squares of N = 4 and ` +
+                 `${lit8}/64 of N = 8. Tick <span class="flip">“sign flips”</span> to see that every remaining square is just one of them negated.`;
+        }
+        return `Click any square to toggle it, or press <b>Play</b> to step through the top-left quarters.`;
+      }
+
+      function step() {
+        if (finished) resetPlay();
+        seqIndex++;
+        if (seqIndex >= sequence.length) {
+          finish();
+          return;
+        }
+        const c = sequence[seqIndex];
+        played[c.N].push(c);
+        selected = c;
+        render();
+      }
+
+      function finish() {
+        stopPlaying();
+        seqIndex = sequence.length;
+        selected = null;
+        finished = true;
+        render();
+      }
+
+      function startPlaying() {
+        if (playing) return;
+        if (finished) resetPlay();
+        playing = true;
+        step();
+        timer = setInterval(step, 950);
+        render();
+      }
+
+      function stopPlaying() {
+        playing = false;
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      function resetPlay() {
+        played[4] = [];
+        played[8] = [];
+        seqIndex = -1;
+        finished = false;
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (playing) {
+          stopPlaying();
+          render();
+        } else {
+          startPlaying();
+        }
+      });
+
+      stepBtn.addEventListener("click", () => {
+        stopPlaying();
+        step();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        stopPlaying();
+        resetPlay();
+        selected = null;
+        render();
+      });
+
+      negBox.addEventListener("change", () => {
+        showNeg = negBox.checked;
+        render();
+      });
+
+      // ---------- iframe auto-height ----------
+      function resizeIframe() {
+        try {
+          if (!window.frameElement) return;
+          const h = Math.ceil(widget.getBoundingClientRect().height) + 2;
+          window.frameElement.style.height = h + "px";
+          window.frameElement.style.overflow = "hidden";
+          window.frameElement.setAttribute("scrolling", "no");
+        } catch (e) {}
+      }
+
+      render();
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(resizeIframe).observe(widget);
+      } else {
+        window.addEventListener("resize", resizeIframe);
+      }
+      resizeIframe();
+    })();
+  </script>
+</body>
+</html>

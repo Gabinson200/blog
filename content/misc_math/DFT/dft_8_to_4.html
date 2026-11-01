@@ -1,0 +1,1585 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recursive DFT Matrix Decomposition</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121212;
+      --panel: #1b1c20;
+      --panel-dark: #151619;
+      --border: #32343a;
+      --text: #f0f2f6;
+      --muted: #aeb5c0;
+      --green: #55d8a9;
+      --orange: #f4bf75;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    body {
+      color: var(--text);
+      font: 14px/1.5 system-ui, -apple-system,
+        "Segoe UI", sans-serif;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:focus-visible {
+      outline: 2px solid #b9d7ff;
+      outline-offset: 2px;
+    }
+
+    /* Main widget */
+
+    .widget {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: var(--bg);
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+
+    h2 {
+      margin: 0 0 6px;
+      font-size: 21px;
+      letter-spacing: -0.025em;
+    }
+
+    .intro {
+      margin: 0 0 16px;
+      color: #bbb;
+      max-width: 880px;
+    }
+
+    .eyebrow {
+      color: #9ccabf;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+      font-weight: 750;
+      margin-bottom: 5px;
+    }
+
+    /* Controls */
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 14px 23px;
+      padding: 13px;
+      background: #202020;
+      border: 1px solid #363636;
+      border-radius: 9px;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .choices button,
+    .next {
+      border: 1px solid #414650;
+      background: #28292d;
+      color: #d2d7e1;
+      padding: 7px 11px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .choices button:hover,
+    .next:hover {
+      background: #393b42;
+    }
+
+    .choices button.active {
+      background: #3b454f;
+      border-color: #93a3bd;
+      color: white;
+    }
+
+    .choices button[data-kind="sum"].active {
+      border-color: #4fbc96;
+      background: #20493c;
+      color: #c5ffeb;
+    }
+
+    .choices button[data-kind="diff"].active {
+      border-color: #d7a365;
+      background: #4a3826;
+      color: #ffe6bd;
+    }
+
+    .next {
+      align-self: end;
+      margin-left: auto;
+    }
+
+    /* Computational trace */
+
+    .trace {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 13px 0;
+      padding: 10px 12px;
+      background: #1b1c20;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: 12px/1.4 ui-monospace,
+        Consolas, monospace;
+    }
+
+    .trace-step {
+      padding: 5px 8px;
+      border: 1px solid #444852;
+      border-radius: 6px;
+      color: #f3f4f6;
+    }
+
+    .trace-step.first {
+      border-color: var(--green);
+    }
+
+    .trace-step.first.diff {
+      border-color: var(--orange);
+    }
+
+    .trace-step.second {
+      border-color: #b3a3ed;
+    }
+
+    .trace-arrow {
+      color: #a5aab5;
+    }
+
+    /* Matrix panels */
+
+    .network {
+      display: grid;
+      grid-template-columns:
+        minmax(420px, 1.35fr)
+        minmax(320px, 1fr)
+        minmax(210px, 0.68fr);
+      align-items: start;
+      gap: 12px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.2s, opacity 0.2s;
+    }
+
+    .panel.active {
+      border-color: #9db4d8;
+    }
+
+    .panel:not(.active) {
+      opacity: 0.90;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .shape {
+      color: var(--muted);
+      font: 12px ui-monospace, Consolas, monospace;
+    }
+
+    .panel-caption {
+      margin: 12px 0 0;
+      color: #b7bbc4;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    /* Matrix and input-vector layout */
+
+    .matrix-area {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .matrix-section {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .axis {
+      margin-bottom: 6px;
+      font: 10px ui-monospace, Consolas, monospace;
+      color: #b6becb;
+      text-align: center;
+    }
+
+    .matgrid {
+      display: grid;
+      grid-template-columns:
+        24px repeat(var(--size), minmax(0, 1fr));
+      gap: 3px;
+    }
+
+    .corner,
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 20px;
+      color: #a4aab7;
+      font: 11px ui-monospace, Consolas, monospace;
+    }
+
+    .header.selected {
+      color: white;
+      font-weight: 700;
+    }
+
+    /* Phase-colored matrix cells */
+
+    .cell {
+      min-width: 0;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 0;
+      border: 1px solid #383b43;
+      border-radius: 5px;
+      background: var(--phase-bg);
+      color: #b6c7da;
+      transition:
+        background 0.15s,
+        border-color 0.15s;
+    }
+
+    .cell:hover {
+      border-color: white;
+    }
+
+    .cell.selected {
+      background: var(--phase-on);
+      border-color: var(--green);
+    }
+
+    .cell.selected.diff {
+      border-color: var(--orange);
+    }
+
+    .cell.focus {
+      background: var(--phase-focus);
+      border: 2px solid white;
+    }
+
+    .cell svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .phase-arrow {
+      stroke: var(--phase-ray);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .cell.selected .phase-arrow,
+    .cell.focus .phase-arrow {
+      stroke: var(--phase-ray-bright);
+    }
+
+    .cell-name {
+      font: 700 10px ui-monospace,
+        Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .cell.selected .cell-name,
+    .cell.focus .cell-name {
+      color: white;
+    }
+
+    /* Input vectors */
+
+    .vector-section {
+      flex: 0 0 65px;
+    }
+
+    .vector-title {
+      margin-bottom: 6px;
+      min-height: 20px;
+      text-align: center;
+      color: #b6becb;
+      font: 11px ui-monospace, Consolas, monospace;
+    }
+
+    .vector {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .vector-value {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 3px;
+      min-height: 34px;
+      color: #e5e9f0;
+      background: #25262c;
+      border: 1px solid #444650;
+      border-radius: 6px;
+      font: 650 11px ui-monospace,
+        Consolas, monospace;
+    }
+
+    .vector-value.selected {
+      color: white;
+      border-color: #9db4d8;
+    }
+
+    .vector-value.sum {
+      border-color: var(--green);
+      background: #203e34;
+    }
+
+    .vector-value.diff {
+      border-color: var(--orange);
+      background: #453525;
+    }
+
+    #v8 .vector-value {
+      min-height: 37px;
+    }
+
+    #v4 .vector-value {
+      min-height: 49px;
+    }
+
+    #m4 {
+      gap: 5px;
+    }
+
+    #m4 .cell {
+      min-height: 43px;
+    }
+
+    /* Equations */
+
+    .equation {
+      margin-top: 12px;
+      padding: 11px;
+      background: #16171a;
+      border: 1px solid #363840;
+      border-radius: 8px;
+    }
+
+    .equation-title {
+      margin-bottom: 5px;
+      color: #b6becb;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .equation-text {
+      color: #f0f2f6;
+      font: 12px/1.8 ui-monospace,
+        Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
+    .green {
+      color: #8af1c9;
+    }
+
+    .amber {
+      color: #ffcf91;
+    }
+
+    .purple {
+      color: #c4b5fd;
+    }
+
+    /* Equation-only 2-point base case */
+
+    .base-matrix {
+      display: inline-block;
+      margin: 7px 0 11px;
+      padding: 8px 12px;
+      border-left: 2px solid #aeb5c0;
+      border-right: 2px solid #aeb5c0;
+      font: 18px/1.45 ui-monospace,
+        Consolas, monospace;
+      white-space: pre;
+    }
+
+    .base-equations {
+      font: 13px/1.9 ui-monospace,
+        Consolas, monospace;
+    }
+
+    .base-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Explanation and legend */
+
+    .explanation {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      background: #1b1c20;
+      color: #c7ccd5;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+      color: #aeb5c0;
+      font-size: 11px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      margin-right: 4px;
+      border-radius: 3px;
+      vertical-align: -1px;
+    }
+
+    .swatch.sum {
+      background: var(--green);
+    }
+
+    .swatch.diff {
+      background: var(--orange);
+    }
+
+    .phase-gradient {
+      display: inline-block;
+      width: 105px;
+      height: 10px;
+      margin: 0 5px;
+      border-radius: 4px;
+      vertical-align: middle;
+      background: linear-gradient(
+        to right,
+        hsl(0 78% 59%),
+        hsl(60 78% 59%),
+        hsl(120 78% 59%),
+        hsl(180 78% 59%),
+        hsl(240 78% 59%),
+        hsl(300 78% 59%),
+        hsl(360 78% 59%)
+      );
+    }
+
+    /* Responsive layout */
+
+    @media (max-width: 1150px) {
+      .network {
+        grid-template-columns:
+          minmax(0, 1.2fr)
+          minmax(0, 1fr);
+      }
+
+      #p2 {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .widget {
+        padding: 12px;
+      }
+
+      .network {
+        grid-template-columns: 1fr;
+      }
+
+      #p2 {
+        grid-column: auto;
+      }
+
+      .next {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .matrix-area {
+        gap: 6px;
+      }
+
+      .vector-section {
+        flex-basis: 53px;
+      }
+
+      .matgrid {
+        gap: 2px;
+        grid-template-columns:
+          20px repeat(var(--size), minmax(0, 1fr));
+      }
+
+      .cell {
+        border-radius: 3px;
+      }
+
+      .cell svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .cell-name {
+        font-size: 8px;
+      }
+
+      .header {
+        font-size: 10px;
+      }
+
+      #v8 .vector-value {
+        min-height: 30px;
+      }
+
+      .panel {
+        padding: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="widget" id="widget">
+
+    <header>
+      <div class="eyebrow">
+        Radix-2 FFT · Decimation in frequency
+      </div>
+
+      <h2>The DFT matrix, factored step by step</h2>
+
+      <p class="intro">
+        Follow one pair of samples from the 8-point transform
+        into a smaller 4-point DFT, then into the 2-point base case.
+        Cell colors and arrows show complex phase.
+      </p>
+    </header>
+
+    <!-- Interactive controls -->
+
+    <section
+      class="controls"
+      aria-label="Matrix decomposition controls"
+    >
+      <div class="control">
+        <span class="control-label">
+          FIRST SPLIT · N = 8
+        </span>
+
+        <div class="choices" id="first-branch">
+          <button
+            type="button"
+            data-value="0"
+            data-kind="sum"
+            class="active"
+          >
+            + Even rows
+          </button>
+
+          <button
+            type="button"
+            data-value="1"
+            data-kind="diff"
+          >
+            − Odd rows
+          </button>
+        </div>
+      </div>
+
+      <div class="control">
+        <span class="control-label">
+          INPUT PAIR
+        </span>
+
+        <div class="choices" id="input-pairs"></div>
+      </div>
+
+      <div class="control">
+        <span class="control-label">
+          SECOND SPLIT · N = 4
+        </span>
+
+        <div class="choices" id="second-branch">
+          <button
+            type="button"
+            data-value="0"
+            data-kind="sum"
+            class="active"
+          >
+            + Even rows
+          </button>
+
+          <button
+            type="button"
+            data-value="1"
+            data-kind="diff"
+          >
+            − Odd rows
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="next"
+        id="next-stage"
+      >
+        Next stage →
+      </button>
+    </section>
+
+    <!-- Intermediate computation trace -->
+
+    <div class="trace" aria-live="polite">
+      <span class="trace-step" id="trace-input">
+        x₀, x₄
+      </span>
+
+      <span class="trace-arrow">→</span>
+
+      <span class="trace-step first" id="trace-p">
+        p₀
+      </span>
+
+      <span class="trace-arrow">→</span>
+
+      <span class="trace-step second" id="trace-q">
+        q₀
+      </span>
+
+      <span class="trace-arrow">→</span>
+
+      <span class="trace-step" id="trace-output">
+        X[0], X[4]
+      </span>
+    </div>
+
+    <!-- Main visualization -->
+
+    <section
+      class="network"
+      aria-label="Recursive matrix computation"
+    >
+
+      <!-- 8 × 8 matrix -->
+
+      <article class="panel active" id="p8">
+        <div class="panel-head">
+          <h3 class="panel-title">
+            1. Original DFT
+          </h3>
+          <span class="shape">8 × 8</span>
+        </div>
+
+        <div class="matrix-area">
+          <div class="matrix-section">
+            <div class="axis">
+              F₈ · rows k × columns n
+            </div>
+
+            <div
+              class="matgrid"
+              id="m8"
+              style="--size:8"
+            ></div>
+          </div>
+
+          <div class="vector-section">
+            <div class="vector-title">
+              x[n]
+            </div>
+
+            <div class="vector" id="v8"></div>
+          </div>
+        </div>
+
+        <div class="equation">
+          <div class="equation-title">
+            Combine inputs four apart
+          </div>
+
+          <div
+            class="equation-text"
+            id="eq8"
+          ></div>
+        </div>
+
+        <p class="panel-caption" id="cap8"></p>
+      </article>
+
+      <!-- 4 × 4 matrix -->
+
+      <article class="panel" id="p4">
+        <div class="panel-head">
+          <h3 class="panel-title">
+            2. Smaller DFT
+          </h3>
+          <span class="shape">4 × 4</span>
+        </div>
+
+        <div class="matrix-area">
+          <div class="matrix-section">
+            <div class="axis">
+              F₄ · rows r × columns n
+            </div>
+
+            <div
+              class="matgrid"
+              id="m4"
+              style="--size:4"
+            ></div>
+          </div>
+
+          <div class="vector-section">
+            <div class="vector-title">
+              p[n]
+            </div>
+
+            <div class="vector" id="v4"></div>
+          </div>
+        </div>
+
+        <div class="equation">
+          <div class="equation-title">
+            Repeat: combine inputs two apart
+          </div>
+
+          <div
+            class="equation-text"
+            id="eq4"
+          ></div>
+        </div>
+
+        <p class="panel-caption" id="cap4"></p>
+      </article>
+
+      <!-- Equation-only base case -->
+
+      <article class="panel" id="p2">
+        <div class="panel-head">
+          <h3 class="panel-title">
+            3. Base case
+          </h3>
+
+          <span class="shape">
+            2-point DFT
+          </span>
+        </div>
+
+        <div
+          class="equation"
+          style="margin-top:0"
+        >
+          <div class="equation-title">
+            The 2 × 2 DFT matrix
+          </div>
+
+          <div class="equation-text">
+            F₂ =
+          </div>
+
+          <div class="base-matrix">1   1
+1  −1</div>
+
+          <div
+            class="base-equations"
+            id="eq2"
+          ></div>
+        </div>
+
+        <p class="panel-caption" id="cap2">
+          Every leaf of the recursion is just
+          one sum and one difference.
+        </p>
+      </article>
+
+    </section>
+
+    <!-- Contextual explanation -->
+
+    <p
+      class="explanation"
+      id="explain"
+      aria-live="polite"
+    ></p>
+
+    <!-- Legend -->
+
+    <footer class="footer">
+      <div class="legend">
+        <span>
+          <i class="swatch sum"></i>
+          Sum (+)
+        </span>
+
+        <span>
+          <i class="swatch diff"></i>
+          Difference (−)
+        </span>
+
+        <span>
+          Phase
+          <i class="phase-gradient"></i>
+          0°–360°
+        </span>
+      </div>
+
+      <span>
+        Click a matrix cell to trace its contribution.
+      </span>
+    </footer>
+
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* -------------------------------------------
+         Helpers and state
+         ------------------------------------------- */
+
+      const $ = id => document.getElementById(id);
+
+      const sub = n =>
+        String(n).replace(
+          /\d/g,
+          d => "₀₁₂₃₄₅₆₇₈₉"[Number(d)]
+        );
+
+      const supers = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+
+      const state = {
+        first: 0,
+        pair: 0,
+        second: 0,
+        stage: 0
+      };
+
+      /*
+       * first:
+       *   0 = even frequency rows / sums
+       *   1 = odd frequency rows / differences
+       *
+       * pair:
+       *   original samples n and n+4
+       *
+       * second:
+       *   0 = even rows of F4
+       *   1 = odd rows of F4
+       *
+       * stage:
+       *   currently emphasized panel
+       */
+
+      /* -------------------------------------------
+         Complex phase calculations
+         ------------------------------------------- */
+
+      function phase(N, k, n) {
+        return (
+          -2 * Math.PI * ((k * n) % N) / N
+        );
+      }
+
+      function phaseHue(N, k, n) {
+        return (
+          (
+            (-360 * ((k * n) % N) / N) % 360
+            + 360
+          ) % 360
+        );
+      }
+
+      /*
+       * Each matrix element is:
+       *
+       * F_N[k,n] = exp(-i 2πkn/N)
+       *
+       * The phase is mapped onto the same
+       * HSL color wheel as the original widget.
+       */
+
+      function phaseGlyph(N, k, n) {
+        const angleDegrees =
+          -phase(N, k, n) * 180 / Math.PI;
+
+        const exponent = (k * n) % N;
+
+        const label =
+          `W${sub(N)}${supers[exponent]}`;
+
+        return `
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-opacity="0.16"
+            />
+
+            <g transform="rotate(${angleDegrees} 12 12)">
+              <path
+                class="phase-arrow"
+                d="M12 12 H20 M17 9 L20 12 L17 15"
+                fill="none"
+              />
+            </g>
+          </svg>
+
+          <span class="cell-name">
+            ${label}
+          </span>
+        `;
+      }
+
+      /* -------------------------------------------
+         Construct an interactive DFT matrix
+         ------------------------------------------- */
+
+      function createMatrix(N, id) {
+        const grid = $(id);
+        grid.replaceChildren();
+
+        const corner = document.createElement("span");
+        corner.className = "corner";
+        corner.textContent = "k\\n";
+        grid.append(corner);
+
+        // Column headers
+        for (let n = 0; n < N; n++) {
+          const header = document.createElement("span");
+
+          header.className = "header";
+          header.dataset.col = n;
+          header.textContent = n;
+
+          grid.append(header);
+        }
+
+        // Matrix rows
+        for (let k = 0; k < N; k++) {
+          const header = document.createElement("span");
+
+          header.className = "header";
+          header.dataset.row = k;
+          header.textContent = k;
+
+          grid.append(header);
+
+          // Matrix cells
+          for (let n = 0; n < N; n++) {
+            const cell = document.createElement("button");
+
+            cell.type = "button";
+            cell.className = "cell";
+
+            cell.dataset.k = k;
+            cell.dataset.n = n;
+
+            cell.setAttribute(
+              "aria-label",
+              `F${N}, row ${k}, column ${n}`
+            );
+
+            const hue = phaseHue(N, k, n);
+
+            // Same phase colors as the original
+            // complex phase-vector visualization.
+            cell.style.setProperty(
+              "--phase-bg",
+              `hsl(${hue} 68% 12%)`
+            );
+
+            cell.style.setProperty(
+              "--phase-on",
+              `hsl(${hue} 68% 25%)`
+            );
+
+            cell.style.setProperty(
+              "--phase-focus",
+              `hsl(${hue} 70% 31%)`
+            );
+
+            cell.style.setProperty(
+              "--phase-ray",
+              `hsl(${hue} 88% 66%)`
+            );
+
+            cell.style.setProperty(
+              "--phase-ray-bright",
+              `hsl(${hue} 88% 74%)`
+            );
+
+            cell.innerHTML = phaseGlyph(N, k, n);
+
+            // Clicking a cell selects its
+            // corresponding recursive branch.
+            cell.addEventListener("click", () => {
+              if (N === 8) {
+                state.first = k % 2;
+                state.pair = n % 4;
+                state.stage = 0;
+              } else {
+                state.second = k % 2;
+                state.pair = n;
+                state.stage = 1;
+              }
+
+              render();
+            });
+
+            grid.append(cell);
+          }
+        }
+      }
+
+      /* -------------------------------------------
+         Display a column of input values
+         ------------------------------------------- */
+
+      function drawVector(
+        id,
+        values,
+        selectedIndices,
+        kind
+      ) {
+        const vector = $(id);
+        vector.replaceChildren();
+
+        for (let i = 0; i < values.length; i++) {
+          const item = document.createElement("div");
+
+          const selected = selectedIndices.includes(i);
+
+          item.className =
+            `vector-value${selected ? ` selected ${kind}` : ""}`;
+
+          item.textContent = values[i];
+
+          vector.append(item);
+        }
+      }
+
+      /* -------------------------------------------
+         Highlight reused matrix coefficients
+         ------------------------------------------- */
+
+      function highlightMatrix(
+        id,
+        rows,
+        columns,
+        focusRows,
+        isDifference
+      ) {
+        const grid = $(id);
+
+        for (const cell of grid.querySelectorAll(".cell")) {
+          const k = Number(cell.dataset.k);
+          const n = Number(cell.dataset.n);
+
+          const selected =
+            rows.includes(k) &&
+            columns.includes(n);
+
+          cell.classList.toggle(
+            "selected",
+            selected
+          );
+
+          cell.classList.toggle(
+            "diff",
+            isDifference
+          );
+
+          cell.classList.toggle(
+            "focus",
+            selected && focusRows.includes(k)
+          );
+
+          cell.setAttribute(
+            "aria-pressed",
+            String(selected)
+          );
+        }
+
+        // Row labels
+        for (
+          const header of grid.querySelectorAll("[data-row]")
+        ) {
+          header.classList.toggle(
+            "selected",
+            rows.includes(Number(header.dataset.row))
+          );
+        }
+
+        // Column labels
+        for (
+          const header of grid.querySelectorAll("[data-col]")
+        ) {
+          header.classList.toggle(
+            "selected",
+            columns.includes(Number(header.dataset.col))
+          );
+        }
+      }
+
+      /* -------------------------------------------
+         Synchronize control button states
+         ------------------------------------------- */
+
+      function syncButtons(groupId, selectedValue) {
+        const group = $(groupId);
+
+        for (const button of group.querySelectorAll("button")) {
+          const active =
+            Number(button.dataset.value) === selectedValue;
+
+          button.classList.toggle(
+            "active",
+            active
+          );
+
+          button.setAttribute(
+            "aria-pressed",
+            String(active)
+          );
+        }
+      }
+
+      /* -------------------------------------------
+         Render the selected recursive path
+         ------------------------------------------- */
+
+      function render() {
+        const b = state.first;
+        const t = state.second;
+        const n = state.pair;
+
+        const m = n % 2;
+        const partner = m + 2;
+
+        // Final frequency indices selected by
+        // the two levels of even/odd splitting.
+        const k0 = b + 2 * t;
+        const k1 = k0 + 4;
+
+        const rows8 = [
+          b,
+          b + 2,
+          b + 4,
+          b + 6
+        ];
+
+        const rows4 = [
+          t,
+          t + 2
+        ];
+
+        /* First matrix: F8 */
+
+        highlightMatrix(
+          "m8",
+          rows8,
+          [n, n + 4],
+          [k0, k1],
+          Boolean(b)
+        );
+
+        drawVector(
+          "v8",
+          Array.from(
+            { length: 8 },
+            (_, i) => `x${sub(i)}`
+          ),
+          [n, n + 4],
+          b ? "diff" : "sum"
+        );
+
+        /* Second matrix: F4 */
+
+        highlightMatrix(
+          "m4",
+          rows4,
+          [m, partner],
+          rows4,
+          Boolean(t)
+        );
+
+        drawVector(
+          "v4",
+          Array.from(
+            { length: 4 },
+            (_, i) => `p${sub(i)}`
+          ),
+          [m, partner],
+          t ? "diff" : "sum"
+        );
+
+        /* First-level equations */
+
+        $("eq8").innerHTML = b
+          ? `
+            <span class="amber">
+              p${sub(n)}
+              = W₈${supers[n]}
+              (x${sub(n)} − x${sub(n + 4)})
+            </span>
+            <br>
+            X[2r + 1] = DFT₄(p)[r]
+          `
+          : `
+            <span class="green">
+              p${sub(n)}
+              = x${sub(n)} + x${sub(n + 4)}
+            </span>
+            <br>
+            X[2r] = DFT₄(p)[r]
+          `;
+
+        /* Second-level equations */
+
+        $("eq4").innerHTML = t
+          ? `
+            <span class="amber">
+              q${sub(m)}
+              = W₄${supers[m]}
+              (p${sub(m)} − p${sub(partner)})
+            </span>
+            <br>
+            DFT₄(p)[2j + 1] = DFT₂(q)[j]
+          `
+          : `
+            <span class="green">
+              q${sub(m)}
+              = p${sub(m)} + p${sub(partner)}
+            </span>
+            <br>
+            DFT₄(p)[2j] = DFT₂(q)[j]
+          `;
+
+        /* Equation-only F2 base case */
+
+        $("eq2").innerHTML = `
+          <span class="purple">
+            X[${k0}] = q₀ + q₁
+          </span>
+          <br>
+          <span class="purple">
+            X[${k1}] = q₀ − q₁
+          </span>
+        `;
+
+        /* Matrix explanations */
+
+        $("cap8").textContent =
+          `Columns ${n} and ${n + 4} have ` +
+          `${b ? "opposite" : "matching"} phases ` +
+          `in ${b ? "odd" : "even"} rows. ` +
+          `Their contributions can be grouped first.`;
+
+        $("cap4").textContent =
+          `The four intermediate p values are now inputs ` +
+          `to F₄. The same symmetry pairs columns ` +
+          `${m} and ${partner}.`;
+
+        /* Computational trace */
+
+        $("trace-input").textContent =
+          `x${sub(n)}, x${sub(n + 4)}`;
+
+        $("trace-p").textContent =
+          `p${sub(n)} ${b ? "(−, rotate)" : "(+)"}`;
+
+        $("trace-p").classList.toggle(
+          "diff",
+          Boolean(b)
+        );
+
+        $("trace-q").textContent =
+          `q${sub(m)} ${t ? "(−, rotate)" : "(+)"}`;
+
+        $("trace-output").textContent =
+          `X[${k0}], X[${k1}]`;
+
+        /* Detailed explanation */
+
+        $("explain").innerHTML =
+          `<strong>Current trace:</strong> ` +
+          `In F₈, combine x${sub(n)} and x${sub(n + 4)} ` +
+          `to help form p${sub(n)}. ` +
+          `In F₄, p${sub(m)} and p${sub(partner)} ` +
+          `form q${sub(m)}. ` +
+          `Finally F₂ combines q₀ and q₁ ` +
+          `to give X[${k0}] and X[${k1}].`;
+
+        /* Update controls */
+
+        syncButtons(
+          "first-branch",
+          b
+        );
+
+        syncButtons(
+          "second-branch",
+          t
+        );
+
+        syncButtons(
+          "input-pairs",
+          n
+        );
+
+        /* Highlight current stage */
+
+        for (let stage = 0; stage < 3; stage++) {
+          const panelId =
+            "p" + [8, 4, 2][stage];
+
+          $(panelId).classList.toggle(
+            "active",
+            state.stage === stage
+          );
+        }
+
+        $("next-stage").textContent =
+          state.stage === 2
+            ? "Restart stages ↺"
+            : "Next stage →";
+
+        resizeIframe();
+      }
+
+      /* -------------------------------------------
+         Build input-pair buttons
+         ------------------------------------------- */
+
+      for (let n = 0; n < 4; n++) {
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.dataset.value = n;
+
+        button.textContent =
+          `${n} · ${n + 4}`;
+
+        button.addEventListener(
+          "click",
+          () => {
+            state.pair = n;
+            render();
+          }
+        );
+
+        $("input-pairs").append(button);
+      }
+
+      /* -------------------------------------------
+         First and second split controls
+         ------------------------------------------- */
+
+      for (
+        const [id, key] of [
+          ["first-branch", "first"],
+          ["second-branch", "second"]
+        ]
+      ) {
+        for (
+          const button of $(id).querySelectorAll("button")
+        ) {
+          button.addEventListener(
+            "click",
+            () => {
+              state[key] =
+                Number(button.dataset.value);
+
+              render();
+            }
+          );
+        }
+      }
+
+      /* -------------------------------------------
+         Stage navigation
+         ------------------------------------------- */
+
+      $("next-stage").addEventListener(
+        "click",
+        () => {
+          state.stage =
+            (state.stage + 1) % 3;
+
+          render();
+        }
+      );
+
+      /* -------------------------------------------
+         Responsive iframe resizing
+         ------------------------------------------- */
+
+      let resizeQueued = false;
+
+      function resizeIframe() {
+        if (resizeQueued) {
+          return;
+        }
+
+        resizeQueued = true;
+
+        requestAnimationFrame(() => {
+          resizeQueued = false;
+
+          // Measure actual content, not the viewport,
+          // to prevent endlessly growing iframes.
+          const height = Math.ceil(
+            $("widget").getBoundingClientRect().height
+          ) + 3;
+
+          try {
+            const frame = window.frameElement;
+
+            if (!frame) {
+              return;
+            }
+
+            const oldHeight =
+              parseFloat(frame.style.height) || 0;
+
+            if (Math.abs(height - oldHeight) > 3) {
+              frame.style.height =
+                `${height}px`;
+            }
+
+            frame.setAttribute(
+              "scrolling",
+              "no"
+            );
+
+          } catch (error) {
+            // Cross-origin iframe restrictions.
+          }
+        });
+      }
+
+      /* -------------------------------------------
+         Initialize
+         ------------------------------------------- */
+
+      createMatrix(
+        8,
+        "m8"
+      );
+
+      createMatrix(
+        4,
+        "m4"
+      );
+
+      if ("ResizeObserver" in window) {
+        const observer =
+          new ResizeObserver(resizeIframe);
+
+        observer.observe(
+          $("widget")
+        );
+      }
+
+      render();
+
+    })();
+  </script>
+</body>
+</html>
