@@ -3,12 +3,21 @@
     <title>TheFirstMan&apos;s Blog</title>
     <link href="https://gabinson200.github.io/blog/feed.xml" rel="self"/>
     <link href="https://gabinson200.github.io/blog/"/>
-    <updated>2026-09-19T00:00:00.000Z</updated>
+    <updated>2026-10-22T00:00:00.000Z</updated>
     <id>https://gabinson200.github.io/blog/</id>
     <author>
         <name>TheFirstMan</name>
     </author>
 
+    <entry>
+        <title>Technobabble 0.1</title>
+        <link href="https://gabinson200.github.io/blog/article.html?slug=ai%2Framblings%2FTechnobabble%200.1"/>
+        <id>https://gabinson200.github.io/blog/article.html?slug=ai%2Framblings%2FTechnobabble%200.1</id>
+        <published>2026-10-22T00:00:00.000Z</published>
+        <updated>2026-10-22T00:00:00.000Z</updated>
+        <summary>Ramblings on AI 1</summary>
+        <category term="AI"/><category term="ramblings"/>
+    </entry>
     <entry>
         <title>FFT</title>
         <link href="https://gabinson200.github.io/blog/article.html?slug=misc_math%2FFFT%2FFFT"/>
