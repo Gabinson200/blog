@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DFT Conjugate Symmetry</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: #f0f2f6;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .widget {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 17px;
+      background: #121212;
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+
+    h3 {
+      font-size: 1.12rem;
+      margin: 0 0 6px;
+    }
+
+    .intro {
+      margin: 0 0 14px;
+      color: #bbb;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .intro b { color: #e9e9e9; }
+
+    /* ---------- controls ---------- */
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .sizes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 4px;
+      background: #202020;
+      border-radius: 9px;
+      border: 1px solid #363636;
+    }
+
+    .sizes button,
+    .actions button {
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #bdbdbd;
+      font: inherit;
+      font-size: 0.87rem;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    .sizes button.active {
+      background: #343c4c;
+      color: #fff;
+      box-shadow: inset 0 0 0 1px #5375aa;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .actions button {
+      background: #26272b;
+      border: 1px solid #3d4048;
+      color: #d4d8e0;
+    }
+
+    .actions button:hover,
+    .sizes button:hover { background: #33363d; }
+
+    button:focus-visible {
+      outline: 2px solid #61a6ff;
+      outline-offset: 2px;
+    }
+
+    /* ---------- matrix ---------- */
+
+    .canvas-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 10px 10px 6px;
+      background: #0f1013;
+      border: 1px solid #2e3035;
+      border-radius: 9px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      max-width: 570px;
+      height: auto;
+      overflow: visible;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .cell { cursor: pointer; }
+    .cell:focus { outline: none; }
+    .cell:focus-visible .cell-bg { stroke: #61a6ff; stroke-width: 2; }
+
+    .cell .cell-bg,
+    .cell line,
+    .cell path,
+    .cell circle { transition: opacity 0.15s ease; }
+
+    .cell.dim .cell-bg { opacity: 0.45; }
+    .cell.dim line,
+    .cell.dim path,
+    .cell.dim circle { opacity: 0.28; }
+
+    .badge {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-weight: 800;
+      fill: #f2b45a;
+      pointer-events: none;
+    }
+
+    .hover-ring {
+      fill: none;
+      stroke: #ffffff;
+      stroke-dasharray: 4 3;
+      stroke-width: 1.4;
+      pointer-events: none;
+    }
+
+    .axis-line {
+      stroke: #f2b45a;
+      stroke-opacity: 0.55;
+      stroke-dasharray: 6 5;
+      stroke-width: 1.3;
+      pointer-events: none;
+    }
+
+    .axis-tag {
+      fill: #f2b45a;
+      fill-opacity: 0.8;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      pointer-events: none;
+    }
+
+    /* ---------- legend ---------- */
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 8px 16px;
+      flex-wrap: wrap;
+      color: #aaa;
+      font-size: 0.77rem;
+      margin: 13px 0 8px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+    .sw {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      background: #262830;
+      border: 1px solid #555;
+    }
+
+    .sw.sel { border: 2px solid #fff; background: #3a3f4c; }
+    .sw.free { border: 2px solid #f2b45a; background: #34302a; }
+    .sw.unk { opacity: 0.4; }
+
+    .rainbow {
+      width: 110px;
+      height: 11px;
+      border: 1px solid #535353;
+      border-radius: 5px;
+      background: linear-gradient(to right,
+        hsl(0 78% 59%), hsl(60 78% 59%), hsl(120 78% 59%), hsl(180 78% 59%),
+        hsl(240 78% 59%), hsl(300 78% 59%), hsl(360 78% 59%));
+    }
+
+    /* ---------- details ---------- */
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 12px;
+      background: #1b1c20;
+      border: 1px solid #32343a;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #b7bbc4;
+      line-height: 1.5;
+    }
+
+    .panel b { color: #f5f5f5; }
+
+    .panel .value {
+      margin-top: 3px;
+      color: #f3f4f6;
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .panel .value .flip { color: #f2b45a; font-weight: 700; }
+
+    .counts {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2px 12px;
+      margin-top: 4px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.85rem;
+    }
+
+    .counts span:nth-child(odd) { color: #9aa0ab; }
+    .counts .c-sel { color: #fff; }
+    .counts .c-free { color: #f2b45a; }
+
+    .bar {
+      display: flex;
+      height: 8px;
+      margin-top: 9px;
+      border-radius: 99px;
+      overflow: hidden;
+      background: #2a2c31;
+    }
+
+    .bar .b-sel { background: #e8ebf2; }
+    .bar .b-free { background: #f2b45a; }
+
+    .tip {
+      margin: 11px 0 0;
+      color: #aeb5c0;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 520px) {
+      .widget { padding: 11px; }
+      .details { grid-template-columns: 1fr; }
+      .sizes button { padding: 7px 9px; }
+      .canvas-wrap { padding: 5px; }
+      .intro { font-size: 0.84rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <section id="widget" class="widget">
+    <h3>DFT Matrix — Conjugate Symmetry</h3>
+    <p class="intro">Each cell is e<sup>−i2πkn/N</sup> drawn as a unit vector, colored by phase. <b>Click a cell</b> to toggle it as computed, or <b>hold and drag</b> to toggle several at once. Every cell you can read off by flipping the sign of an imaginary part (row k ↔ row N − k) lights up in amber with a <b>*</b>.</p>
+
+    <div class="controls">
+      <div class="sizes" role="group" aria-label="Matrix dimensions">
+        <button type="button" data-n="4">N = 4</button>
+        <button type="button" data-n="6">N = 6</button>
+        <button type="button" data-n="7">N = 7</button>
+        <button type="button" data-n="8" class="active" aria-pressed="true">N = 8</button>
+        <button type="button" data-n="16">N = 16</button>
+      </div>
+      <div class="actions">
+        <button type="button" id="fillBtn">Select top half</button>
+        <button type="button" id="clearBtn">Clear</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <svg id="matrix" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 555"
+           role="group" aria-label="DFT matrix: click or drag to toggle cells"></svg>
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="sw sel"></span>toggled (computed)</span>
+      <span class="legend-item"><span class="sw free"></span>free: imaginary sign flipped (*)</span>
+      <span class="legend-item"><span class="sw unk"></span>still unknown</span>
+      <span class="legend-item">phase <span class="rainbow"></span></span>
+    </div>
+
+    <div class="details">
+      <div class="panel">
+        Last toggled <b id="lastIdx">none</b>
+        <div class="value" id="lastVal">Click a cell, or drag across several.</div>
+        <div class="value" id="partnerVal"></div>
+      </div>
+    </div>
+
+    <p class="tip">Hover a cell to outline both it and its mirror partner. Rows k and N − k reflect across the dashed line (the real axis, in complex-plane terms). Row 0, and row N/2 when N is even, are their own mirror images, so they always have to be computed.</p>
+  </section>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const MODE = "conj"; // "conj" or "flip"
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const svg = document.getElementById("matrix");
+      const widget = document.getElementById("widget");
+      const sizeButtons = [...document.querySelectorAll("[data-n]")];
+
+      let N = 8;
+      let selected = new Set();   // "k,n"
+      let cells = [];             // per-cell refs
+      let last = null;            // last toggled {k,n}
+      let hoverKey = null;
+
+      const LEFT = 37, TOP = 10, SIDE = 496;
+
+      const mod = (a, b) => ((a % b) + b) % b;
+      const key = (k, n) => k + "," + n;
+
+      function entry(k, n) {
+        const idx = mod(k * n, N);
+        const theta = -2 * Math.PI * idx / N;
+        return {
+          idx,
+          theta,
+          phase: mod(-360 * idx / N, 360),
+          re: Math.cos(theta),
+          im: Math.sin(theta)
+        };
+      }
+
+      // The single cell that can be read off from (k, n) using this optimization,
+      // plus how: "conj" = flip the imaginary sign, "copy" = identical, "neg" = flip both signs.
+      function partner(k, n) {
+        if (MODE === "conj") {
+          const pk = mod(N - k, N);
+          return { k: pk, n, how: "conj", self: pk === k };
+        }
+        const pn = mod(n + N / 2, N);
+        return { k, n: pn, how: k % 2 === 0 ? "copy" : "neg", self: false };
+      }
+
+      function fmt(v) {
+        if (Math.abs(v) < 5e-4) return "0";
+        return Number(v.toFixed(3)).toString();
+      }
+
+      function complexStr(re, im, flipRe, flipIm) {
+        const r = Math.abs(re) < 5e-4 ? 0 : re;
+        const i = Math.abs(im) < 5e-4 ? 0 : im;
+        const reTxt = fmt(r);
+        const imSign = i < 0 ? "−" : "+";
+        const reHtml = flipRe ? `<span class="flip">${reTxt}</span>` : reTxt;
+        const imHtml = flipIm ? `<span class="flip">${imSign}</span>` : imSign;
+        return `${reHtml} ${imHtml} ${fmt(Math.abs(i))}i`;
+      }
+
+      function el(name, attrs = {}, parent = svg) {
+        const e = document.createElementNS(SVG_NS, name);
+        for (const [a, v] of Object.entries(attrs)) e.setAttribute(a, String(v));
+        parent.appendChild(e);
+        return e;
+      }
+
+      /* ---------- build the grid for the current N ---------- */
+
+      function build() {
+        svg.replaceChildren();
+        cells = [];
+        const cs = SIDE / N;
+        const g = el("g");
+
+        for (let k = 0; k < N; k++) {
+          for (let n = 0; n < N; n++) {
+            const e = entry(k, n);
+            const cx = LEFT + (n + 0.5) * cs;
+            const cy = TOP + (k + 0.5) * cs;
+            const hue = e.phase;
+
+            const grp = el("g", {
+              class: "cell",
+              tabindex: "0",
+              role: "button",
+              "data-k": k,
+              "data-n": n,
+              "aria-label": `Row ${k}, column ${n}, phase ${e.phase.toFixed(1)} degrees`
+            }, g);
+
+            const bg = el("rect", {
+              class: "cell-bg",
+              x: LEFT + n * cs + 0.9,
+              y: TOP + k * cs + 0.9,
+              width: cs - 1.8,
+              height: cs - 1.8,
+              rx: Math.max(1, cs * 0.06)
+            }, grp);
+
+            const r = cs * 0.31;
+            const ex = cx + r * Math.cos(e.theta);
+            const ey = cy - r * Math.sin(e.theta);
+            el("line", {
+              x1: cx, y1: cy, x2: ex, y2: ey,
+              stroke: `hsl(${hue} 88% 66%)`,
+              "stroke-width": Math.max(1.7, cs * 0.07),
+              "stroke-linecap": "round"
+            }, grp);
+
+            const hs = Math.max(2.6, cs * 0.12);
+            const dir = Math.atan2(ey - cy, ex - cx);
+            el("path", {
+              d: `M ${ex - hs * Math.cos(dir - 0.48)} ${ey - hs * Math.sin(dir - 0.48)} ` +
+                 `L ${ex} ${ey} L ${ex - hs * Math.cos(dir + 0.48)} ${ey - hs * Math.sin(dir + 0.48)}`,
+              fill: "none",
+              stroke: `hsl(${hue} 88% 74%)`,
+              "stroke-width": Math.max(1.5, cs * 0.065),
+              "stroke-linejoin": "round",
+              "stroke-linecap": "round"
+            }, grp);
+
+            el("circle", { cx, cy, r: Math.max(1.2, cs * 0.032), fill: "#eff2fa" }, grp);
+
+            const badge = el("text", {
+              class: "badge",
+              x: LEFT + (n + 1) * cs - Math.max(3, cs * 0.08),
+              y: TOP + k * cs + Math.max(10, cs * 0.26),
+              "text-anchor": "end",
+              "font-size": Math.max(9, cs * 0.22)
+            }, grp);
+
+            grp.addEventListener("keydown", ev => {
+              if (ev.key === "Enter" || ev.key === " ") {
+                ev.preventDefault();
+                toggle(k, n, !selected.has(key(k, n)));
+                update();
+              }
+            });
+            grp.addEventListener("pointerenter", () => { hoverKey = key(k, n); updateHover(); });
+            grp.addEventListener("pointerleave", () => {
+              if (hoverKey === key(k, n)) { hoverKey = null; updateHover(); }
+            });
+
+            cells.push({ k, n, hue, grp, bg, badge, cx, cy });
+          }
+        }
+
+        // symmetry guide
+        if (MODE === "conj") {
+          // rows k and N-k mirror around row N/2
+          const y = TOP + (N / 2) * cs + (N % 2 === 0 ? cs / 2 : 0);
+          el("line", { class: "axis-line", x1: LEFT - 4, x2: LEFT + SIDE + 4, y1: y, y2: y });
+        } else {
+          const x = LEFT + (N / 2) * cs;
+          el("line", { class: "axis-line", x1: x, x2: x, y1: TOP - 4, y2: TOP + SIDE + 4 });
+        }
+
+        hoverRings = [
+          el("rect", { class: "hover-ring", visibility: "hidden" }),
+          el("rect", { class: "hover-ring", visibility: "hidden" })
+        ];
+
+        for (let k = 0; k < N; k++) {
+          el("text", {
+            x: 27, y: TOP + (k + 0.5) * cs + 4,
+            fill: "#9298a4", "font-size": N === 16 ? 10 : 12, "text-anchor": "middle"
+          }).textContent = k;
+        }
+        for (let n = 0; n < N; n++) {
+          el("text", {
+            x: LEFT + (n + 0.5) * cs, y: TOP + SIDE + 17,
+            fill: "#9298a4", "font-size": N === 16 ? 10 : 12, "text-anchor": "middle"
+          }).textContent = n;
+        }
+        el("text", { x: LEFT + SIDE / 2, y: 546, fill: "#afb3bc", "font-size": 12, "text-anchor": "middle" })
+          .textContent = "Sample index n →";
+        el("text", {
+          x: 10, y: TOP + SIDE / 2, fill: "#afb3bc", "font-size": 12, "text-anchor": "middle",
+          transform: `rotate(-90 10 ${TOP + SIDE / 2})`
+        }).textContent = "Frequency index k →";
+
+        update();
+      }
+
+      let hoverRings = [];
+
+      /* ---------- state -> visuals ---------- */
+
+      function freeSet() {
+        const free = new Map(); // key -> how
+        for (const s of selected) {
+          const [k, n] = s.split(",").map(Number);
+          const p = partner(k, n);
+          if (p.self) continue;
+          const pk = key(p.k, p.n);
+          if (!selected.has(pk)) free.set(pk, p.how);
+        }
+        return free;
+      }
+
+      function update() {
+        const free = freeSet();
+        const any = selected.size > 0;
+        const BADGE = { conj: "*", copy: "=", neg: "−" };
+
+        for (const c of cells) {
+          const kk = key(c.k, c.n);
+          const isSel = selected.has(kk);
+          const how = free.get(kk);
+          const L = isSel ? 27 : how ? 19 : 12;
+          c.bg.setAttribute("fill", `hsl(${c.hue} 68% ${L}%)`);
+          c.bg.setAttribute("stroke", isSel ? "#ffffff" : how ? "#f2b45a" : "#383b43");
+          c.bg.setAttribute("stroke-width", isSel ? 1.8 : how ? 1.6 : 0.5);
+          c.grp.classList.toggle("dim", any && !isSel && !how);
+          c.grp.setAttribute("aria-pressed", isSel ? "true" : "false");
+          c.badge.textContent = how ? BADGE[how] : "";
+        }
+
+        updateDetails();
+        updateHover();
+        notifyHeight();
+      }
+
+      function updateDetails() {
+        const idx = document.getElementById("lastIdx");
+        const val = document.getElementById("lastVal");
+        const pv = document.getElementById("partnerVal");
+        if (!last) {
+          idx.textContent = "none";
+          val.textContent = "Click a cell, or drag across several.";
+          pv.textContent = "";
+          return;
+        }
+        const { k, n } = last;
+        const e = entry(k, n);
+        const p = partner(k, n);
+        const pe = entry(p.k, p.n);
+        idx.textContent = `(k = ${k}, n = ${n})`;
+        val.innerHTML = `F[${k},${n}] = ${complexStr(e.re, e.im)}`;
+
+        if (p.self) {
+          pv.innerHTML = `Row ${k} is its own mirror image (all its entries are real), so it can't be read off another row.`;
+        } else if (p.how === "conj") {
+          pv.innerHTML = `F[${p.k},${p.n}] = ${complexStr(pe.re, pe.im, false, true)} &nbsp;← same, imaginary sign flipped`;
+        } else if (p.how === "copy") {
+          pv.innerHTML = `F[${p.k},${p.n}] = ${complexStr(pe.re, pe.im)} &nbsp;← k even: exact copy`;
+        } else {
+          pv.innerHTML = `F[${p.k},${p.n}] = ${complexStr(pe.re, pe.im, true, true)} &nbsp;← k odd: both signs flipped`;
+        }
+      }
+
+      function updateHover() {
+        if (!hoverRings.length) return;
+        if (!hoverKey) {
+          hoverRings.forEach(ring => ring.setAttribute("visibility", "hidden"));
+          return;
+        }
+        const [k, n] = hoverKey.split(",").map(Number);
+        const p = partner(k, n);
+        const cs = SIDE / N;
+        const positions = p.self ? [{ k, n }] : [{ k, n }, { k: p.k, n: p.n }];
+        hoverRings.forEach((ring, i) => {
+          if (i >= positions.length) {
+            ring.setAttribute("visibility", "hidden");
+            return;
+          }
+          const pos = positions[i];
+          ring.setAttribute("x", LEFT + pos.n * cs + 2);
+          ring.setAttribute("y", TOP + pos.k * cs + 2);
+          ring.setAttribute("width", cs - 4);
+          ring.setAttribute("height", cs - 4);
+          ring.setAttribute("rx", Math.max(1, cs * 0.06));
+          ring.setAttribute("visibility", "visible");
+        });
+      }
+
+      function toggle(k, n, on) {
+        const kk = key(k, n);
+        if (on) selected.add(kk); else selected.delete(kk);
+        last = { k, n };
+      }
+
+      /* ---------- click + drag selection ---------- */
+
+      let dragging = false;
+      let dragOn = true;
+      let visited = new Set();
+
+      function cellAt(x, y) {
+        const t = document.elementFromPoint(x, y);
+        const g = t && t.closest ? t.closest(".cell") : null;
+        if (!g || !svg.contains(g)) return null;
+        return { k: Number(g.dataset.k), n: Number(g.dataset.n) };
+      }
+
+      svg.addEventListener("pointerdown", ev => {
+        if (ev.button !== undefined && ev.button !== 0) return;
+        const c = cellAt(ev.clientX, ev.clientY);
+        if (!c) return;
+        ev.preventDefault();
+        dragging = true;
+        dragOn = !selected.has(key(c.k, c.n)); // first cell decides select vs deselect
+        visited = new Set([key(c.k, c.n)]);
+        toggle(c.k, c.n, dragOn);
+        try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
+        update();
+      });
+
+      svg.addEventListener("pointermove", ev => {
+        if (!dragging) return;
+        const c = cellAt(ev.clientX, ev.clientY);
+        if (!c) return;
+        const kk = key(c.k, c.n);
+        if (visited.has(kk)) return;
+        visited.add(kk);
+        toggle(c.k, c.n, dragOn);
+        hoverKey = kk;
+        update();
+      });
+
+      function endDrag(ev) {
+        if (!dragging) return;
+        dragging = false;
+        try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+      }
+      svg.addEventListener("pointerup", endDrag);
+      svg.addEventListener("pointercancel", endDrag);
+
+      /* ---------- buttons ---------- */
+
+      document.getElementById("fillBtn").addEventListener("click", () => {
+        selected = new Set();
+        for (let k = 0; k < N; k++) {
+          for (let n = 0; n < N; n++) {
+            const inside = MODE === "conj" ? k <= Math.floor(N / 2) : n < N / 2;
+            if (inside) selected.add(key(k, n));
+          }
+        }
+        last = { k: 1, n: 1 };
+        update();
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        selected = new Set();
+        last = null;
+        update();
+      });
+
+      sizeButtons.forEach(b => {
+        b.addEventListener("click", () => {
+          N = Number(b.dataset.n);
+          selected = new Set();
+          last = null;
+          hoverKey = null;
+          sizeButtons.forEach(o => {
+            o.classList.toggle("active", o === b);
+            o.setAttribute("aria-pressed", String(o === b));
+          });
+          build();
+        });
+      });
+
+      /* ---------- iframe height ---------- */
+
+      function notifyHeight() {
+        const height = Math.ceil(widget.getBoundingClientRect().height) + 2;
+        try {
+          if (window.frameElement) {
+            window.frameElement.style.height = height + "px";
+            window.frameElement.setAttribute("scrolling", "no");
+          }
+        } catch (e) {}
+      }
+
+      if ("ResizeObserver" in window) new ResizeObserver(notifyHeight).observe(widget);
+      window.addEventListener("load", notifyHeight);
+
+      build();
+    })();
+  </script>
+</body>
+</html>

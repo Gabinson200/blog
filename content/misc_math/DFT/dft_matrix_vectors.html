@@ -185,7 +185,7 @@
 
     .details {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
       margin-top: 10px;
     }
@@ -280,16 +280,6 @@
       <button type="button" data-n="16">N = 16</button>
     </div>
 
-
-      <label class="toggle">
-        <input
-          id="pairs"
-          type="checkbox"
-          checked
-        >
-        Highlight conjugate row pairs
-      </label>
-
     </div>
 
     <!-- Matrix visualization -->
@@ -324,22 +314,12 @@
         <div class="value" id="angleValue"></div>
       </div>
 
-      <div class="panel">
-        Corresponding row
-        <b id="pairValue"></b>
 
-        <div id="pairExplanation">
-          Select a cell to compare conjugate rows.
-        </div>
-      </div>
 
     </div>
 
     <p class="tip">
-      Click any cell to highlight its row and conjugate
-      partner. The first row and column are all 1;
-      pairs of rows k and N − k reflect across
-      the real axis.
+      Click a cell to inspect its individual complex coefficient. The first row and column are all 1. Conjugate symmetry is explored in the next visualization.
     </p>
 
   </section>
@@ -362,7 +342,7 @@
         ...document.querySelectorAll("[data-n]")
       ];
 
-      const pairToggle = document.getElementById("pairs");
+      
 
       let N = 8;
       let selectedK = 1;
@@ -497,27 +477,7 @@
         document.getElementById("angleValue").textContent =
           `Phase: ${entry.phase.toFixed(2)}° | magnitude: 1`;
 
-        // The conjugate row of k is (N-k) mod N.
-        const partner = mod(
-          N - selectedK,
-          N
-        );
 
-        document.getElementById("pairValue").textContent =
-          `k = ${selectedK} and k = ${partner}`;
-
-        const explanation =
-          document.getElementById("pairExplanation");
-
-        if (partner === selectedK) {
-          explanation.textContent =
-            "This row is its own conjugate: " +
-            "all its entries are real.";
-        } else {
-          explanation.textContent =
-            `The entries in row ${partner} are ` +
-            `complex conjugates of row ${selectedK}.`;
-        }
       }
 
       /* ==========================================
@@ -540,11 +500,6 @@
 
         const matrixGroup = createSVG("g");
 
-        const conjugateRow = mod(
-          N - selectedK,
-          N
-        );
-
         for (let k = 0; k < N; k++) {
           for (let n = 0; n < N; n++) {
 
@@ -562,20 +517,14 @@
             // Each angle maps to one hue.
             const hue = phase;
 
-            const isSelectedRow =
-              k === selectedK;
-
-            const isConjugateRow =
-              pairToggle.checked &&
-              k === conjugateRow &&
-              conjugateRow !== selectedK;
+            const isSelectedCell = k === selectedK && n === selectedN;
 
             const group = createSVG(
               "g",
               {
                 class:
                   "cell" +
-                  (isSelectedRow ? " selected" : ""),
+                  (isSelectedCell ? " selected" : ""),
 
                 tabindex: "0",
                 role: "button",
@@ -591,18 +540,12 @@
                Cell background
                ------------------------------ */
 
-            const lightness =
-              isSelectedRow ? "25%" :
-              isConjugateRow ? "18%" :
-              "12%";
+            const lightness = isSelectedCell ? "25%" : "12%";
 
             const backgroundColor =
               `hsl(${hue} 68% ${lightness})`;
 
-            const borderColor =
-              isSelectedRow ? "#ffffff" :
-              isConjugateRow ? "#a2b8df" :
-              "#383b43";
+            const borderColor = isSelectedCell ? "#ffffff" : "#383b43";
 
             createSVG(
               "rect",
@@ -624,7 +567,7 @@
                 stroke: borderColor,
 
                 "stroke-width":
-                  isSelectedRow ? 1.1 : 0.5
+                  isSelectedCell ? 1.1 : 0.5
               },
               group
             );
@@ -787,13 +730,13 @@
               y,
 
               fill:
-                k === selectedK ? "#fff" : "#9298a4",
+                "#9298a4",
 
               "font-size":
                 N === 16 ? 10 : 12,
 
               "font-weight":
-                k === selectedK ? 700 : 400,
+                400,
 
               "text-anchor": "middle"
             }
@@ -898,11 +841,6 @@
       /* ==========================================
          Conjugate-row toggle
          ========================================== */
-
-      pairToggle.addEventListener(
-        "change",
-        drawMatrix
-      );
 
       /* ==========================================
          Responsive height handling

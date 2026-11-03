@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DFT — Fold into a 4-point transform</title>
+  <style>
+    /* Match the dark panels and phase colors of dft_combined_symmetry.html. */
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: #f0f2f6;
+      background: transparent;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    body { overflow-x: hidden; }
+    .widget {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 17px;
+      background: #121212;
+      border: 1px solid #414141;
+      border-radius: 12px;
+    }
+    h3 { font-size: 1.12rem; margin: 0 0 6px; }
+    h4 { font-size: .88rem; margin: 0 0 10px; color: #e8ebf1; }
+    .intro { margin: 0 0 14px; color: #bbb; font-size: .9rem; line-height: 1.5; }
+    .intro b { color: #eee; }
+
+    .controls {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+    }
+    .actions { display: flex; gap: 7px; }
+    button { font: inherit; cursor: pointer; }
+    .actions button {
+      padding: 7px 13px; border-radius: 6px; border: 1px solid #3d4048;
+      background: #26272b; color: #d4d8e0; font-size: .87rem;
+    }
+    .actions button:hover { background: #33363d; }
+    button:focus-visible, .matrix-cell:focus-visible, .num-cell:focus-visible {
+      outline: 2px solid #61a6ff; outline-offset: 2px;
+    }
+    .status { font-size: .79rem; color: #aeb5bf; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+    .panel {
+      min-width: 0; padding: 13px;
+      background: #1b1c20; border: 1px solid #32343a; border-radius: 9px;
+    }
+    .panel-title { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+    .panel-title .aside { color: #9299a7; font-size: .74rem; white-space: nowrap; }
+    .canvas-wrap {
+      display: flex; justify-content: center; align-items: center;
+      padding: 7px 4px; border-radius: 8px;
+      background: #0f1013; border: 1px solid #2e3035;
+    }
+    svg { display: block; width: 100%; height: auto; user-select: none; }
+    #original { max-width: 480px; touch-action: manipulation; }
+    #smaller { max-width: 192px; touch-action: manipulation; }
+    .matrix-cell { cursor: pointer; }
+    .matrix-cell.inactive { cursor: default; opacity: .16; pointer-events: none; }
+    .matrix-cell .base { stroke: #383b43; stroke-width: .8; }
+    .matrix-cell .arrow { stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .matrix-cell .outline { fill: none; stroke: #f5f7fb; stroke-width: 1.6;
+      stroke-dasharray: 4 3; pointer-events: none; }
+    .footnote { margin-top: 9px; color: #aeb5c0; font-size: .77rem; line-height: 1.5; }
+
+    .label { color: #b7bdc6; font-size: .78rem; font-weight: 650; margin: 0 0 8px; }
+    .value-row { display: grid; gap: 5px; }
+    .value-row.eight { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    .num-cell {
+      min-width: 0; border: 1px solid #41444d; background: #26282e; color: #eff2f6;
+      border-radius: 5px; min-height: 48px; padding: 5px 1px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; text-align: center;
+    }
+    button.num-cell:hover { background: #33363e; }
+    .num-cell .index { font: 10px/1.2 ui-monospace, Consolas, monospace; color: #abb1bc; }
+    .num-cell .value { font: 700 12px/1.1 ui-monospace, Consolas, monospace; white-space: nowrap; }
+    .num-cell .value.tiny { font-size: 10px; }
+    .num-cell.focus { border: 1.8px dashed #fff; background: #353941; }
+    .num-cell.output-focus { border: 1.8px solid #f2b45a; background: #3b342a; }
+    /* Each input pair x[n], x[n+4] and its folded value share a hue. */
+    .num-cell.tinted { background: hsl(var(--hue) 38% 17%); border-color: hsl(var(--hue) 50% 42%); }
+    .num-cell.tinted .index { color: hsl(var(--hue) 70% 76%); }
+    button.num-cell.tinted:hover { background: hsl(var(--hue) 40% 23%); }
+    .num-cell.tinted.focus { border: 1.8px dashed #fff; background: hsl(var(--hue) 45% 28%); }
+    .value-row.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .workflow .section { margin-top: 11px; }
+    .mini-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .multiply {
+      display: flex; justify-content: center; gap: 8px; align-items: center;
+      padding: 10px 7px; background: #0f1013; border: 1px solid #2e3035;
+      border-radius: 8px;
+    }
+    .multiply .matrix-col { flex: 0 1 192px; min-width: 0; }
+    .multiply .vector-col { flex: 0 1 73px; min-width: 0; }
+    .vertical { display: grid; grid-template-rows: repeat(4, 38px); gap: 2px; }
+    .vertical .num-cell { min-height: 0; padding: 2px 1px; }
+    .vertical .index { font-size: 9px; }
+    .vertical .value { font-size: 10.5px; }
+    .vertical .value.tiny { font-size: 9px; }
+    .operator { color: #adb2bd; font-size: 1.08rem; font-weight: 650; }
+    .small-note { font-size: .71rem; color: #929aa6; text-align: center; margin: 3px 0 0; }
+    .explainer {
+      padding: 10px 12px; margin-top: 13px;
+      border: 1px solid #32343a; border-radius: 8px; background: #1b1c20;
+      color: #c1c5ce; font-size: .81rem; line-height: 1.6;
+    }
+    .explainer b { color: #f5f6f8; }
+    .explainer .math { font-family: ui-monospace, Consolas, monospace; color: #f2b45a; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 17px; align-items: center;
+      margin-top: 11px; color: #aeb5c0; font-size: .74rem; }
+    .dash-key { display: inline-block; width: 13px; height: 13px; border: 1.5px dashed #fff;
+      border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+    .rainbow { display: inline-block; width: 105px; height: 10px; margin-left: 5px;
+      border-radius: 4px; vertical-align: middle; border: 1px solid #535353;
+      background: linear-gradient(to right, hsl(0 78% 59%),hsl(60 78% 59%),hsl(120 78% 59%),
+      hsl(180 78% 59%),hsl(240 78% 59%),hsl(300 78% 59%),hsl(360 78% 59%)); }
+    @media (max-width: 790px) {
+      .layout { grid-template-columns: 1fr; }
+      .matrix-panel { max-width: 580px; width: 100%; margin: auto; }
+    }
+    @media (max-width: 440px) {
+      .widget { padding: 11px; }
+      .panel { padding: 9px; }
+      .multiply { gap: 4px; padding: 6px 3px; }
+      .multiply .vector-col { flex-basis: 68px; }
+      .multiply .matrix-col { flex-basis: 167px; }
+      .vertical .value.tiny { font-size: 8px; }
+      .num-cell .value { font-size: 11px; }
+      .status { width: 100%; }
+    }
+  </style>
+</head>
+
+<!-- Change "even" to "odd" to switch derivations. -->
+<body data-mode="even">
+  <section class="widget" id="widget">
+    <h3 id="title"></h3>
+    <p class="intro" id="intro"></p>
+
+    <div class="controls">
+      <div class="actions">
+        <button type="button" id="play">Play</button>
+        <button type="button" id="reset">Reset</button>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+
+    <div class="layout">
+      <div class="panel matrix-panel">
+        <div class="panel-title">
+          <h4>Original 8 × 8 DFT matrix</h4>
+          <span class="aside" id="rows-label"></span>
+        </div>
+        <div class="canvas-wrap">
+          <svg id="original" viewBox="0 0 510 512" role="group" aria-label="8 by 8 DFT matrix"></svg>
+        </div>
+        <p class="footnote" id="matrix-note"></p>
+      </div>
+
+      <div class="panel workflow">
+        <div class="section" style="margin-top:0">
+          <div class="label">1. Original input x[n]</div>
+          <div class="value-row eight" id="inputs"></div>
+        </div>
+
+        <div class="section">
+          <div class="label" id="fold-label">2. Fold the input into four values</div>
+          <div class="value-row four" id="fold-row"></div>
+        </div>
+
+        <div class="section">
+          <div class="label">3. Multiply by the 4 × 4 DFT matrix</div>
+          <div class="multiply">
+            <div class="matrix-col">
+              <svg id="smaller" viewBox="0 0 210 198" role="group" aria-label="4 by 4 DFT matrix"></svg>
+            </div>
+            <div class="operator">×</div>
+            <div class="vector-col">
+              <div class="vertical" id="fold-vector"></div>
+              <div class="small-note" id="fold-vector-label"></div>
+            </div>
+            <div class="operator">=</div>
+            <div class="vector-col">
+              <div class="vertical" id="outputs"></div>
+              <div class="small-note">DFT outputs</div>
+            </div>
+          </div>
+          <div class="explainer" id="explanation"></div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="dash-key"></i> Corresponding coefficients and samples</span>
+      <span>Phase <span class="rainbow"></span></span>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      "use strict";
+      const N = 8, M = 4;
+      const odd = document.body.dataset.mode === "odd";
+      const symbol = odd ? "b" : "a";
+      const data = [1, 2, 0, -1, 3, -1, 2, 1];
+      const $ = id => document.getElementById(id);
+      const ns = "http://www.w3.org/2000/svg";
+
+      // The four folded inputs and four outputs really are a 4-point DFT.
+      const root = (size, p) => {
+        const a = -2 * Math.PI * p / size;
+        return { re: Math.cos(a), im: Math.sin(a) };
+      };
+      const mul = (a, b) => ({ re: a.re * b.re - a.im * b.im,
+                              im: a.re * b.im + a.im * b.re });
+      const add = (a, b) => ({ re: a.re + b.re, im: a.im + b.im });
+      const folded = Array.from({ length: M }, (_, n) => {
+        const value = data[n] + (odd ? -1 : 1) * data[n + M];
+        return odd ? mul({ re: value, im: 0 }, root(N, n)) : { re: value, im: 0 };
+      });
+      const outputs = Array.from({ length: M }, (_, r) => {
+        let sum = { re: 0, im: 0 };
+        for (let n = 0; n < M; n++) sum = add(sum, mul(folded[n], root(M, r * n)));
+        return sum;
+      });
+      const valText = v => Math.abs(v) < 0.00001 ? "0" : String(Number(v.toFixed(2)));
+      const complexText = z => {
+        if (Math.abs(z.im) < 0.00001) return valText(z.re);
+        if (Math.abs(z.re) < 0.00001) return valText(z.im) + "i";
+        return valText(z.re) + (z.im < 0 ? " − " : " + ") + valText(Math.abs(z.im)) + "i";
+      };
+
+      let selected = { r: 0, n: 0 };
+      let hover = null;
+      let timer = null;
+      let step = -1;
+      const mainCells = [], smallCells = [];
+      const inputButtons = [], foldColumn = [], outputButtons = [];
+
+      const svgEl = (tag, attrs, parent) => {
+        const el = document.createElementNS(ns, tag);
+        for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, String(value));
+        parent.appendChild(el);
+        return el;
+      };
+
+      // Draw the phase-colored rotation vectors using the same HSL mapping
+      // and dashed white selection rings as the combined-symmetry widget.
+      function drawMatrix(target, size, left, top, side, out) {
+        const cell = side / size;
+        const g = svgEl("g", {}, target);
+        for (let r = 0; r < size; r++) {
+          for (let n = 0; n < size; n++) {
+            const phase = ((-360 * r * n / size) % 360 + 360) % 360;
+            const angle = -2 * Math.PI * r * n / size;
+            const x = left + n * cell, y = top + r * cell;
+            const cx = x + cell / 2, cy = y + cell / 2;
+            const radius = cell * .30;
+            const ex = cx + radius * Math.cos(angle);
+            const ey = cy - radius * Math.sin(angle);
+            const color = `hsl(${phase} 88% 66%)`;
+            const grp = svgEl("g", {
+              class: "matrix-cell", role: "button", tabindex: "0",
+              "aria-label": `Row ${r}, column ${n}`
+            }, g);
+            const bg = svgEl("rect", {
+              class: "base", x: x + 1, y: y + 1, width: cell - 2,
+              height: cell - 2, rx: cell * .06,
+              fill: `hsl(${phase} 68% 12%)`
+            }, grp);
+            svgEl("line", {
+              class: "arrow", x1: cx, y1: cy, x2: ex, y2: ey,
+              stroke: color, "stroke-width": Math.max(1.9, cell * .068)
+            }, grp);
+            const h = cell * .12;
+            const a = Math.atan2(ey - cy, ex - cx);
+            svgEl("path", {
+              class: "arrow", d: `M ${ex-h*Math.cos(a-.48)} ${ey-h*Math.sin(a-.48)} L ${ex} ${ey} L ${ex-h*Math.cos(a+.48)} ${ey-h*Math.sin(a+.48)}`,
+              stroke: color, "stroke-width": Math.max(1.6, cell * .06)
+            }, grp);
+            svgEl("circle", { cx, cy, r: Math.max(1.25, cell * .029), fill: "#eff2fa" }, grp);
+            const ring = svgEl("rect", { class: "outline", x: x + 3, y: y + 3,
+              width: cell - 6, height: cell - 6, rx: cell * .06,
+              visibility: "hidden" }, grp);
+            out.push({ r, n, grp, bg, ring, phase });
+
+            // Only rows of the chosen parity are relevant in the 8 × 8 matrix.
+            if (size === 8 && r % 2 !== Number(odd)) grp.classList.add("inactive");
+            else {
+              const select = () => {
+                stop(); step = -1;
+                if (size === 8) selected = { r: (r - Number(odd)) / 2, n: n % M };
+                else selected = { r, n };
+                update();
+              };
+              grp.addEventListener("click", select);
+              grp.addEventListener("keydown", e => {
+                if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); }
+              });
+              grp.addEventListener("pointerenter", () => {
+                if (size === 8) hover = { r: (r - Number(odd)) / 2, n: n % M };
+                else hover = { r, n };
+                update();
+              });
+              grp.addEventListener("pointerleave", () => { hover = null; update(); });
+            }
+          }
+        }
+        for (let r = 0; r < size; r++) {
+          svgEl("text", { x: left - 11, y: top + (r+.5)*cell + 4,
+            fill: size === 8 && r%2===Number(odd) ? "#e0e3ec" : "#8d94a1",
+            "font-size": size === 8 ? 12 : 11,
+            "text-anchor": "middle" }, target).textContent = r;
+          svgEl("text", { x: left + (r+.5)*cell, y: top+side+16,
+            fill: "#9298a4", "font-size": size === 8 ? 12 : 11,
+            "text-anchor": "middle" }, target).textContent = r;
+        }
+        svgEl("text", { x: left+side/2, y: top+side+33,
+          fill: "#afb3bc", "font-size": 11, "text-anchor":"middle" }, target)
+          .textContent = size === 8 ? "Sample index n →" : "n →";
+        svgEl("text", { x: 10, y: top+side/2, fill: "#afb3bc",
+          "font-size": 11, "text-anchor": "middle",
+          transform: `rotate(-90 10 ${top+side/2})` }, target)
+          .textContent = size === 8 ? "Frequency index k →" : "r →";
+        if (size === 8) {
+          // Separator between the two input halves.
+          svgEl("line", { x1: left+side/2, x2: left+side/2,
+            y1: top-4, y2: top+side+4, stroke: "#f2b45a",
+            "stroke-dasharray": "6 5", "stroke-width": 1.3, "stroke-opacity": .6 }, target);
+        }
+      }
+
+      const hues = [205, 160, 270, 330];
+      function numberButton(label, value, onClick, hue) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "num-cell";
+        if (hue !== undefined) { btn.classList.add("tinted"); btn.style.setProperty("--hue", hue); }
+        btn.innerHTML = `<span class="index">${label}</span><span class="value"></span>`;
+        const display = btn.querySelector(".value");
+        display.textContent = value;
+        if (value.length > 8) display.classList.add("tiny");
+        btn.addEventListener("click", onClick);
+        return btn;
+      }
+
+      function build() {
+        $("title").textContent = odd
+          ? "Odd frequency indices → a 4-point DFT"
+          : "Even frequency indices → a 4-point DFT";
+        $("intro").innerHTML = odd
+          ? "The <b>odd rows</b> use opposite signs across the two halves. Subtract each input pair, then rotate by W₈ⁿ to obtain b[n]. Both branches use the same 4 × 4 DFT matrix."
+          : "The <b>even rows</b> repeat across the two halves. Add each input pair to obtain a[n], then multiply by the 4 × 4 DFT matrix.";
+        $("rows-label").textContent = odd ? "k = 1, 3, 5, 7" : "k = 0, 2, 4, 6";
+        $("matrix-note").textContent = odd
+          ? "Only odd rows are bright. Left and right coefficients are negatives of one another."
+          : "Only even rows are bright. Left and right coefficients are identical.";
+        $("fold-vector-label").textContent = odd ? "b[n]" : "a[n]";
+
+        drawMatrix($("original"), 8, 37, 10, 448, mainCells);
+        drawMatrix($("smaller"), 4, 23, 6, 152, smallCells);
+
+        for (let i = 0; i < N; i++) {
+          const n = i % M;
+          const btn = numberButton(`x[${i}]`, String(data[i]), () => { stop(); selected = { r: selected.r, n }; step = -1; update(); }, hues[n]);
+          inputButtons.push(btn); $("inputs").appendChild(btn);
+        }
+        // The folded values appear twice: as a row in step 2 and as the column vector in step 3.
+        for (const parent of [$("fold-row"), $("fold-vector")]) {
+          for (let n = 0; n < M; n++) {
+            const cell = numberButton(`${symbol}[${n}]`, complexText(folded[n]).replaceAll(" ", ""),
+              () => { stop(); selected = { r: selected.r, n }; step = -1; update(); }, hues[n]);
+            foldColumn.push(cell); parent.appendChild(cell);
+          }
+        }
+        for (let r = 0; r < M; r++) {
+          const k = 2*r + Number(odd);
+          const btn = numberButton(`X[${k}]`, complexText(outputs[r]).replaceAll(" ", ""),
+            () => { stop(); selected = { r, n: selected.n }; step = -1; update(); });
+          // Hovering an output highlights its whole matrix row and every input.
+          btn.addEventListener("pointerenter", () => { hover = { r, row: true }; update(); });
+          btn.addEventListener("pointerleave", () => { hover = null; update(); });
+          outputButtons.push(btn); $("outputs").appendChild(btn);
+        }
+        update();
+      }
+
+      function update() {
+        const { r, n, row } = hover || selected;
+        const k = 2*r + Number(odd);
+        const hoverPair = [n, n+M];
+        for (const c of mainCells) {
+          const paired = c.r === k && (row || hoverPair.includes(c.n));
+          c.ring.setAttribute("visibility", paired ? "visible" : "hidden");
+          c.bg.setAttribute("fill", `hsl(${c.phase} 68% ${paired ? 25 : 12}%)`);
+        }
+        for (const c of smallCells) {
+          const paired = c.r === r && (row || c.n === n);
+          c.ring.setAttribute("visibility", paired ? "visible" : "hidden");
+          c.bg.setAttribute("fill", `hsl(${c.phase} 68% ${paired ? 25 : 12}%)`);
+        }
+        inputButtons.forEach((b, i) => b.classList.toggle("focus", row || hoverPair.includes(i)));
+        foldColumn.forEach((b, i) => b.classList.toggle("focus", row || i % M === n));
+        outputButtons.forEach((b, i) => b.classList.toggle("output-focus", i === r));
+
+        if (row) {
+          const terms = folded.map((v, j) => complexText(mul(root(M, r*j), v)));
+          $("explanation").innerHTML =
+            `Row ${r}: <span class="math">X[${k}] = Σ F₄[${r},n] × ${symbol}[n]</span>` +
+            ` = ${terms.map(t => `(${t})`).join(" + ")} = <b>${complexText(outputs[r])}</b>`;
+          $("status").textContent = `Row r = ${r}, k = ${k}`;
+          return;
+        }
+        const d = data[n], e = data[n+M];
+        const coef = root(M, r*n);
+        const term = mul(coef, folded[n]);
+        const foldDetails = odd
+          ? `b[${n}] = (${d} − ${e}) × W₈${sup(n)} = <b>${complexText(folded[n])}</b>`
+          : `a[${n}] = ${d} + (${e}) = <b>${complexText(folded[n])}</b>`;
+        $("explanation").innerHTML = `${foldDetails}<br>` +
+          `Selected product: <span class="math">F₄[${r},${n}] × ${symbol}[${n}]</span>` +
+          ` = (${complexText(coef)}) × (${complexText(folded[n])}) = <b>${complexText(term)}</b>. ` +
+          `The sum of all four products in this row gives <b>X[${k}] = ${complexText(outputs[r])}</b>.`;
+        $("status").textContent = step < 0
+          ? `Selected: n = ${n}, k = ${k}`
+          : `Element ${step + 1} of ${2 * N}: k = ${k}, n = ${n} (n = ${n + M} comes free)`;
+      }
+      function sup(n) { return ["⁰","¹","²","³"][n]; }
+
+      function stop() {
+        if (timer !== null) { clearInterval(timer); timer = null; }
+        $("play").textContent = "Play";
+      }
+      $("play").addEventListener("click", () => {
+        if (timer !== null) { stop(); return; }
+        step = -1;
+        $("play").textContent = "Pause";
+        function advance() {
+          step++;
+          // Only the left half is walked; each right-half coefficient is its mirror.
+          if (step === 2 * N) { stop(); step = -1; selected = { r: 0, n: 0 }; update(); return; }
+          selected = { r: Math.floor(step / M), n: step % M };
+          hover = null;
+          update();
+        }
+        advance();
+        timer = setInterval(advance, 650);
+      });
+      $("reset").addEventListener("click", () => {
+        stop(); step = -1; hover = null; selected = { r: 0, n: 0 }; update();
+      });
+
+      // Like the reference widget, send height to a same-origin iframe parent.
+      function notifyHeight() {
+        const height = Math.ceil($("widget").getBoundingClientRect().height) + 2;
+        try {
+          if (window.frameElement) {
+            window.frameElement.style.height = height + "px";
+            window.frameElement.setAttribute("scrolling", "no");
+          }
+        } catch (e) { /* Different-origin iframe: host may handle resize messages. */ }
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: "iframe-resize", height }, "*");
+        }
+      }
+      if ("ResizeObserver" in window) new ResizeObserver(notifyHeight).observe($("widget"));
+      window.addEventListener("load", notifyHeight);
+      build();
+    })();
+  </script>
+</body>
+</html>
