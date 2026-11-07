@@ -598,18 +598,18 @@
     "links": ["misc_math/Euler's Formula/Euler's Formula"]
   },
   {
-    "slug": "misc_math/DFT/DFT",
-    "title": "DFT",
+    "slug": "misc_math/DFT/DFT and FFT",
+    "title": "DFT and FFT",
     "category": "Mathematics",
     "subcategory": "miscellaneous",
-    "summary": "Discrete Fourier transform and its applications.",
+    "summary": "Discrete and Fast Fourier transform.",
     "date": "2026-7-22",
     "nodeType": "article",
     "links": ["misc_math/Fourier/Fourier"]
   },
   {
-    "slug": "misc_math/FFT/FFT",
-    "title": "FFT",
+    "slug": "misc_math/FT Applications/FT Applications",
+    "title": "FT Applications",
     "category": "Mathematics",
     "subcategory": "miscellaneous",
     "summary": "Fast Fourier transform and its applications.",

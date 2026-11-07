@@ -1,25 +1,34 @@
 
-The goal of this article is to further explore the Fourier Transform, and understand its application after discretization into the Discrete Fourier Transform (DFT).
+The goal of this article is to further explore the Fourier Transform, discretize it to derive the Discrete Fourier transform (DFT) and then optimize the algorithm to produce the Fast Fourier Transform (FFT). 
 
 The main sections will be:
 - [Fourier Transform](#Fourier-Transform)
     - [Functions of any period](#Functions-of-any-period)
     - [Functions of infinite period](#Functions-of-infinite-period)
-    - [Analysis equation and Synthesis Equations](#Analysis-and-Synthesis-Equations)
+    - [Analysis and Synthesis Equations](#Analysis-and-Synthesis-Equations)
     - [Analysis Equation Outputs](#Analysis-equation-outputs)
-- [DFT](#DFT)
+    - [Recap](##Recap)
+- [Discrete Fourier Transform (DFT)](#DFT)
     - [Discretization](#Discretization)
-    - [DFT output interpretation](#DFT-output-interpretation)
-    - [Use cases](#Use-cases)
+    - [Sampling](#Sampling)
+- [Algorithm](#algorithm)
+    - [Index of Terms](#Index-of-Terms)
     - [Pseudocode](#Pseudocode)
+    - [View through the matrix](#View-through-the-matrix)
+    - [First Optimization: Conjugate Symmetry](#First-Optimization:-Conjugate-Symmetry)
+    - [Second Optimization: Loop Symmetry](#Second-Optimization:-Loop-Symmetry)
+    - [Combining the Two Optimizations](#Combining-the-Two-Optimizations)
+- [Fast Fourier Transform (FFT)](#Fast-Fourier-Transform-(FFT))
+    - [Divide and Conquer](#Divide-and-Conquer)
 
 
 # Fourier Transform
 
 From the previous article on [Fourier series / transform](article.html?slug=\misc_math\Fourier\Fourier), we determined that functions / signals can be decomposed into a sum of exponential terms that really just encode rotations (see [Euler's formula](article.html?slug=\misc_math\Euler's%20Formula\Euler's%20Formula)), scaled by how much our signal "resonates" or aligns with each complex exponential in function space. This is not a very rigorous description but if it does not ring any bells then I would briefly review the previous article. But fret not the entire beginning of this article is about going from the Fourier Series to the Fourier Transform.
+ 
+The goal of this section is to expand the Fourier Series so that it can be generalized to functions of any length which are not necessarily periodic, this generalization will lead us to the Fourier Transform.
 
 ## Functions of any period
-
 
 <div class="formula-box">
 
@@ -41,7 +50,7 @@ This gives us the fundamental angular frequency
 $$\boxed{\omega_0 = \frac{2\pi}{T}}$$
 
 The higher-frequency basis functions are integer multiples of this fundamental frequency:
-$$\frac{2\pi k}{T},\qquad k\in\mathbb Z$$
+$$k \omega_0 = \frac{2\pi k}{T},\qquad k\in\mathbb Z$$
 
 When $T = 2\pi$:
 $$\omega_0=\frac{2\pi}{2\pi} = 1,\qquad \omega_k=k\omega_0=k$$
@@ -56,6 +65,7 @@ $$\boxed{
 f(x)=\sum_{k=-\infty}^{\infty}c_k e^{i\omega_k x},\qquad c_k=\frac{1}{T}\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}dx 
 }$$
 
+With this generalization we can consider the Fourier Series of a function of any length by changing the bounds and weight of the coefficients $c_k$s and adjusting the angular frequency so that it completes an integer number of full rotations ($2\pi$) over $T$.
 Notice that the Fourier index $k$ is still an integer. Changing the period does not change the set of integers we sample, it changes the fundamental frequency which multiplies each $k$.
 
 Ok, so now we can compute functions with any period $T$, but the Fourier series still assumes that the function is periodic: a finite interval of length $T$ is repeated indefinitely.
@@ -90,9 +100,6 @@ $$\omega_k=k\frac{2\pi}{T}.$$
 
 As $T$ increases, these discrete frequencies become more and more densely packed. For example, if you compare two periodic functions with periods $2\pi$ and $6\pi$ you would still need infinitely many  samples ($k$) to reconstruct them, the difference is the spacing between frequency samples ($\omega_k$); for a period of $6\pi$, samples of $\omega_k$ will be 3 times closer together then for a period $2\pi$. As $T$ goes to infinity $\Delta\omega$ approaches zero, so the discrete frequency grid becomes continuous and we replace the sum over discrete frequencies with an integral over all real angular frequencies $\omega$.
 
-The Fourier series represents a periodic function using a countably infinite set of discrete frequencies, while the Fourier transform represents a non-periodic function using a continuous, uncountable range of frequencies.
-
-
 Lets derive this algebraically keeping in mind that as $T \to \infty \qquad \Delta \omega \to 0$.
 
 Lets define:
@@ -105,7 +112,7 @@ From a linear algebra perspective, it can also be interpreted as the inner produ
 
 $$
 \widehat f_T(\omega_k)=\langle f,e^{i\omega_k x}\rangle
-=\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}\,dx
+=\int_{-T/2}^{T/2}f(x)e^{-i\omega_k x}dx
 $$
 
 Notice that the negative exponent arises because the inner product of complex-valued functions takes the complex conjugate of its second argument.
@@ -121,11 +128,11 @@ $$c_k=\frac{1}{T}\widehat f_T(\omega_k)
 
 Substituting this into the **Fourier series** gives
 
-$$f(x)=\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat f_T(\omega_k)e^{i\omega_kx}\Delta\omega.$$
+$$f(x)=\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat f_T(\omega_k)e^{i\omega_kx}\Delta\omega$$
 
 This now has the form of a Riemann sum,
 
-$$\sum_k g(\omega_k)\Delta\omega,$$
+$$\sum_k g(\omega_k)\Delta\omega$$
 
 where
 
@@ -145,9 +152,15 @@ $$\frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\widehat f_T(\omega_k)e^{i\omega_kx}\De
 \quad\xrightarrow{T\to\infty}\quad
 \frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x}d\omega = f(x)$$
 
-This gives us the two continuous-frequency counterparts of the Fourier-series equations.
+This gives us the two continuous-frequency counterparts of the Fourier-series equations:
 
-## Analysis equation and Synthesis Equations
+1. $$ \widehat f(\omega_k)=\int_{-\infty}^{\infty}f(x)e^{-i\omega_k x}dx$$
+
+2. $$f(x) = \frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x}d\omega$$
+
+which define the Fourier Transform. Thus we can say that the Fourier series represents a periodic function using a countably infinite set of discrete frequencies, while the Fourier transform represents a non-periodic function using a continuous, uncountable range of frequencies.
+
+## Analysis and Synthesis Equations
 
 Recall that the Fourier series itself had two steps. First, we **analyzed** the signal by computing how strongly it aligned with each allowed basis frequency:
 
@@ -159,18 +172,11 @@ $$f(x)=\sum_{k=-\infty}^{\infty}c_ke^{i\omega_kx}$$
 
 When $T\to\infty$, the discrete frequencies $\omega_k$ become a continuous frequency variable $\omega$. The discrete coefficient sequence $c_k$ is therefore replaced by a continuous frequency-domain function
 
-$$
-\boxed{
-\widehat f(\omega)
-=
-\int_{-\infty}^{\infty}
-f(x)e^{-i\omega x}dx
-}
-$$
+$$\boxed{\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}dx}$$
 
 which tells us the magnitude and phase associated with every angular frequency $\omega$.
 
-This is the **forward Fourier transform**. It performs the same role that calculating the coefficients $c_k$ performed in the Fourier series: it takes the original function and decomposes it into its frequency components.
+This is the **forward Fourier transform**. It performs the same role that calculating the coefficients $c_k$ performed in the Fourier series: it takes the original function and decomposes it into its frequency components. Equivalently, this is the same thing as taking the inner function product between an exponential basis function and our input function. 
 
 To reconstruct the original function, we perform the continuous analogue of the Fourier-series summation. Instead of adding together discrete components
 
@@ -178,15 +184,11 @@ $$c_ke^{i\omega_kx}$$
 
 we integrate contributions from every possible angular frequency:
 
-$$
-\boxed{
-f(x)
-=
+$$\boxed{f(x)=
 \frac{1}{2\pi}
 \int_{-\infty}^{\infty}
 \widehat f(\omega)e^{i\omega x}d\omega
-}
-$$
+}$$
 
 This is the **inverse Fourier transform**.
 
@@ -230,20 +232,16 @@ $$\boxed{f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega 
 
 Again, this produces an entire function $f$. After reconstructing that function, we may evaluate it at some particular position or time $x_0$:
 
-$$f(x_0)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega x_0}d\omega$$
+$$f(t_0)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\widehat f(\omega)e^{i\omega t_0}d\omega$$
 So the complete relationship is
 $$\boxed{f \; \xrightarrow{\mathfrak F} \; \widehat f \; \xrightarrow{\mathfrak F^{-1}} \; f}$$
 
 where the forward transform changes our **representation** of the same signal from the original domain to the frequency domain, and the inverse transform changes that representation back.
 
-At the level of individual evaluations,
-
+At the level of individual evaluations:
 $$f(x_0)$$
-
 is the value of the signal at one particular position or time, while
-
 $$\widehat f(\omega_0)$$
-
 is the value of its frequency-domain representation at one particular angular frequency.
 
 The Fourier transform therefore does not merely return "the frequency of a signal." It constructs a complete function $\widehat f(\omega)$ describing how the signal is distributed across all frequencies, just as the original function $f(x)$ describes how the signal is distributed across position or time.
@@ -253,7 +251,7 @@ The output of the analysis equation $\widehat f(\omega)$ for a desired frequency
 
 ## Analysis equation outputs
 
-In this setion we will unpack the analysis equation and see how that reveals the components responsible for different parts of the output allowing us to better interpret said output.
+In this setion we will unpack the analysis equation and see how that reveals the components responsible for different parts of the output, allowing us to better interpret said output.
 
 Lets dive deeper into what the output of the analysis equation:
 $$\widehat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}dx$$
@@ -279,7 +277,7 @@ and
 
 $$\operatorname{Im}\left(\widehat f(\omega)\right)=-\int_{-\infty}^{\infty}f(x)\sin(\omega x)dx$$
 
-If we took the inner product of the function with just sine or cosine, we would get a real scalar measuring alignment with that basis function. The Fourier transform performs both measurements at once: the inner product with cosine gives the real part of the complex number, while the negative of the inner product with sine gives the imaginary part.
+If we took the inner product of the function with just sine or cosine, we would get a real or imaginary scalar measuring alignment with that basis function respectively. The Fourier transform performs both measurements at once: the inner product with cosine gives the real part of the complex number, while the negative of the inner product with sine gives the imaginary part.
 
 Thus, the complex Fourier coefficient simply packages two real measurements together:
 
@@ -306,7 +304,7 @@ So we can rewrite our original phase-shifted cosine wave as,
 
 $$f(x)=A\cos(\phi)\cos(\omega_0x)-A\sin(\phi)\sin(\omega_0x)$$
 
-This shows that a phase-shifted cosine can always be represented as a scaled but unshifted combination of cosine and sine at the same frequency. The same is true for a phase shifted sine wave:
+This shows that a phase-shifted cosine can always be represented as a scaled but unshifted combination of cosine and sine of the same frequency. The same is true for a phase shifted sine wave:
 
 $$\sin(\omega_0x+\phi)=\sin(\omega_0x)\cos(\phi)+\cos(\omega_0x)\sin(\phi)$$
 
@@ -351,17 +349,17 @@ $$\operatorname{Im}\left(\widehat f(\omega)\right)=-\int_{-\infty}^{\infty}f(x)\
 Note that the imaginary part of the Fourier transform output is the **negative** of the sine alignment.
 
 Now a blast from the past; as explored in the previous Fourier blog we saw that the inner product of two functions is:
-$$\langle f,g\rangle=\int_a^b f(x)g(x)\,dx$$
+$$\langle f,g\rangle=\int_a^b f(x)g(x)dx$$
 
 namely for sine and cosine:
 
-$$\langle \sin(mx),\sin(nx)\rangle=\int_0^{2\pi}\sin(mx)\sin(nx)\,dx=
+$$\langle \sin(mx),\sin(nx)\rangle=\int_0^{2\pi}\sin(mx)\sin(nx)dx=
 \begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
 $$
-\langle \cos(mx),\cos(nx)\rangle=\int_0^{2\pi}\cos(mx)\cos(nx)\,dx=
+\langle \cos(mx),\cos(nx)\rangle=\int_0^{2\pi}\cos(mx)\cos(nx)dx=
 \begin{cases}0, & m\neq n, \\\pi, & m=n,\end{cases}$$
 and
-$$\langle \sin(mx),\cos(nx)\rangle=\int_0^{2\pi}\sin(mx)\cos(nx)\,dx=0$$
+$$\langle \sin(mx),\cos(nx)\rangle=\int_0^{2\pi}\sin(mx)\cos(nx)dx=0$$
 
 So for our phase-shifted cosine,
 
@@ -463,7 +461,7 @@ Ok, just to briefly recap, thus far we have taken the Fourier Series, let it's p
 
 Now we will transition to the applications side of things and discretize our equations so that we can use the magic of computer science to solve them analytically.
 
-# DFT
+# Discrete Fourier Transform (DFT)
 
 ## Discretization
 
@@ -791,8 +789,6 @@ $$N > 2Tf_{max}$$
 
 
 
-
-
 # Algorithm
 
 Now that we have defined the DFT and its inputs lets get into the more computational side of things and implementation.
@@ -808,7 +804,6 @@ $$
 X[k]=\sum_{n=0}^{N-1}x[n]e^{-i\frac{2\pi kn}{N}}
 \qquad
 x[n]=\frac{1}{N}\sum_{k=0}^{N-1}X[k]e^{i\frac{2\pi kn}{N}}
-
 }
 $$
 
@@ -1153,7 +1148,7 @@ This raises a more interesting question:
 **Can we use the same symmetries to reorganize the multiplication, so that we no longer need to evaluate every weighted sum independently?**
 
 
-# Radix-2 FFT
+# Fast Fourier Transform (FFT)
 
 ## Divide and Conquer
 
@@ -1194,9 +1189,7 @@ X[k]=\sum_{n=0}^{N/2-1}\left(x[n]+(-1)^kx[n+N/2]\right)W_N^{kn}
 }
 $$
 
-So instead of multiplying two separate input samples by related exponential coefficients, we can first combine the input samples and then perform a single multiplication.
-
-We have reduced the number of terms in each sum from $N$ to $N/2$, at the cost of introducing additions or subtractions.
+So instead of multiplying two separate input samples by related exponential coefficients, we can first combine the input samples and then perform a single multiplication. With this we have reduced the number of terms in each sum from $N$ to $N/2$, at the cost of introducing additions or subtractions.
 
 But notice something interesting: the operation inside the parentheses depends only on whether $k$ is even or odd.
 
@@ -1208,43 +1201,32 @@ For even values of $k$, we can write $k=2r$.
 
 Since $(-1)^{2r}=1$, the equation becomes:
 
-$$
-X[2r]=
-\sum_{n=0}^{N/2-1}
-\left(x[n]+x[n+N/2]\right)W_N^{2rn}
-$$
+$$X[2r]=\sum_{n=0}^{N/2-1}\left(x[n]+x[n+N/2]\right)W_N^{2rn}$$
 
-Define a new sequence containing the pairwise sums of our original input:
+Lets define a new sequence containing the pairwise sums of our original input:
 
-$$
-a[n]=x[n]+x[n+N/2],
-\qquad 0\le n<N/2
-$$
-
+$$a[n]=x[n]+x[n+N/2], \qquad 0\le n<N/2$$
 Then:
-
-$$
-X[2r]=\sum_{n=0}^{N/2-1}a[n]W_N^{2rn}
-$$
+$$X[2r]=\sum_{n=0}^{N/2-1}a[n]W_N^{2rn}$$
 
 Now let's take a closer look at the exponential coefficient.
+(Keep in mind that $0\leq n \leq \frac{N}{2}-1$).
 
-$$
-W_N^{2rn}
-=e^{-i2\pi(2rn)/N}
-=e^{-i2\pi rn/(N/2)}
-=W_{N/2}^{rn}
-$$
+$$W_N^{2rn}=e^{-i2\pi(2rn)/N}=e^{-i2\pi rn/(N/2)}=W_{N/2}^{rn}$$
 
-Every second row of the original $N$-point DFT therefore contains exactly the same exponential coefficients as an $N/2$-point DFT.
+Geometrically this shows that the rotations done twice as fast in an $N$ length row produce the same values as rotating at a speed of one around an $\frac{N}{2}$ row. This is just a restatement of the loop symmetry we discussed in the second optimization, but I bring it to attention again because we can generalize it to any positive integer $\alpha$:
+
+$$W_N^{\alpha rn}=e^{-i2\pi(\alpha rn)/N}=e^{-i2\pi rn/(N/\alpha)}=W_{N/\alpha}^{rn}$$
+
+Intuitively, this means that moving around a circle $\alpha$ times faster, while sampling at evenly spaced intervals, produces exactly the same sequence of rotations as moving at the original speed around a circle with $\frac{N}{\alpha}$ sampling positions. The faster rotation simply completes its cycle in $\frac{N}{\alpha}$ steps instead of $N$.
+
+So going back to our case where $\alpha=2$, mean that every second row of the original $N$-point DFT therefore contains exactly the same exponential coefficients as an $N/2$-point DFT.
 
 Substituting this into our equation:
 
-$$
-\boxed{
-X[2r]=\sum_{n=0}^{N/2-1}a[n]W_{N/2}^{rn}
-}
-$$
+$$\boxed{X[2r]=\sum_{n=0}^{N/2-1}a[n]W_{N/2}^{rn}
+, \qquad a[n]=x[n]+x[n+N/2], \qquad 0\le n<N/2}$$
+
 
 **We have just rewritten all the even-indexed outputs of our original DFT as a single DFT of half the size!**
 
@@ -1260,6 +1242,40 @@ $$
   style="display:block;border:none;border-radius:12px;">
 </iframe>
 
+
+### Odd Frequency Indices
+
+Now consider the odd rows, where $k=2r+1$.
+
+Since $(-1)^{2r+1}=-1$:
+
+$$X[2r+1]=\sum_{n=0}^{N/2-1}\left(x[n]-x[n+N/2]\right)W_N^{(2r+1)n}$$
+
+Unlike the even case, our exponential coefficients don't immediately match those of an $N/2$-point DFT.
+
+However, we can split the exponent:
+
+$$W_N^{(2r+1)n}=W_N^{2rn}W_N^n=W_{N/2}^{rn}W_N^n$$
+
+Substituting:
+
+$$X[2r+1]=\sum_{n=0}^{N/2-1}\left(x[n]-x[n+N/2]\right)W_N^nW_{N/2}^{rn}$$
+
+Notice that $W_N^n$ depends only on the sample index $n$, not on the frequency index $r$, so in effect the set of $W_N^n$s is just the first half of the first row of $F_N$.
+
+This means we can include it in another new input sequence:
+
+$$b[n]=\left(x[n]-x[n+N/2]\right)W_N^n,\qquad 0\le n<N/2$$
+
+Giving:
+
+$$\boxed{X[2r+1]=\sum_{n=0}^{N/2-1}b[n]W_{N/2}^{rn}}$$
+
+Once again, we have arrived at the definition of an $N/2$-point DFT!
+
+The only difference is that our new input is formed by taking the pairwise differences of the original samples and multiplying them by an additional complex exponential, $W_N^n$. These additional rotations are commonly called **twiddle factors**, and are equivalent to the first row values of an $F_{N/2}$ exponential matrix.
+
+
 <!-- Odd frequency indices -->
 <iframe
   src="./content/misc_math/DFT/dft_odd_rows_to_4point.html"
@@ -1272,59 +1288,7 @@ $$
 </iframe>
 
 
-### Odd Frequency Indices
-
-Now consider the odd rows, where $k=2r+1$.
-
-Since $(-1)^{2r+1}=-1$:
-
-$$
-X[2r+1]=
-\sum_{n=0}^{N/2-1}
-\left(x[n]-x[n+N/2]\right)W_N^{(2r+1)n}
-$$
-
-Unlike the even case, our exponential coefficients don't immediately match those of an $N/2$-point DFT.
-
-However, we can split the exponent:
-
-$$
-W_N^{(2r+1)n}
-=W_N^{2rn}W_N^n
-=W_{N/2}^{rn}W_N^n
-$$
-
-Substituting:
-
-$$
-X[2r+1]=
-\sum_{n=0}^{N/2-1}
-\left(x[n]-x[n+N/2]\right)
-W_N^nW_{N/2}^{rn}
-$$
-
-Notice that $W_N^n$ depends only on the sample index $n$, not on the frequency index $r$.
-
-This means we can include it in another new input sequence:
-
-$$
-b[n]=\left(x[n]-x[n+N/2]\right)W_N^n,
-\qquad 0\le n<N/2
-$$
-
-Giving:
-
-$$
-\boxed{
-X[2r+1]=\sum_{n=0}^{N/2-1}b[n]W_{N/2}^{rn}
-}
-$$
-
-Once again, we have arrived at the definition of an $N/2$-point DFT!
-
-The only difference is that our new input is formed by taking the pairwise differences of the original samples and multiplying them by an additional complex exponential, $W_N^n$. These additional rotations are commonly called **twiddle factors**.
-
-### Putting the Two Halves Together
+### Division of Divisions
 
 Let's summarize what we have discovered.
 
@@ -1345,8 +1309,8 @@ Then, instead of evaluating one $N$-point DFT, we evaluate two independent $N/2$
 $$
 \boxed{
 \begin{aligned}
-X[2r]&=\operatorname{DFT}_{N/2}(a)[r]\\[4pt]
-X[2r+1]&=\operatorname{DFT}_{N/2}(b)[r]
+X[2r]&=\operatorname{F}_{N/2}(a)[r]\\[4pt]
+X[2r+1]&=\operatorname{F}_{N/2}(b)[r]
 \end{aligned}
 \qquad 0\le r<N/2
 }
@@ -1354,766 +1318,201 @@ $$
 
 The first produces all the even-indexed frequency outputs, while the second produces all the odd-indexed outputs.
 
-<!-- 
-<iframe
- src="./content/misc_math/DFT/dft_two_half_dfts.html"
- width="100%"
- height="1050"
- scrolling="no"
- loading="lazy"
- title="DFT Divide and Conquer Visualization"
- style="display:block;width:100%;border:none;overflow:hidden;border-radius:12px;margin:20px 0;">
-</iframe>
--->
-
-For example, an eight-point DFT can be evaluated by forming four pairwise sums and four twiddle-weighted differences, then evaluating two four-point DFTs.
-
-But here is the most important observation: **these two smaller problems are themselves DFTs.**
-
-There is nothing stopping us from applying exactly the same procedure to each one.
-
-Each four-point DFT can be divided into two two-point DFTs, and each two-point DFT can be divided into two one-point DFTs.
+For example, an eight-point DFT can be evaluated by forming four pairwise sums and four twiddle-weighted differences, then evaluating two four-point DFTs. But here is the most important observation: these two smaller problems are themselves DFTs. Each four-point DFT can be divided into two two-point DFTs, and each two-point DFT can be divided into two one-point DFTs.
 
 Rather than independently computing each frequency output, we have discovered a way to recursively divide a large DFT into smaller DFTs.
 
 This approach is known as the **radix-2 Decimation-in-Frequency Fast Fourier Transform (FFT)**.
 
-<iframe
- src="./content/misc_math/DFT/dft_8_to_4.html"
- width="100%"
- height="1000"
- scrolling="no"
- loading="lazy"
- title="Recursive DFT Matrix Decomposition"
- style="display:block;border:0;width:100%;overflow:hidden;border-radius:12px;margin:20px 0;">
-</iframe>
+To compute an $N$-point DFT, we split it into two DFTs of size $N/2$. Each of these is then split into two DFTs of size $N/4$, and so on, until we reach the simplest possible DFTs of size 2, which can be evaluated using just an addition and a subtraction. At each level of this recursion, the number of subproblems doubles while their size halves. For example, an 8-point DFT becomes two 4-point DFTs, then four 2-point DFTs.
 
-The key difference from our previous optimizations is that we are no longer simply reusing individual matrix entries. We are reusing the structure of the entire computation.
+The important observation is that the total amount of work at each level remains proportional to $N$. At recursion depth $j$, we have $2^j$ subproblems, each of size $N/2^j$, giving:
 
-As we'll see next, this recursive structure is what reduces the computational complexity from $O(N^2)$ to $O(N\log_2 N)$.
+$$2^j \frac{N}{2^j}=N$$
 
+Since the size of each subproblem is halved at every step, the number of levels required to reach our base case is:
 
+$$\frac{N}{2^L}=1 \quad \Longrightarrow \quad L=\log_2 N$$
 
+Thus, we have $\log_2 N$ levels of computation, each requiring $O(N)$ operations. This gives us the time complexity:
 
+$$\boxed{T(N)=O(N\log_2 N)}$$
 
+This is a significant improvement over the naive DFT's $O(N^2)$ complexity, and it comes entirely from reorganizing the computation to reuse intermediate results rather than evaluating each frequency independently.
 
+The additional nice part is that this recursive self-calling is perfect for a recursive programmatic implementation:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Combining the Two Optimizations
-
-From here on it's convenient to name the basic rotation. Let
-
-$$W_N=e^{-i\frac{2\pi}{N}}$$
-
-so that every entry of the matrix is just a power of it:
-
-$$F_N[k,n]=W_N^{kn}$$
-
-Now let's actually use the second optimization in the sum. Split the DFT into the first and second halves of the input:
-
-$$X[k]=\sum_{n=0}^{N-1}x[n]e^{-i\frac{2\pi kn}{N}}
-=\sum_{n=0}^{N/2-1}x[n]W_N^{kn}+\sum_{n=0}^{N/2-1}x\left[n+\tfrac N2\right]W_N^{k(n+N/2)}$$
-
-The second optimization tells us $W_N^{k(n+N/2)}=(-1)^kW_N^{kn}$, so both sums use the same left-half coefficients and we can factor them out:
-
-$$X[k]=\sum_{n=0}^{N/2-1} W_N^{kn}\left(x[n]+(-1)^kx\left[n+\tfrac N2\right]\right)$$
-
-The $(-1)^k$ term accounts for the sign flipping on odd rows. So we iterate through the first and second half of our input array, adding the two elements for even indexes and subtracting them for odd ones, (which creates a new array of $\frac{N}{2}$ values) and only then matrix multiply against the left half of the exponential matrix row. That is $N/2$ multiply-and-accumulates per output instead of $N$.
-
-put a visualization here that takes the input matrix does hte split and creates a new matrix which is then shown to be multiplied by the first half of the exponential matrix's kth rows elements.
-
-Now stack the first optimization on top: we only need the outputs $k=0$ to $N/2$, and the rest come from flipping imaginary signs. Together, the coefficients we multiply by lie in the left $N/2$ columns and the first $N/2+1$ rows. This is **slightly more than** the top-left quarter because the Nyquist row $k=N/2$ is also required.
-
-
-Here is the combined view. Start by selecting a cell in the top-left region and watch its related coefficients appear by either conjugation, a half-row sign flip, or both. The extra Nyquist row ($k=N/2$) is included because it is self-conjugate and must be computed separately.
-
-<iframe
- src="./content/misc_math/DFT/dft_combined_symmetry.html"
- width="100%"
- height="850"
- scrolling="no"
- loading="lazy"
- title="DFT Matrix Combined Symmetry"
- style="display:block;width:100%;border:none;overflow:hidden;border-radius:12px;margin:20px 0;">
-</iframe>
+Note that this only works for values of $N$ which are powers of two so they can be recursively split into two subproblems.
 
 ```py
-def dft_half_half(x):
-    N = len(x)          # assumes N is even
-    H = N // 2
-    X = [0j] * N
 
-    # Left half gives the right half: fold the input once
-    s_even = [x[n] + x[n + H] for n in range(H)]   # even k: right half is a copy
-    s_odd  = [x[n] - x[n + H] for n in range(H)]   # odd k: right half is negated
-
-    # Top half of the rows, left half of the columns
-    for k in range(H + 1):
-        s = s_even if k % 2 == 0 else s_odd
-        for n in range(H):
-            angle = -2 * pi * k * n / N
-            X[k] += s[n] * exp(1j * angle)
-
-    # Bottom half: flip the sign of the imaginary part
-    for k in range(1, H):
-        X[N - k] = complex(X[k].real, -X[k].imag)
-
-    return X
-```
-This costs $N$ additions and subtractions to fold the input, about $\frac N2\left(\frac N2+1\right)\approx\frac{N^2}{4}$ multiply-and-accumulates, and $\frac N2-1$ sign flips: roughly a quarter of the work we started with. But a quarter of $N^2$ is still $O(N^2)$.
-
-So far we have only removed redundancy within the matrix, and each $X[k]$ is still computed on its own. To do better we have to look at what different frequencies share with each other, and the fold above already hints at it.
-
-
-
-
-
-# Radix-2 FFT
-
-## Divide and Conquer
-
-So far, we have seen that the DFT matrix contains a significant amount of symmetry. Many of its entries are either identical, negatives, or complex conjugates of other entries.
-
-We used these symmetries to reduce the number of distinct complex exponential coefficients we need to evaluate. However, even after eliminating these redundant coefficients, we still have to compute matrix multiply aka the weighted sums that produce each DFT output.
-
-Can we use these same symmetries to reduce the number of operations needed to compute the sums themselves?
-
-Recall our original DFT equation:
-
-$$X[k]=\sum_{n=0}^{N-1}x[n]W_N^{kn}$$
-where
-$$W_N=e^{-i2\pi/N}$$
-
-We previously divided the DFT matrix into four quadrants by separating both the frequency index $k$ and the sample index $n$ into two halves.
-
-Let's revisit the left and right halves of the matrix. We know that for even $N$:
-
-$$W_N^{k(n+N/2)}=(-1)^kW_N^{kn}$$
-
-This means the right half of each row is either identical to or the negative of the left half, depending on whether $k$ is even or odd.
-
-Using this identity, we can split our original sum into two halves:
-
-$$X[k]=\sum_{n=0}^{N/2-1}x[n]W_N^{kn}+
-\sum_{n=0}^{N/2-1}x[n+N/2]W_N^{k(n+N/2)}$$
-
-Substituting our symmetry relation and combining the sums gives:
-
-$$\boxed{X[k]=\sum_{n=0}^{N/2-1}\left(x[n]+(-1)^kx[n+N/2]\right)W_N^{kn}}$$
-
-We have now reduced the length of the sum from $N$ terms to $N/2$ terms, but we have introduced an addition or subtraction between pairs of input samples.
-
-The important observation is that $(-1)^k$ has only two possible values. Rather than treating every frequency index independently, let's separate the outputs into even and odd frequencies.
-
-### Even frequency indices
-
-For even values of $k$, write $k=2r$, where $r=0,1,\ldots,N/2-1$.
-
-Since $(-1)^{2r}=1$, our equation becomes:
-
-$$X[2r]=\sum_{n=0}^{N/2-1}\left(x[n]+x[n+N/2]\right)W_N^{2rn}$$
-
-Now notice something interesting about the exponential coefficient:
-
-$$
-W_N^{2rn}
-=e^{-i2\pi(2rn)/N}
-=e^{-i2\pi rn/(N/2)}
-=W_{N/2}^{rn}.
-$$
-
-In other words, **every second frequency row of the original $N$-point DFT uses exactly the same exponential coefficients as a DFT of size $N/2$.**
-
-Define a new sequence containing the pairwise sums of our original input:
-
-$$a[n]=x[n]+x[n+N/2],\qquad 0\le n\le \frac{N}{2}-1$$
-Then:
-$$\boxed{X[2r]=\sum_{n=0}^{N/2-1}a[n]W_{N/2}^{rn}}$$
-
-But this is simply the definition of a DFT, except now it has only $N/2$ inputs! We can therefore compute all even-indexed outputs of our original DFT using one half-sized DFT.
-
-### Odd frequency indices
-
-Now consider the odd rows, where $k=2r+1$.
-
-Since $(-1)^{2r+1}=-1$:
-
-$$X[2r+1]=\sum_{n=0}^{N/2-1}\left(x[n]-x[n+N/2]\right)W_N^{(2r+1)n}$$
-
-Unlike the even case, our exponential coefficient does not immediately look like an $N/2$-point DFT coefficient.
-
-However, we can split its exponent:
-$$W_N^{(2r+1)n}=W_N^{2rn}W_N^n=W_{N/2}^{rn}W_N^n$$
-
-Substituting this back into the sum:
-
-$$
-X[2r+1]=
-\sum_{n=0}^{N/2-1}
-\left(x[n]-x[n+N/2]\right)
-W_N^nW_{N/2}^{rn}.
-$$
-
-Notice that $W_N^n$ depends only on the sample index $n$, not on the frequency index $r$.
-
-This means we can include it in another new input sequence:
-
-$$b[n]=\left(x[n]-x[n+N/2]\right)W_N^n \qquad 0\le n\le \frac{N}{2}-1$$
-
-Giving:
-
-$$
-\boxed{
-X[2r+1]=\sum_{n=0}^{N/2-1}b[n]W_{N/2}^{rn}
-}
-$$
-
-Once again, we have arrived at the definition of an $N/2$-point DFT!
-
-The only difference is that our new input is formed by taking the pairwise differences of the original samples and multiplying them by an additional complex exponential, $W_N^n$. These additional rotations are commonly called **twiddle factors**.
-
-
-<iframe
-  src="content/misc_math/DFT/dft_two_half_dfts.html"
-  width="100%"
-  height="1050"
-  style="border: none; border-radius: 12px;"
-  title="DFT Divide and Conquer Visualization"
-  loading="lazy"
-></iframe>
-
-
-### Putting the two halves together
-
-We can now express our entire original DFT as two smaller DFTs:
-
-$$
-\boxed{
-\begin{aligned}
-a[n] &= x[n]+x[n+N/2],\\[4pt]
-b[n] &= \left(x[n]-x[n+N/2]\right)W_N^n,\\[8pt]
-X[2r] &= \operatorname{DFT}_{N/2}(a)[r],\\[4pt]
-X[2r+1] &= \operatorname{DFT}_{N/2}(b)[r].
-\end{aligned}
-}
-$$
-
-Here, both $n$ and $r$ range from $0$ to $N/2-1$.
-
-We started with a single DFT containing $N$ samples. By exploiting the relationship between the left and right halves of its matrix, we have rewritten it as **two independent DFTs, each containing only $N/2$ samples**.
-
-For example, an eight-point DFT can be evaluated by first forming four pairwise sums and four twiddle-weighted differences, then computing two four-point DFTs. The first produces the even-indexed frequency outputs, and the second produces the odd-indexed outputs.
-
-There is one particularly important distinction here: we are not simply removing redundant entries from the original matrix. We have reorganized the computation into smaller problems that have exactly the same mathematical structure as the original.
-
-And since these two smaller problems are themselves DFTs, there is nothing stopping us from applying the exact same procedure again.
-
-Each four-point DFT can become two two-point DFTs. Each two-point DFT can become two one-point DFTs.
-
-Rather than computing every output independently, we have discovered a **recursive divide-and-conquer algorithm**.
-
-This is the central idea behind the radix-2 *Decimation-in-Frequency Fast Fourier Transform* (FFT).
-
-Next, let's examine how repeatedly dividing the problem changes its computational complexity from $O(N^2)$ to $O(N\log_2 N)$.
-
-<iframe
- src="./content/misc_math/DFT/dft_8_to_4.html"
- width="100%"
- height="1000"
- scrolling="no"
- loading="lazy"
- title="Recursive DFT Matrix Decomposition"
- style="display:block; border:0; width:100%; overflow:hidden; border-radius:12px;">
- </iframe>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Algorithm
-
-Now that we have defined the DFT and it's inputs lets get into the more computational side of things and implementation.
-
-First, lets do a quick recap of the terms and equations we will be using as building blocks for our code.
-
-## Index of Terms
-
-DFT and IDFT:
-
-$$
-\boxed{
-X[k]=\sum_{n=0}^{N-1}x[n]e^{-i\frac{2\pi kn}{N}}
-\qquad
-x[n]=\frac{1}{N}\sum_{k=0}^{N-1}X[k]e^{i\frac{2\pi kn}{N}}
-
-}
-$$
-
-Where
-- $T$ - Total observation duration
-- $N$ Number of sampled points
-- $n$ - Sample index, $0\le n<N$
-- $k$ - DFT frequency index, $0\le k<N$
-- $\Delta t$ - Time interval between samples
-- $f_s$ - Sampling frequency, in samples per second
-- $f_{\max}$ - Highest frequency present in a band-limited signal
-- $f_N$ - Nyquist frequency
-- $\Delta f$ - Spacing between adjacent DFT frequency bins
-- $\omega_k$ - Angular frequency of the $k$th frequency bin
-- $x[n]$ - Original signal sampled at index $n$
-- $X[k]$ - Complex Fourier coefficient at index $k$
-
-The main relationships are:
-
-$$\boxed{\Delta t=\frac{T}{N}}$$
-$$\boxed{f_s=\frac{1}{\Delta t}=\frac{N}{T}}$$
-$$\boxed{f_N=\frac{f_s}{2}=\frac{N}{2T}}$$
-$$\boxed{\Delta f=\frac{1}{T}=\frac{f_s}{N}}$$
-$$\boxed{\omega_k=2\pi\frac{k}{T}=\frac{2\pi kf_s}{N}}$$
-
-
-## Pseudocode
-
-I will give the pseudocode in Python and in C++ in a collapsible section.
-
-```py
-# x = [x1, x2, ... xn]
-def dft(x):
-    N = len(x)      # Input length
-    X = [0j] * N    # Empty list of imaginary numbers of size N
-
-    for k in range(N):
-        for n in range(N):
-            angle = -2 * pi * k * n / N    # Exponent term
-            X[k] += x[n] * exp(1j * angle) # Summation
-
-    return X
-```
-
-
-This is it, the outer loops iterates over the $N$ frequency bins and the inner loops computes and sums up the contribution of every input samples towards that $k$th frequency.
-
-This gives a time complexity of $O(N^2)$ which is not great.
-
-To put that into perspective if we were to evaluate a recording sampled at 44.1kHz ie 44,100 samples every second for a duration of ten seconds it would require $(44100 * 10)^2$ complex multiply and accumulate operations. This would take in the ballpark of 15 seconds to compute on a 2015-ish iPhone. (kind of a weird metric but I just thought of a device that many people today might have had experience using). This might not seem too bad but since the computation is quadratic time, for a 3 minute long signal, the time jumps to over an hour.
-
-## View through the matrix
-
-If we look at the DFT we see that the exponential term does not depend on a specific sampled value $x[n]$ only on size $N$.
-
-$$e^{-i\frac{2\pi kn}{N}}$$
-
-so we can precompute these values for each $k$ and store them in an $N \times N$ matrix $F_N$, which is nice because we can perform multiply and summation by matrix multiplying the matrix with the samples.
-
-Ex. $N = 4$
-
-$$
-F_4 =
-\begin{bmatrix}
-e^{-i\frac{2\pi(0)(0)}{4}} & e^{-i\frac{2\pi(0)(1)}{4}} & e^{-i\frac{2\pi(0)(2)}{4}} & e^{-i\frac{2\pi(0)(3)}{4}} \\
-e^{-i\frac{2\pi(1)(0)}{4}} & e^{-i\frac{2\pi(1)(1)}{4}} & e^{-i\frac{2\pi(1)(2)}{4}} & e^{-i\frac{2\pi(1)(3)}{4}} \\
-e^{-i\frac{2\pi(2)(0)}{4}} & e^{-i\frac{2\pi(2)(1)}{4}} & e^{-i\frac{2\pi(2)(2)}{4}} & e^{-i\frac{2\pi(2)(3)}{4}} \\
-e^{-i\frac{2\pi(3)(0)}{4}} & e^{-i\frac{2\pi(3)(1)}{4}} & e^{-i\frac{2\pi(3)(2)}{4}} & e^{-i\frac{2\pi(3)(3)}{4}}
-\end{bmatrix}
-=
-\begin{bmatrix}
-1 & 1 & 1 & 1 \\
-1 & -i & -1 & i \\
-1 & -1 & 1 & -1 \\
-1 & i & -1 & -i
-\end{bmatrix}
-$$
-
-So we can compute the output by matrix multiplying this matrix by a column vector of samples:
-
-$$\mathbf{X} = F_N \mathbf{x}$$
-
-Ex:
-
-$$ 
-\mathbf{X} =
-\begin{bmatrix}
-1 & 1 & 1 & 1 \\
-1 & -i & -1 & i \\
-1 & -1 & 1 & -1 \\
-1 & i & -1 & -i
-\end{bmatrix} 
-
-\begin{bmatrix}
-x[0] \\
-x[1] \\
-x[2] \\
-x[3]
-\end{bmatrix} 
-$$
-
-Here is a visualization of the exponential term matrix for different values of $N$:
-
-<iframe
-  src="./content/misc_math/DFT/dft_matrix_vectors.html"
-  width="100%"
-  height="850"
-  scrolling="no"
-  loading="lazy"
-  title="DFT Matrix Complex Vector Visualizer"
-  style="
-    display: block;
-    width: 100%;
-    border: none;
-    overflow: hidden;
-    border-radius: 12px;
-    margin: 20px 0;
-  ">
-</iframe>
-
-Here are some noteworthy observations about the exponential matrix:
-
-1. The entire first row ($k=0$) and first column ($n=0$) evaluate to $e^0=1$, regardless of the size of $N$.
-
-2. For $k=1$, each successive value advances by an angle of $-2\pi/N$ around the complex unit circle. It therefore takes exactly $N$ steps to complete one full rotation.
-
-3. For any row $k$, the angular step between consecutive values is $k$ times the angular step of row $k=1$:
-
-   $$\Delta\theta_k=-\frac{2\pi k}{N}$$
-
-   Note that the magnitude of every vector remains 1; only its direction changes. The number of distinct values in row $k$ is $N/\gcd(k,N)$ for $k>0$. Consequently, some rows complete their rotations and begin repeating before reaching $N$ steps.
-
-4. When $N$ is even, the row $k=N/2$ corresponds to the Nyquist frequency. Its values alternate between $1$ and $-1$:
-
-   $$e^{-i\frac{2\pi(N/2)n}{N}}=e^{-i\pi n}=(-1)^n$$
-
-   When $N$ is odd, there is no row corresponding exactly to the Nyquist frequency.
-
-5. Rows $k$ and $N-k$ are complex conjugates of each other:
-
-    $$\boxed{F_N[N-k,n]=\overline{F_N[k,n]}}$$
-
-   Geometrically, their vectors are reflected across the real axis of the complex plane. Their real components are identical, while their imaginary components have opposite signs. This symmetry exists for every $N$.
-
-6. The matrix is symmetric along its main diagonal because multiplication is commutative:
-    $$F_N[k,n]=F_N[n,k]$$
-
-7. The size and factorization of $N$ affect the repetition patterns within the matrix. For example, when $N=7$ (prime), every nonzero row visits all seven distinct roots of unity before repeating. When $N=6$ (composite), some rows repeat after fewer than six steps.
-
-
-## First Optimization: Conjugate Symmetry (top half gives us second half)
-
-As we have seen in the sampling section and in the matrix one above: rows $k$ and $N-k$ are complex conjugates of each other:
-
-$$\boxed{F_N[N-k,n]=\overline{F_N[k,n]}}$$
-
-It's worth being precise about what taking a conjugate actually costs us. For a complex number $z=a+ib$, its conjugate is
-
-$$\overline{z}=\overline{a+ib}=a-ib$$
-
-Geometrically this reflects the vector across the real (x) axis and computationally it means flipping the sign of the imaginary part. So instead of having to calculate all $N$ terms we can just calculate the first $0$ to $N/2$ terms and conjugate to get the remaining $floor(N/2)$ terms for free.
-
-Below is the same exponential matrix as before. Toggle cells by clicking, or hold and drag across the grid to toggle several at once. Every cell that can be read off a toggled one by flipping its imaginary sign lights up. Try "Select top half" to see the whole matrix fill in, and notice that row $0$ (and row $N/2$ when $N$ is even) are their own mirror images, which is why they have to be computed.
-
-<iframe
- src="./content/misc_math/DFT/dft_conjugate_symmetry.html"
- width="100%"
- height="1000"
- scrolling="no"
- loading="lazy"
- title="DFT Matrix Conjugate Symmetry"
- style="
- display: block;
- width: 100%;
- border: none;
- overflow: hidden;
- border-radius: 12px;
- margin: 20px 0;
- ">
- </iframe>
-
-
-```py
-def dft_conj(x):
+def FFT(x):
     N = len(x)
-    X = [0j] * N
 
-    # Calculate only the top half (nonnegative frequencies)
-    for k in range(N // 2 + 1):
-        for n in range(N):
-            angle = -2 * pi * k * n / N
-            X[k] += x[n] * exp(1j * angle)
+    # Base case: DFT of a single element
+    if N == 1: return x
 
-    # Bottom half: flip the sign of the imaginary part
-    for k in range(1, (N - 1) // 2 + 1):
-        X[N - k] = complex(X[k].real, -X[k].imag) # conjugate
+    H = N // 2 # Half
+
+    # Split the input into pairwise sums and differences
+    a = [0] * H
+    b = [0] * H
+
+    for n in range(H):
+        a[n] = x[n] + x[n + H]
+        b[n] = (x[n] - x[n + H]) * exp(-2j * pi * n / N) # apply twiddle factor
+
+    # Recursively compute the two half-sized DFTs
+    A = FFT(a)  # Even frequency outputs
+    B = FFT(b)  # Odd frequency outputs
+
+    # Interleave the results into their correct positions
+    X = [0] * N
+
+    for r in range(H):
+        X[2*r]     = A[r]
+        X[2*r + 1] = B[r]
 
     return X
-
 ```
 
-This means that for even $N$ the number of summation terms decreases from $N^2$ to $N(\frac{N}{2}+1)$ plus a sign flip for each of the $\frac{N}{2} - 1$ terms. Note, that while this improved our computation by a constant factor the asymptotic complexity is still $O(N^2)$ and this only works for real-valued input signals as complex sequences do not have this conjugate symmetry. (For our focus of signal processing this is fine as we will be working with real valued signals.)
+This is it! We have now explored how to go from the conceptual mathematical basis of Fourier series and transforms, rooted in function spaces all the way to an optimized implementation of the Fourier transform!
 
-## Second Optimization: Loop Symmetry (The left half gives us the right half)
+Don't worry I haven't forgot about the Inverse FFT and the good news is that it is conceptually the same as the FFT, just with a positive exponent to undo the unwinding and a final division by $N$ to normalize the forward DFT. Because the forward DFT sums $N$ contributions without normalizing them, applying the inverse transform without this factor would recover $N$ times the original signal. Dividing by $N$ compensates for this scaling, ensuring that applying the inverse FFT to the FFT of a signal reconstructs the original samples exactly (up to numerical precision).
 
+$$x[n]=\frac{1}{N}\sum_{k=0}^{N-1}X[k]e^{i\frac{2\pi kn}{N}}$$
 
-The first optimization split the matrix horizontally. A crucial symmetry appears when we instead compare the first half of a row of the DFT matrix to the second half.
-
-Recall that
-
-$$F_N[k,n]=e^{-i\frac{2\pi kn}{N}}$$
-
-Now compare the entry in column $n$ with the entry in column $n+\frac N2$:
-
-$$
-F_N\left[k,n+\frac N2\right]
-=
-e^{-i\frac{2\pi k(n+N/2)}{N}}
-=
-e^{-i\frac{2\pi kn}{N}}e^{-i\pi k}
-=
-(-1)^kF_N[k,n]
-$$
-
-Therefore:
-
-- if $k$ is even, then
-  $$
-  F_N\left[k,n+\frac N2\right]=F_N[k,n]
-  $$
-- if $k$ is odd, then
-  $$
-  F_N\left[k,n+\frac N2\right]=-F_N[k,n]
-  $$
-
-We can understand this property geometrically by remembering that each element of our DFT matrix is an $N$th root of unity raised to some integer power, representing a rotation around the complex unit circle.
-
-For a fixed row $k$, moving from column $n$ to column $n+\frac N2$ advances the rotation by
-
-$$\Delta\theta=-\frac{2\pi k}{N}\frac N2=-\pi k.$$
-
-In other words, moving halfway across a row corresponds to making $k$ half clockwise revolutions around the unit circle or equivalently $k/2$ full rotations. (This is a property we already stated as .2 and .3 when we observed hte exponential matrix initially)
-
-- **When $k$ is even**, $k/2$ is an integer, so we complete an integer number of full revolutions and return to exactly the same position. Therefore, the corresponding complex values are identical.
-- **When $k$ is odd**, $k/2$ is a half-integer, so after completing some number of full revolutions, we have an additional half-revolution ($\pi$ radians) remaining. This places us on the opposite side of the unit circle, giving us the negative of the original complex value.
-
-For example, when $k=2$, moving halfway across the row produces one complete revolution ($2\pi$), whereas for $k=3$, it produces one and a half revolutions ($3\pi$).
-
-This explains why the second half of every row is either a copy or the negation of its first half. The symmetry is a direct consequence of the periodicity of complex rotations, and as we'll see next, it allows us to combine pairs of input samples using additions and subtractions rather than calculating every contribution independently.
-
-Computationally this sign flip is just a negation, this time of both complex parts, $-(a+ib) = -a-ib$, which is a half-turn around the origin.
-
-Here is the matrix again, this time split down the middle. Toggling a cell (or dragging across several) lights up its partner half a row away: marked $=$ when $k$ is even and $-$ when $k$ is odd. "Select left half" shows the left half alone determines the whole matrix.
-
-<iframe
- src="./content/misc_math/DFT/dft_sign_flip.html"
- width="100%"
- height="1020"
- scrolling="no"
- loading="lazy"
- title="DFT Matrix Left Half Gives the Right Half"
- style="
- display: block;
- width: 100%;
- border: none;
- overflow: hidden;
- border-radius: 12px;
- margin: 20px 0;
- ">
- </iframe>
-
-
-
-
-
-
-## Combining the Two Optimizations
-
-From here on it's convenient to name the basic rotation. Let
-
-$$W_N=e^{-i\frac{2\pi}{N}}$$
-
-so that every entry of the matrix is just a power of it:
-
-$$F_N[k,n]=W_N^{kn}$$
-
-Now let's actually use the second optimization in the sum. Split the DFT into the first and second halves of the input:
-
-$$X[k]=\sum_{n=0}^{N/2-1}x[n]W_N^{kn}+\sum_{n=0}^{N/2-1}x\left[n+\tfrac N2\right]W_N^{k(n+N/2)}$$
-
-The second optimization tells us $W_N^{k(n+N/2)}=(-1)^kW_N^{kn}$, so both sums use the same left-half coefficients and we can factor them out:
-
-$$X[k]=\sum_{n=0}^{N/2-1} W_N^{kn}\left(x[n]+(-1)^kx\left[n+\tfrac N2\right]\right)$$
-
-The $(-1)^k$ term accounts for the sign flipping on odd rows. So we first fold the input in half, adding the two halves for even $k$ and subtracting them for odd $k$, and only then multiply against the left half of the row. That is $N/2$ multiply-and-accumulates per output instead of $N$.
-
-Now stack the first optimization on top: we only need the outputs $k=0$ to $N/2$, and the rest come from flipping imaginary signs. Together, the only part of the matrix we ever multiply by is the top-left quarter: the top half of the rows and the left half of the columns.
+The normalization does not have to be applied specifically during the inverse transform. It is simply a convention: we could instead divide the forward transform by $N$, or divide both transforms by $\sqrt{N}$, as long as their combined normalization equals $1/N$.
 
 ```py
-def dft_half_half(x):
-    N = len(x)          # assumes N is even
-    H = N // 2
-    X = [0j] * N
+def IFFT(X):
+    N = len(X)
 
-    # Left half gives the right half: fold the input once
-    s_even = [x[n] + x[n + H] for n in range(H)]   # even k: right half is a copy
-    s_odd  = [x[n] - x[n + H] for n in range(H)]   # odd k: right half is negated
+    def inverse_recursive(v):
+        M = len(v)
 
-    # Top half of the rows, left half of the columns
-    for k in range(H + 1):
-        s = s_even if k % 2 == 0 else s_odd
+        # Base case: transform of a single element
+        if M == 1:    return v
+
+        H = M // 2
+
+        # Pairwise sums and differences
+        a = [0] * H
+        b = [0] * H
+
         for n in range(H):
-            angle = -2 * pi * k * n / N
-            X[k] += s[n] * exp(1j * angle)
+            a[n] = v[n] + v[n + H]
+            b[n] = (v[n] - v[n + H]) * exp(2j * pi * n / M) # Note: positive exponent
 
-    # Bottom half: flip the sign of the imaginary part
-    for k in range(1, H):
-        X[N - k] = complex(X[k].real, -X[k].imag)
+        # Recursively compute two half-sized transforms
+        A = inverse_recursive(a)
+        B = inverse_recursive(b)
 
-    return X
+        # Interleave the results
+        result = [0] * M
+
+        for r in range(H):
+            result[2*r]     = A[r]
+            result[2*r + 1] = B[r]
+
+        return result
+
+    # Normalize once by the original length N
+    x = inverse_recursive(X)
+    return [value / N for value in x]
+
 ```
-This costs $N$ additions and subtractions to fold the input, about $\frac N2\left(\frac N2+1\right)\approx\frac{N^2}{4}$ multiply-and-accumulates, and $\frac N2-1$ sign flips: roughly a quarter of the work we started with. But a quarter of $N^2$ is still $O(N^2)$.
+### Conjugate Relationship Between the FFT and IFFT
 
-So far we have only removed redundancy within the matrix, and each $X[k]$ is still computed on its own. To do better we have to look at what different frequencies share with each other, and the fold above already hints at it.
+An interesting observation is that the inverse FFT doesn't actually require a separate algorithm. We can compute it using the forward FFT by exploiting the relationship between their complex exponential coefficients.
 
+Recall that the forward DFT uses a negative exponent, while the inverse DFT uses a positive exponent:
 
+$$X[k]=\sum_{n=0}^{N-1}x[n]e^{-i2\pi kn/N}$$
 
+$$x[n]=\frac{1}{N}\sum_{k=0}^{N-1}X[k]e^{i2\pi kn/N}$$
 
+Since the complex conjugate of an exponential reverses the sign of its exponent,
 
-# Radix-2 FFT
+$$\overline{e^{-i\theta}}=e^{i\theta},$$
 
-## Divide and Conquer
+we should be able to obtain the inverse transform by conjugating the result of a forward FFT.
 
-Keeping this flip-flopping sign in mind, let's see how it can be used to divide and conquer the computation at the heart of the DFT:
+However, there is a slight complication: taking the conjugate of a sum also conjugates every coefficient inside it, whereas we only want to reverse the sign of the exponential. To account for this, we can conjugate the input coefficients before applying the forward FFT, so that the final conjugation restores them to their original values.
 
-$$X[k]=\sum_{n=0}^{N-1}x[n]W_N^{kn}=\sum_{n=0}^{N/2-1} W_N^{kn}\left(x[n]+(-1)^kx\left[n+\tfrac N2\right]\right)$$
+Let's see this algebraically.
 
-Notice that the folded input only depends on whether $k$ is even or odd, namely:
+First, take the complex conjugate of every element in our frequency-domain input $X[k]$, and apply the forward FFT:
 
 $$
-\begin{aligned}
-k \text{ even: }\quad & s_e[n] = x[n]+x[n+N/2] \\
-k \text{ odd: }\quad & s_o[n] = x[n]-x[n+N/2]
-\end{aligned}
+\operatorname{FFT}(\overline X)[n]
+=
+\sum_{k=0}^{N-1}\overline{X[k]}e^{-i2\pi kn/N}
 $$
 
-are the only two computations we need to do on the input, for all $N$ rows. (These are exactly the s_even and s_odd lists in dft_half_half.)
+Notice that the exponential still has a negative exponent, and the coefficients are now conjugated.
 
-Here is the amazing part!
+Next, conjugate the entire output:
 
-<iframe
- src="./content/misc_math/DFT/dft_8_to_4.html"
- width="100%"
- height="1000"
- scrolling="no"
- loading="lazy"
- title="Recursive DFT Matrix Decomposition"
- style="display:block; border:0; width:100%; overflow:hidden; border-radius:12px;">
- </iframe>
+$$
+\overline{\operatorname{FFT}(\overline X)[n]}
+=
+\overline{
+\sum_{k=0}^{N-1}\overline{X[k]}e^{-i2\pi kn/N}
+}
+$$
 
+Since complex conjugation distributes over addition and multiplication, we can move it inside the sum:
+
+$$
+=
+\sum_{k=0}^{N-1}
+\underbrace{\overline{\overline{X[k]}}}_{X[k]}
+\underbrace{\overline{e^{-i2\pi kn/N}}}_{e^{+i2\pi kn/N}}
+$$
+
+And because conjugating a complex number twice returns the original number, we obtain:
+
+$$
+\boxed{
+\overline{\operatorname{FFT}(\overline X)[n]}
+=
+\sum_{k=0}^{N-1}X[k]e^{+i2\pi kn/N}
+}
+$$
+
+So we have successfully reversed the direction of the complex exponentials without changing the original input coefficients.
+The first conjugation prepares the coefficients so that they will be restored by the second. The second conjugation, applied to the FFT output, performs the actual exponential sign reversal.
+
+The only remaining operation is to divide by $N$ for normalization.
+
+Therefore,
+
+$$
+\boxed{
+\operatorname{IFFT}(X)
+=
+\frac{1}{N}\overline{\operatorname{FFT}(\overline X)}
+}
+$$
+
+This means that the same FFT algorithm can perform both the forward and inverse transforms, requiring only complex conjugation of the input and output and a normalization factor.
+
+```py
+def IFFT(X):
+    N = len(X)
+
+    # Conjugate the input coefficients
+    conjugated = [v.conjugate() for v in X]
+
+    # Apply the forward FFT
+    result = FFT(conjugated)
+
+    # Reverse the exponential sign and normalize
+    return [v.conjugate() / N for v in result]
+```
+
+Since these additional conjugations and the final normalization are $O(N)$ operations, the inverse FFT retains the same $O(N\log_2 N)$ time complexity as the forward FFT.
+
+# Conclusion
 
