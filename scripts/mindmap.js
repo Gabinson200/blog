@@ -241,9 +241,26 @@ function renderGraph(graph) {
   // 2. Add Zoom Behavior
   const zoom = d3.zoom()
     .scaleExtent([0.1, 8]) // Zoom out to 0.1x, in to 8x
+    // d3's default filter, plus: ignore wheel events during a Safari pinch
+    // gesture (handled below) so the zoom isn't applied twice.
+    .filter(event => (!event.ctrlKey || event.type === 'wheel') && !event.button &&
+      !(event.type === 'wheel' && gestureScale !== null))
     .on('zoom', (event) => {
+      if (event.sourceEvent) autoFit = false; // the user took over
       if (view.mode === '2d') gContent.attr('transform', event.transform);
     });
+
+  // Until the user zooms, pans or drags, the 2D view keeps the whole graph
+  // in frame, so it fits narrow (tablet) screens instead of spilling out.
+  let autoFit = true;
+  function fitToView() {
+    const box = gContent.node().getBBox();
+    if (!box.width || !box.height) return;
+    const pad = 24;
+    const k = Math.min(1, (width - 2 * pad) / box.width, (height - 2 * pad) / box.height);
+    const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2 - k * cx, height / 2 - k * cy).scale(k));
+  }
 
   // Define Arrow Markers
   const defs = svg.append('defs');
@@ -286,6 +303,7 @@ function renderGraph(graph) {
     .call(d3.drag()
       .filter(event => view.mode === '2d' && !event.ctrlKey && !event.button)
       .on('start', (event, d) => {
+        autoFit = false;
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x; d.fy = d.y;
       })
@@ -342,9 +360,15 @@ function renderGraph(graph) {
     .force('x', d3.forceX(width / 2).strength(0.05)) // Gentle pull to center
     .force('y', d3.forceY(height / 2).strength(0.05));
 
+  // d3 seeds the nodes around (0, 0), the top-left corner; start them around
+  // the centre of the view instead.
+  graph.nodes.forEach(d => { d.x += width / 2; d.y += height / 2; });
+
   // 5. Tick function - Updates positions freely
   simulation.on('tick', () => {
-    if (view.mode === '2d') draw();
+    if (view.mode !== '2d') return;
+    draw();
+    if (autoFit) fitToView();
   });
 
   // ------------------------------------------------------------
@@ -360,6 +384,9 @@ function renderGraph(graph) {
   const pointer = { down: false, moved: false, x: 0, y: 0 };
 
   const DEFAULT_DIST = layout3d.radius * 3;
+  const setCameraDist = d => {
+    view.camera.dist = Math.max(layout3d.radius * 1.25, Math.min(layout3d.radius * 9, d));
+  };
 
   /**
    * Pick the starting viewpoint: try a ring of camera angles and keep the one
@@ -392,7 +419,19 @@ function renderGraph(graph) {
   const initialView = chooseDefaultCamera();
   view.camera = { ...initialView.cam };
   const updateFocal = () => {
-    view.focal = Math.min((0.45 * width) / initialView.spanX, (0.43 * height) / initialView.spanY) * DEFAULT_DIST;
+    let focal = Math.min((0.45 * width) / initialView.spanX, (0.43 * height) / initialView.spanY) * DEFAULT_DIST;
+    // Perspective makes near nodes land further out than that estimate,
+    // which pushed them off the edge on narrow (tablet) screens: shrink
+    // until every node (and room for a label on its right) is in frame.
+    graph.nodes.forEach(d => {
+      const [x, y, z] = toCamera(d.P, initialView.cam);
+      const depth = Math.max(DEFAULT_DIST - z, DEFAULT_DIST * 0.15);
+      const roomX = Math.max(40, width / 2 - (x > 0 ? 90 : d.r + 12));
+      const roomY = Math.max(40, height / 2 - d.r - 12);
+      if (x) focal = Math.min(focal, (roomX * depth) / Math.abs(x));
+      if (y) focal = Math.min(focal, (roomY * depth) / Math.abs(y));
+    });
+    view.focal = focal;
   };
   updateFocal();
 
@@ -535,6 +574,7 @@ function renderGraph(graph) {
   }
 
   function to3d() {
+    autoFit = false;
     simulation.stop();
     enter3dStatic();
 
@@ -661,8 +701,7 @@ function renderGraph(graph) {
   // ------------------------------------------------------------
 
   function attachOrbitControls() {
-    const R = layout3d.radius;
-    const setDist = d => { view.camera.dist = Math.max(R * 1.25, Math.min(R * 9, d)); };
+    const setDist = setCameraDist;
     const active = new Map(); // pointerId -> { x, y } for pinch-zoom
     let pinch = null;
     const spread = () => {
@@ -718,7 +757,7 @@ function renderGraph(graph) {
         pointer.down = active.size > 0;
       })
       .on('wheel.orbit', (event) => {
-        if (view.mode !== '3d') return;
+        if (view.mode !== '3d' || gestureScale !== null) return;
         event.preventDefault();
         setDist(view.camera.dist * Math.exp(event.deltaY * 0.0012));
         draw3d();
@@ -751,6 +790,43 @@ function renderGraph(graph) {
     }
   });
 
+  // ------------------------------------------------------------
+  // Safari pinch: macOS trackpads and iPads send non-standard gesture
+  // events, and Safari zooms the whole page unless they are cancelled.
+  // Trackpad pinches zoom the graph; touch pinches are already handled by
+  // d3.zoom (2D) and the pointer handlers (3D), so those are only cancelled.
+  // ------------------------------------------------------------
+
+  let gestureScale = null; // last event.scale of a trackpad pinch, else null
+  let touches = 0;
+  const svgEl = svg.node();
+  const countTouches = (event) => { touches = event.touches.length; };
+  ['touchstart', 'touchend', 'touchcancel'].forEach(type =>
+    svgEl.addEventListener(type, countTouches, { passive: true }));
+
+  svgEl.addEventListener('gesturestart', (event) => {
+    event.preventDefault();
+    gestureScale = touches ? null : 1;
+  });
+  svgEl.addEventListener('gesturechange', (event) => {
+    event.preventDefault();
+    if (gestureScale === null || !event.scale) return;
+    const ratio = event.scale / gestureScale;
+    gestureScale = event.scale;
+    if (view.mode === '2d') {
+      autoFit = false;
+      const rect = svgEl.getBoundingClientRect();
+      zoom.scaleBy(svg, ratio, [event.clientX - rect.left, event.clientY - rect.top]);
+    } else if (view.mode === '3d') {
+      setCameraDist(view.camera.dist / ratio);
+      draw3d();
+    }
+  });
+  svgEl.addEventListener('gestureend', (event) => {
+    event.preventDefault();
+    gestureScale = null;
+  });
+
   attachZoom();
   updateToggle();
 
@@ -764,6 +840,7 @@ function renderGraph(graph) {
     simulation.force('y').y(height / 2);
     updateFocal();
     if (view.mode === '3d') draw3d();
+    else if (view.mode === '2d' && autoFit) fitToView();
   }).observe(container);
 
   // Legend (Stays fixed on SVG, does not zoom)

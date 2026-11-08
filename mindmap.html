@@ -16,8 +16,12 @@
         margin-left: -42vw;
         margin-right: -42vw;
         
-        /* Height */
+        /* Height: never taller than the screen is wide (keeps it usable on
+           portrait tablets, with room to scroll past it). svh is the visible
+           height on iOS Safari; browsers without svh keep the vh fallback. */
         height: 85vh;
+        height: min(85svh, 75vw);
+        min-height: 320px;
         
         /* Visuals */
         margin-top: 1rem;
@@ -46,7 +50,14 @@
         stroke-width: 1;
         pointer-events: none;
       }
-      #mindmap svg { display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+      #mindmap svg {
+        display: block;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
       #mindmap svg.is-3d { cursor: grab; }
       #mindmap svg.is-3d:active { cursor: grabbing; }
 

@@ -15,6 +15,12 @@
   --border-color: #e0e0e0;
 }
 
+html {
+  /* Stop iOS/iPadOS Safari from inflating text sizes in landscape. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -28,8 +34,10 @@ a {
   color: var(--link-color);
   text-decoration: none;
 }
-a:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
 .site-header {
@@ -61,8 +69,17 @@ a:hover {
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
   transition: background-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
-.site-nav .nav-list li a:hover {
+/* Hover effects only where there is a real hover: on touch screens
+   (tablets, phones) Safari otherwise leaves them stuck on after a tap. */
+@media (hover: hover) {
+  .site-nav .nav-list li a:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+  }
+}
+.site-nav .nav-list li a:active {
   background-color: var(--accent-color);
   color: #fff;
 }
@@ -89,8 +106,10 @@ a:hover {
   padding: 1rem;
   transition: box-shadow 0.2s;
 }
-.category-card:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+@media (hover: hover) {
+  .category-card:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
 }
 .category-card h3 {
   margin-top: 0;
@@ -119,8 +138,10 @@ a:hover {
   padding: 1rem;
   transition: box-shadow 0.2s;
 }
-.article-card:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+@media (hover: hover) {
+  .article-card:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
 }
 .article-card h3 {
   margin: 0 0 0.5rem 0;
@@ -150,12 +171,43 @@ a:hover {
   margin-top: 1.2rem;
 }
 
+.article-content {
+  overflow-wrap: break-word;
+}
+
 .article-content pre {
   background: #f6f6f6;
   color: #333;
   padding: 0.75rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 4px;
+}
+
+.article-content pre code {
+  /* Code blocks scroll sideways instead of breaking lines. */
+  overflow-wrap: normal;
+}
+
+/* Wide display equations and tables scroll inside the column instead of
+   widening the whole page on narrow (tablet) screens. */
+.article-content mjx-container[display='true'] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+.article-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Embedded widgets: never wider than the column (iOS Safari otherwise sizes
+   an iframe to its content). Heights are kept in sync by article.js. */
+.article-content iframe {
+  max-width: 100%;
 }
 
 .article-content code {
@@ -166,7 +218,8 @@ a:hover {
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-.article-content img {
+.article-content img,
+.article-content video {
   max-width: 100%;
   height: auto;
   display: block;

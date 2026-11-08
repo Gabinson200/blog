@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   let blocks = [];
   let stopWatchingImages = () => {};
 
+  if (content) {
+    fitFramesToContent(content);
+  }
+
   try {
     if (!rawSlug) throw new Error('Missing ?slug=');
     if (!content) throw new Error('Missing #article-content');
@@ -437,11 +441,8 @@ function restoreAnchor(anchor) {
       )
     : anchor.y;
 
-  window.scrollTo({
-    left: anchor.x,
-    top,
-    behavior: 'instant'
-  });
+  // Two-argument form: older Safari throws on behavior: 'instant'.
+  window.scrollTo(anchor.x, top);
 }
 
 
@@ -548,11 +549,7 @@ function restoreInitialPosition(slug) {
         saved?.slug === slug &&
         Number.isFinite(saved.scrollY)
       ) {
-        window.scrollTo({
-          left: 0,
-          top: saved.scrollY,
-          behavior: 'instant'
-        });
+        window.scrollTo(0, saved.scrollY);
 
         return;
       }
@@ -815,4 +812,52 @@ function escapeHtml(text) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+
+/*
+ * Embedded widgets are same-origin iframes with a fixed height. On narrower
+ * screens (tablets) their content reflows taller and was cut off, since they
+ * use scrolling="no". Grow or shrink each iframe to its content whenever it
+ * loads or its content changes size. Load events don't bubble, so listen in
+ * the capture phase; iframes moved into the article reload and fire again.
+ */
+function fitFramesToContent(container) {
+  container.addEventListener('load', event => {
+    if (event.target.tagName === 'IFRAME') {
+      fitFrame(event.target);
+    }
+  }, true);
+}
+
+
+function fitFrame(frame) {
+  let win;
+  let doc;
+
+  try {
+    win = frame.contentWindow;
+    doc = frame.contentDocument;
+  } catch {
+    return; // Cross-origin: leave its height alone.
+  }
+
+  const root = doc?.documentElement;
+
+  if (!root || !doc.body || !win.ResizeObserver) return;
+
+  // The root element's box is as tall as the content (the widgets hide
+  // overflow on html/body, so scrollHeight would echo the iframe's height).
+  const apply = () => {
+    const height = Math.ceil(root.getBoundingClientRect().height);
+
+    if (height > 0 && Math.abs(frame.offsetHeight - height) > 1) {
+      frame.style.height = height + 'px';
+    }
+  };
+
+  // Observe from the iframe's own window so the observer lives (and dies)
+  // with the document it watches.
+  new win.ResizeObserver(apply).observe(root);
+  apply();
 }
