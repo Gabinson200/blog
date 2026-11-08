@@ -2,24 +2,25 @@
 The goal of this article is to further explore the Fourier Transform, discretize it to derive the Discrete Fourier transform (DFT) and then optimize the algorithm to produce the Fast Fourier Transform (FFT). 
 
 The main sections will be:
-- [Fourier Transform](#Fourier-Transform)
-    - [Functions of any period](#Functions-of-any-period)
-    - [Functions of infinite period](#Functions-of-infinite-period)
-    - [Analysis and Synthesis Equations](#Analysis-and-Synthesis-Equations)
-    - [Analysis Equation Outputs](#Analysis-equation-outputs)
-    - [Recap](##Recap)
-- [Discrete Fourier Transform (DFT)](#DFT)
-    - [Discretization](#Discretization)
-    - [Sampling](#Sampling)
+- [Fourier Transform](#fourier-transform)
+    - [Functions of any period](#functions-of-any-period)
+    - [Functions of infinite period](#functions-of-infinite-period)
+    - [Analysis and Synthesis Equations](#analysis-and-synthesis-equations)
+    - [Analysis Equation Outputs](#analysis-equation-outputs)
+    - [Recap](#recap)
+- [Discrete Fourier Transform (DFT)](#discrete-fourier-transform-dft)
+    - [Discretization](#discretization)
+    - [Sampling](#sampling)
 - [Algorithm](#algorithm)
-    - [Index of Terms](#Index-of-Terms)
-    - [Pseudocode](#Pseudocode)
-    - [View through the matrix](#View-through-the-matrix)
-    - [First Optimization: Conjugate Symmetry](#First-Optimization:-Conjugate-Symmetry)
-    - [Second Optimization: Loop Symmetry](#Second-Optimization:-Loop-Symmetry)
-    - [Combining the Two Optimizations](#Combining-the-Two-Optimizations)
-- [Fast Fourier Transform (FFT)](#Fast-Fourier-Transform-(FFT))
-    - [Divide and Conquer](#Divide-and-Conquer)
+    - [Index of Terms](#index-of-terms)
+    - [Pseudocode](#pseudocode)
+    - [View through the matrix](#view-through-the-matrix)
+    - [First Optimization: Conjugate Symmetry](#first-optimization-conjugate-symmetry)
+    - [Second Optimization: Loop Symmetry](#second-optimization-loop-symmetry)
+    - [Combining the Two Optimizations](#combining-the-two-optimizations)
+- [Fast Fourier Transform (FFT)](#fast-fourier-transform-fft)
+    - [Divide and Conquer](#divide-and-conquer)
+- [Conclusion](#conclusion)
 
 
 # Fourier Transform
@@ -310,7 +311,7 @@ $$\sin(\omega_0x+\phi)=\sin(\omega_0x)\cos(\phi)+\cos(\omega_0x)\sin(\phi)$$
 
 >    **A bit of geometric intuition**: 
 >
->    Back to our original phase-shifted cosine, the coefficient of the cosine component is
+>    Considering our original phase-shifted cosine, the coefficient of the cosine component is
 >    $$C=A\cos(\phi),$$
 >
 >    while the coefficient of the sine component is
@@ -481,11 +482,15 @@ Since our $N$ samples are equally spaced over an observation interval of duratio
 
 $$\Delta t=\frac{T}{N}$$
 
+I like to read this as: the spacing between samples is the total length of time divided by the number  of samples we want to take.
+
 The reciprocal of the sampling interval is called the **sampling frequency** $f_s$, which tells us how many measurements we collect per second:
 
 $$f_s=\frac{1}{\Delta t}=\frac{N}{T}$$
 
-It's worth distinguishing between two operations here:
+I like to read this as: the sampling frequency is the number of samples we can squeeze into our time interval.
+
+It's worth distinguishing between two operations that are needed to create discrete samples from an infinite continuous input:
 
 1. **Sampling:** Replacing the continuous time variable $t$ with discrete points $t_n=n\Delta t$.
 2. **Truncation:** Restricting ourselves to a finite number $N$ of samples.
@@ -530,7 +535,7 @@ Starting with:
 
 $$\widehat f_T(\omega)=\int_0^T f(t)e^{-i\omega t}dt$$
 
-We replace the integral with a sum:
+We approximate the integral with the sum:
 
 $$\widehat f_T(\omega)\approx\sum_{n=0}^{N-1}f(t_n)e^{-i\omega t_n}\Delta t$$
 
@@ -623,7 +628,9 @@ Earlier, our Fourier series used infinitely many frequencies indexed by $k\in\ma
 But the DFT only evaluates $N$ frequencies:
 
 $$k=0,1,\ldots,N-1$$
-Why?
+
+This feels like we are not fulfilling a pretty hefty requirement of the Fourier Series when we discretize. So why does it still work?
+
 Consider the exponential term in the DFT:
 $$e^{-i\frac{2\pi kn}{N}}$$
 
@@ -656,7 +663,7 @@ Consequently:
 $$\boxed{X[k+N]=X[k]}$$
 The DFT is periodic in its frequency index with period $N$.
 
-Therefore, there are only $N$ distinct discrete exponential basis functions, and we only need $N$ frequency coefficients to represent an arbitrary sequence of $N$ complex-valued samples.
+Because frequency indices $k$ and $k+N$ produce the same sampled exponential, there are only $N$ distinct basis vectors in the DFT. These vectors form a basis for $\mathbb{C}^N$, so any sequence of $N$ complex-valued samples can be represented by $N$ DFT coefficients.
 
 ### Discretizing the Inverse Fourier Transform
 
@@ -706,19 +713,15 @@ We've now converted both Fourier Transform equations into their discrete counter
 
 The forward DFT transforms an array of $N$ samples into an array of $N$ complex frequency coefficients:
 
-$$
-\boxed{
+$$\boxed{
 X[k]=\sum_{n=0}^{N-1}x[n]e^{-i\frac{2\pi kn}{N}}
-}
-$$
+}$$
 
 The inverse DFT reconstructs the original samples from those coefficients:
 
-$$
-\boxed{
+$$\boxed{
 x[n]=\frac{1}{N}\sum_{k=0}^{N-1}X[k]e^{i\frac{2\pi kn}{N}}
-}
-$$
+}$$
 
 where $n,k\in\{0,1,\ldots,N-1\}$.
 
@@ -773,8 +776,9 @@ for integer $n$.
 For example sampling a 5Hz cosine at 8 samples per second produces exactly the same values as sampling a 3Hz cosine at the same rate. Meaning that if we sample using a rate of 8 samples per second a 5Hz cosine could be "confused" for a 3Hz cosine.
 
 In signal processing this symmetry phenomenon is called **aliasing**. 
+I like to think about is as kind of analogous to a palindrome where the middle letter is analogous to when the number of samples equals the signal frequency $f_{signal}$. The values of the samples below $f_{signal}$ are the same as those above $f_{signal}$ up until $2 \times f_{signal}$ just in reverse order. Ex. "MADAM" 
 
-As we saw frequencies above half the sampling rate can become indistinguishable from lower frequencies. The critical cutoff frequency for which we can get distinct sample values is called the **Nyquist frequency**:
+As we saw cosine frequencies above half the sampling rate can become indistinguishable from lower frequencies. The critical cutoff frequency above which we can get distinct sample values is called the **Nyquist frequency**:
 $$f_N = \frac{f_s}{2} = \frac{N}{2T}$$
 
 or in terms of angular frequency:
@@ -785,8 +789,6 @@ There is a lot more information-theoretical stuff we can go into here but the ma
 $$f_s > 2f_{max}$$
 or equivalently,
 $$N > 2Tf_{max}$$
-
-
 
 
 # Algorithm
@@ -861,7 +863,7 @@ If we look at the DFT we see that the exponential term does not depend on a spec
 
 $$e^{-i\frac{2\pi kn}{N}}$$
 
-so we can precompute these values for each $k$ and store them in an $N \times N$ matrix $F_N$, which is nice because we can perform multiply and summation by matrix multiplying the matrix with the samples.
+so we can precompute these values for each $k$ and store them in an $N \times N$ matrix $F_N$, which is nice because we can perform multiplication and summation by matrix multiplying the matrix with the samples.
 
 Ex. $N = 4$
 
@@ -1174,20 +1176,15 @@ $$X[k]= \sum_{n=0}^{N-1}x[n]W_N^{kn} =
 
 Using our symmetry identity, we can replace the exponential in the second sum:
 
-$$
-X[k]=
-\sum_{n=0}^{N/2-1}x[n]W_N^{kn}
-+
-\sum_{n=0}^{N/2-1}x[n+N/2](-1)^kW_N^{kn}
-$$
+$$X[k]=
+\sum_{n=0}^{N/2-1}x[n]W_N^{kn}+
+\sum_{n=0}^{N/2-1}x[n+N/2](-1)^kW_N^{kn}$$
 
 Both sums now contain exactly the same exponential coefficient, allowing us to combine them:
 
-$$
-\boxed{
+$$\boxed{
 X[k]=\sum_{n=0}^{N/2-1}\left(x[n]+(-1)^kx[n+N/2]\right)W_N^{kn}
-}
-$$
+}$$
 
 So instead of multiplying two separate input samples by related exponential coefficients, we can first combine the input samples and then perform a single multiplication. With this we have reduced the number of terms in each sum from $N$ to $N/2$, at the cost of introducing additions or subtractions.
 
@@ -1515,4 +1512,7 @@ def IFFT(X):
 Since these additional conjugations and the final normalization are $O(N)$ operations, the inverse FFT retains the same $O(N\log_2 N)$ time complexity as the forward FFT.
 
 # Conclusion
+
+Wow, that was a lot so lets recap: first, we derived the Fourier Transform and explored the interpretations of its parameters, inputs, and outputs. We then discretized it so that we can compute it algorithmically in $O(n^2)$ time. Finally, we leveraged innate symmetry to perform several optimizations which allowed us to compute the DFT in $O(nlogn)$ time. In the next and likely final article in this series we will look at some more programmatic use cases for the FFT and see all the possible domains in which it is used.
+
 
