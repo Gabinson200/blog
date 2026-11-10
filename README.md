@@ -1,4 +1,6 @@
-[My blog site](https://gabinson200.github.io/blog/mindmap.html)
+[My blog site](https://blog.gabinson200.workers.dev/)
+or alternatively
+https://gabinson200.github.io/blog/mindmap.html
 
 RSS: https://gabinson200.github.io/blog/feed.xml
 
